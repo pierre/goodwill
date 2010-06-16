@@ -39,4 +39,16 @@ public class GoodwillConfig
     {
         return "";
     }
+
+    @Config(value = "goodwill.store.csv.file.path")
+    public String getCSVFilePath()
+    {
+        return "";
+    }
+
+    @Config(value = "goodwill.log.conf.file.path")
+    public String getLogConfFilePath()
+    {
+        return null;
+    }
 }
