@@ -1,6 +1,11 @@
 Goodwill, a Thrift types store
 ==============================
 
+BUILD
+=====
+
+mvn clean install
+
 LICENSE
 =======
 
