@@ -4,7 +4,7 @@ Goodwill, a Thrift types store
 BUILD
 =====
 
-mvn clean install
+mvn assembly:assembly
 
 LICENSE
 =======
