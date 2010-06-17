@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 public class ThriftFieldTest
 {
-
     private static final String THRIFT_FIELD_NAME = "fileName";
     private static final String THRIFT_FIELD_TYPE = "string";
     private static final Integer THRIFT_FIELD_POSITION = 1;

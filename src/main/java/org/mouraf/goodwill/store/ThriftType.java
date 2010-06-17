@@ -10,8 +10,9 @@ public class ThriftType
 {
     private String name;
     private final HashMap<Integer, ThriftField> thriftItems = new HashMap<Integer, ThriftField>();
-    public static final String EVENT_TYPE_NAME = "name";
-    public static final String EVENT_TYPE_SCHEMA = "schema";
+
+    public static final String JSON_THRIFT_TYPE_NAME = "name";
+    public static final String JSON_THRIFT_TYPE_SCHEMA = "schema";
 
     public ThriftType(
         String name
@@ -24,26 +25,54 @@ public class ThriftType
         JSONObject eventJson
     ) throws JSONException
     {
-        this.name = (String) eventJson.get(ThriftType.EVENT_TYPE_NAME);
+        this(eventJson.getString(ThriftType.JSON_THRIFT_TYPE_NAME));
 
-        JSONArray array = (JSONArray) eventJson.get(ThriftType.EVENT_TYPE_SCHEMA);
-        int i = 0;
-        for (i = 0; i < array.length(); i++) {
-            JSONObject thriftItemObject = (JSONObject) array.get(i);
-
+        JSONArray array = eventJson.getJSONArray(ThriftType.JSON_THRIFT_TYPE_SCHEMA);
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject thriftItemObject = array.getJSONObject(i);
             ThriftField thriftField = new ThriftField(thriftItemObject);
-            addThriftItem(thriftField.getPosition(), thriftField);
+            addThriftField(thriftField);
         }
     }
 
-    public void addThriftItem(Integer position, ThriftField thriftField)
+    /**
+     * Add a field in the Thrift. The code does not enforce sanity w.r.t. field positions.
+     *
+     * @param thriftField field to add
+     */
+    public void addThriftField(ThriftField thriftField)
     {
-        thriftItems.put(position, thriftField);
+        thriftItems.put(thriftField.getPosition(), thriftField);
     }
 
     public String getName()
     {
         return name;
+    }
+
+    /**
+     * Given a position, return the field at that position.
+     *
+     * @param i position in the Thrift (start with 1)
+     * @return the ThriftField object
+     */
+    public ThriftField getFieldByPosition(int i)
+    {
+        return thriftItems.get(i);
+    }
+
+    @Override
+    public String toString()
+    {
+        try {
+            return toJSON().toString();
+        }
+        catch (JSONException e) {
+            return "ThriftType{" +
+                JSON_THRIFT_TYPE_NAME + "='" + name + '\'' +
+                ", thriftItems=" + thriftItems +
+                '}';
+        }
     }
 
     public JSONObject toJSON() throws JSONException
@@ -54,16 +83,7 @@ public class ThriftType
         }
 
         return new JSONObject()
-            .put(EVENT_TYPE_NAME, name)
-            .put(EVENT_TYPE_SCHEMA, array);
-    }
-
-    @Override
-    public String toString()
-    {
-        return "ThriftType{" +
-            "name='" + name + '\'' +
-            ", thriftItems=" + thriftItems +
-            '}';
+            .put(JSON_THRIFT_TYPE_NAME, name)
+            .put(JSON_THRIFT_TYPE_SCHEMA, array);
     }
 }

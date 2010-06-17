@@ -74,7 +74,7 @@ public class CSVFileStore implements GoodwillStore
                 log.debug(String.format("Found new ThriftType thriftField to: %s", currentThriftTypeName));
             }
 
-            currentThriftType.addThriftItem(position, thriftField);
+            currentThriftType.addThriftField(thriftField);
             log.debug(String.format("Added ThriftField to %s: %s", currentThriftTypeName, thriftField.toString()));
         }
 
