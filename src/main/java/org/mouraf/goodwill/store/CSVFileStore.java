@@ -48,7 +48,7 @@ public class CSVFileStore implements GoodwillStore
         List<ThriftType> thriftTypes = new ArrayList<ThriftType>();
         for (Object entry : entries) {
             Integer position = -1;
-            ThriftItem item = null;
+            ThriftField thriftField = null;
             String[] line = (String[]) entry;
 
             try {
@@ -60,7 +60,7 @@ public class CSVFileStore implements GoodwillStore
             }
 
             try {
-                item = new ThriftItem(position, line[2], line[3]);
+                thriftField = new ThriftField(line[3], line[2], position);
             }
             catch (IllegalArgumentException e) {
                 log.warn(String.format("Ignoring unsupported type <%s>: %s", line[2], StringUtils.join(line, ",")));
@@ -71,11 +71,11 @@ public class CSVFileStore implements GoodwillStore
                 currentThriftTypeName = line[0];
                 currentThriftType = new ThriftType(currentThriftTypeName);
                 thriftTypes.add(currentThriftType);
-                log.debug(String.format("Found new ThriftType item to: %s", currentThriftTypeName));
+                log.debug(String.format("Found new ThriftType thriftField to: %s", currentThriftTypeName));
             }
 
-            currentThriftType.addThriftItem(position, item);
-            log.debug(String.format("Added ThriftItem to %s: %s", currentThriftTypeName, item.toString()));
+            currentThriftType.addThriftItem(position, thriftField);
+            log.debug(String.format("Added ThriftField to %s: %s", currentThriftTypeName, thriftField.toString()));
         }
 
         this.thriftTypes = thriftTypes;

@@ -46,6 +46,11 @@
             <version>2.1</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>thrift</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20090211</version>
@@ -69,6 +74,11 @@
             <groupId>org.skife.config</groupId>
             <artifactId>config-magic</artifactId>
             <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>5.12.1</version>
         </dependency>
     </dependencies>
     <build>
