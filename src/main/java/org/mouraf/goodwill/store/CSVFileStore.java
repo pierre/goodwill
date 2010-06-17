@@ -2,8 +2,11 @@ package org.mouraf.goodwill.store;
 
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.mouraf.goodwill.binder.config.GoodwillConfig;
 
 import java.io.FileReader;
@@ -11,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Singleton
 public class CSVFileStore implements GoodwillStore
 {
     private final Logger log = Logger.getLogger(CSVFileStore.class);
@@ -85,4 +89,50 @@ public class CSVFileStore implements GoodwillStore
     {
         return thriftTypes;
     }
+
+    /**
+     * Given a Thrift name, find it in the store
+     *
+     * @param typeName name of the Thrift to search
+     * @return the ThriftType if found, null otherwise
+     */
+    @Override
+    public ThriftType findByName(String typeName)
+    {
+        for (ThriftType thriftType : getTypes()) {
+            if (thriftType.getName().equals(typeName)) {
+                return thriftType;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Serialize all Thrifts in the store
+     *
+     * @return JSONArray representation
+     */
+    @Override
+    public JSONArray toJSON() throws JSONException
+    {
+        JSONArray array = new JSONArray();
+        for (ThriftType type : getTypes()) {
+            array.put(type.toJSON());
+        }
+
+        return array;
+    }
+
+    /**
+     * Add a new type to the store
+     *
+     * @param thriftType ThriftType to add
+     */
+    @Override
+    public void addType(ThriftType thriftType)
+    {
+        thriftTypes.add(thriftType);
+    }
+
 }

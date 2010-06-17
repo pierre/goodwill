@@ -105,9 +105,11 @@ public class ThriftField
             thriftItemJSONObject.has(JSON_THRIFT_FIELD_DESCRIPTION) ?
                 thriftItemJSONObject.getString(JSON_THRIFT_FIELD_DESCRIPTION) : null,
             thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getString(JSON_THRIFT_FIELD_SQL_TYPE) : null,
+                (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_TYPE) ?
+                    thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getString(JSON_THRIFT_FIELD_SQL_TYPE) : null) : null,
             thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_LENGTH) : null);
+                (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_LENGTH) ?
+                    thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_LENGTH) : null) : null);
     }
 
     /**
