@@ -1,6 +1,8 @@
 package org.mouraf.goodwill.endpoint;
 
 import com.google.inject.Inject;
+import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.api.view.Viewable;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -31,7 +35,8 @@ public class Registrar
     }
 
     @GET
-    public Response get(
+    @Produces("application/json")
+    public Response getJson(
         @QueryParam("type") String typeName
     ) throws IOException, JSONException
     {
@@ -46,6 +51,20 @@ public class Registrar
         }
 
         return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/{type}/")
+    public Viewable getType(@PathParam("type") String typeName) throws JSONException
+    {
+        ThriftType typeFound = store.findByName(typeName);
+
+        if (typeFound != null) {
+            return new Viewable("type", typeFound);
+        }
+
+        throw new NotFoundException("Type, " + typeName + ", is not found");
     }
 
     @POST

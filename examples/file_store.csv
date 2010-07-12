@@ -1,0 +1,5 @@
+"EVENTTYPE","FIELDID","FIELDTYPE","FIELDNAME","MINVERSION","MAXVERSION"
+"Awesomeness",1,"date","date",1,2147483647
+"Awesomeness",2,"string","cat",1,2147483647
+"Awesomeness",3,"double","puppy_quotient",1,2147483647
+"Awesomeness",4,"i16","stars",1,2147483647

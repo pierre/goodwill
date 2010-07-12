@@ -3,6 +3,7 @@ package org.mouraf.goodwill.endpoint;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
+import org.apache.jasper.servlet.JspServlet;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -10,7 +11,6 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mouraf.goodwill.binder.config.GoodwillConfig;
@@ -24,6 +24,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class HttpServer
 {
     private final static Logger log = Logger.getLogger(HttpServer.class);
+
+    final String WEBAPPDIR = "webapp";
+
     private final String ip;
     private final int port;
     private final int sslPort;
@@ -102,9 +105,14 @@ public class HttpServer
         FilterHolder filterHolder = new FilterHolder(GuiceFilter.class);
         context.addFilter(filterHolder, "/*", Handler.DEFAULT);
 
-        ServletHolder sh = new ServletHolder(DefaultServlet.class);
+        ServletHolder sh = new ServletHolder(JspServlet.class);
         sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
         sh.setInitParameter("com.sun.jersey.config.property.packages", "ning.dsp.collector.endpoint");
+        //sh.setInitParameter("com.sun.jersey.config.property.WebPageContentRegex", "/(images|css|jsp)/.*");
+        sh.setInitParameter("com.sun.jersey.config.feature.ImplicitViewables", "true");
+        sh.setInitParameter("com.sun.jersey.config.feature.Redirect", "true");
+        //sh.setInitParameter("keepGenerated", "true");
+        //sh.setInitParameter("com.sun.jersey.config.property.JSPTemplatesBasePath", WEBAPPDIR);
         context.addServlet(sh, "/*");
 
         server.start();

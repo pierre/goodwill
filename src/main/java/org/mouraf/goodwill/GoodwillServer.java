@@ -7,6 +7,7 @@ import com.google.inject.Module;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import com.sun.jersey.server.impl.template.ViewableMessageBodyWriter;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -40,6 +41,7 @@ public class GoodwillServer
                 {
                     GoodwillConfig config = new ConfigurationObjectFactory(System.getProperties()).build(GoodwillConfig.class);
                     binder.bind(GoodwillConfig.class).toInstance(config);
+                    binder.bind(ViewableMessageBodyWriter.class);
 
                     binder.bind(GoodwillStore.class).to(CSVFileStore.class);
                 }
