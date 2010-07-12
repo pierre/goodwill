@@ -1,0 +1,67 @@
+body {background:#efefef;font-family: 'Trebuchet MS', helvetica, arial, sans-serif; color:#000; font-size:13px; }
+body, form, h1, h2, h3, h4, h5, h6, ul, li, p {margin:0; padding:0; font-family: 'Trebuchet MS', helvetica, arial, sans-serif}
+a, a:link, a:visited {text-decoration:none; color:#0066cc; cursor:pointer; outline-style:none}
+a:hover, a:focus {text-decoration:underline; color:#0066cc;}
+a img {border:none;}
+
+
+/* General DOM Shit */
+.wrapper                {padding:0px 20px; margin:0px auto;}
+#main                   {background-color:#efefef; }
+#header                 {width:100%; height:30px; background:#182740; border-bottom:4px solid black;}
+#header .wrapper        {line-height:30px;}
+h1                      {font-size:15px; color:white;}
+#footer                 {background-color:#efefef;}
+#title                  {height:30px; padding-left:10px; line-height:30px; border-bottom:1px solid #ccc; background-color:#969898; }
+
+
+/* Left Column Table */
+#table                          {float:left; width:64.9%; overflow:auto;}
+table                           {width:100%; background-color:#efefef;border-collapse: collapse;}
+table th                        {background-color:#969898; color:#fff; }
+table tr                        {height:30px; background-color:#efefef; border:1px solid #ccc;}
+table td                        {padding-left:10px;}
+.highlight                      {background-color:#d5d9e4;}
+.selected                       {background-color:#d3d3d3;}
+
+
+
+
+/* Right Column Shit */
+#resultsWrapper                                   {width:35%; float:left; margin-top:1px;}
+#resultsPane .EventType                           {float:left; font-size:14px; color:#fff;}
+#resultsPane h3                                   {float:left; font-size:14px; color:#fff;}
+#resultsPane                                      {padding:0px 20px; overflow: -moz-scrollbars-vertical; overflow-y: scroll;}
+#resultsPane .element                             {width:100%; margin-top:20px; color:#fff; background-color:#8aa9c4; border-bottom:1px solid #ccc;}
+#resultsPane .element .navBar                     {height:30px; padding-left:10px; line-height:30px; background-color:#244e85; border-bottom: 1px solid #1a3b64;}
+#resultsPane .element .navBar .name               {float:left; font-size:14px; color:#ffffff;}
+#resultsPane .element .navBar .buttons            {float:right; }
+#resultsPane .element .details                    {margin-top:10px; padding:10px;}
+#resultsPane .element .description                {height:40px; }
+#resultsPane .element .footer                     {margin-top:10px; height:30px; line-height:30px; background-color:#6e8cac;}
+#resultsPane .element .footer > div               {float:left; margin-left:10px;}
+
+
+
+/*
+#resultsPane .element textarea                    {width:90%; padding:6px;}
+#resultsPane .element .i input                    {width:250px; height:20px; font-size:12px; line-height:20px; padding-left:5px; border:1px solid #999999;}
+#resultsPane .element .sql                        {margin-top:25px; height:40px; padding:15px 15px;border:1px solid #efefef;}
+#resultsPane .element .selected                   {background-color:#edf3eb; border:1px solid #ccc;}
+*/
+
+/* Right Column Options Stuff */
+.buttons                {float:right; height:30px; padding:5px;}
+.buttons > div          {float:left; height:20px; width:20px; margin-left:10px; }
+.buttons > div:hover    {border-bottom:5px solid #162949;}
+.blue                   {background:url('../images/blue.png') no-repeat;}
+.remove                 {background:url('../images/Remove.png') no-repeat;}
+
+
+
+/* FIXED stuff */
+.fixed                  {position:fixed; top:0px;}
+#resultsWrapper.fixed   {left:65%;}
+
+
+.test {border:1px solid red;}
