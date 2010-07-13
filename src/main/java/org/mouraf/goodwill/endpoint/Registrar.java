@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.view.Viewable;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mouraf.goodwill.store.GoodwillStore;
@@ -34,6 +35,39 @@ public class Registrar
         this.store = store;
     }
 
+    /*
+     * UI
+     */
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Viewable getAll() throws JSONException
+    {
+        return new Viewable("/registrar/type.jsp", store.toJSON());
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/{type}/")
+    public Viewable getType(@PathParam("type") String typeName) throws JSONException
+    {
+        ThriftType typeFound = store.findByName(typeName);
+
+        log.debug(String.format("Found type: %s", typeFound));
+        if (typeFound != null) {
+            // Return a JSON array (JS code expects it)
+            JSONArray array = new JSONArray();
+            array.put(typeFound.toJSON());
+            return new Viewable("/registrar/type.jsp", array);
+        }
+
+        throw new NotFoundException("Type, " + typeName + ", is not found");
+    }
+
+    /*
+     * REST API
+     */
+
     @GET
     @Produces("application/json")
     public Response getJson(
@@ -51,21 +85,6 @@ public class Registrar
         }
 
         return Response.status(Response.Status.NOT_FOUND).build();
-    }
-
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    @Path("/{type}/")
-    public Viewable getType(@PathParam("type") String typeName) throws JSONException
-    {
-        ThriftType typeFound = store.findByName(typeName);
-
-        log.warn(String.format("Found type: %s", typeFound));
-        if (typeFound != null) {
-            return new Viewable("/registrar/type.jsp", typeFound);
-        }
-
-        throw new NotFoundException("Type, " + typeName + ", is not found");
     }
 
     @POST

@@ -13,6 +13,6 @@
     </filter>
     <filter-mapping>
         <filter-name>guiceFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/registrar/*</url-pattern>
     </filter-mapping>
 </web-app>

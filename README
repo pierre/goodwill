@@ -2,21 +2,22 @@ h1. Goodwill, a Thrift types store
 
 h2. Usage
 
-java -Dgoodwill.store.csv.file.path=examples/file_store.csv -jar target/goodwill-*-jar-with-dependencies.jar
+mvn -Dgoodwill.store.csv.file.path=examples/file_store.csv jetty:run
 
 This creates a store with a single type Awesomeness:
 
-   curl -H'Accept: text/html' http://127.0.0.1:8080/registrar/Awesomeness
+   curl -H'Accept: text/html' http://127.0.0.1:8080/goodwill/registrar/Awesomeness
+   curl -H'Accept: application/json' http://127.0.0.1:8080/goodwill/registrar/Awesomeness
 
 
 To debug:
 
-java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -Dgoodwill.store.csv.file.path=examples/file_store.csv -jar target/goodwill-*-jar-with-dependencies.jar
+mvn -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -Dgoodwill.store.csv.file.path=examples/file_store.csv jetty:run
 
 
 h2. Build
 
-mvn assembly:assembly
+mvn package
 
 
 h2. License
