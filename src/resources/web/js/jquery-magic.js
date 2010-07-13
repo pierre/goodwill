@@ -1,21 +1,14 @@
-
-
-
 $(document).ready(function(){
 
-	// Variables
-  var height = $(window).height();
-	var objects = {};
-	
 	// build objects hash
+	var objects = {};
 	$.each(json, function(i, val) {
 	  objects[val.name] = val.schema; 
 	});
-			
-  // Set the height of the left and right columns
-  $("#resultsPane").css("height", (height - 40));
-  $("#table").css("height", (height - 40));
 
+  // Set the height of the left and right columns
+  panel_heights();
+  
 	// Build the EventType Table
   $.each(objects, function(eName, schema){
     $('table#eventTypes').append(
@@ -24,39 +17,29 @@ $(document).ready(function(){
     );					
   });
 
-	// hover function
-  // $('table#eventTypes tbody tr').hover(function(){
-  //  $(this).addClass("highlight");
-  // }, function(){
-  //  $(this).removeClass("highlight");
-  // });
-	
-	
 	// click function
 	$('table#eventTypes tbody tr').click(function(){
-		  
-		  
+
+
 		  // get and set the current resultsPane
 			eName   = $('td', this).attr('name');
 			schema  = objects[eName];
 			pane    = $("#resultsPane");
-			
+
 			// clear the current results pane
 			pane.children().remove(".element");
-			
-			// add and remove selected row class
+
+			// selected row + schema title
 			$(this).parent().children().removeClass("selected");
 			$(this).addClass("selected");
-			
-			// add the eventType to the schema title
-			$("#resultsPane #title #name").html("&nbsp;" + eName)
-			
+			$("#resultsPane #title #name").html("&nbsp;" + eName);
+
 			// create each element
-			$.each(schema, function(index, element){
-			  
+			$.each(schema, function(index, field_obj){
+
         // append element to resultsPane
-			  elementDiv(element).appendTo(pane);
-			
+			  elementDiv(field_obj).appendTo(pane);
+
         // hide parts of the element
         $(".navBar .buttons").hide();
         $(".actions").hide();
@@ -66,112 +49,61 @@ $(document).ready(function(){
           $(".details").hide();
         }        
 			});
-			
-	   	
-	   // ELEMENT hover
-     $("#resultsPane .element").hover(function(){
-       $(".navBar .buttons", this).show();
-     }, function(){
-       $(".navBar .buttons", this).hide();
-     });
-     
-     
-     // Element REMOVE button jazz
-     $("#resultsPane .remove").click(function(){
-       if(confirm("Are you sure you want to depricate this type?")){
-         $(this).parent().parent().parent().slideUp(200, function() {$(this).remove();})
-       }
-     })
-     
-     // Element BLUE button jazz
-     $("#resultsPane .blue").click(function(){
-       
-       // get values
-       var element = $(this).parent().parent().parent();
-       var name = $(".name", element).html();
-       var description = $(".description", element).html();
-       var sql_type = $(".sql .dropdown").html();
-       var sql_param = $(".sql .param").html();
-       var edit_mode = $(element).attr("_edit") || "";
-       
-       // show edit DOM stuff
-       if(edit_mode == "") {
-         $(".details", element).show();
-         $(".name", element).addClass("edit").html($("<input>").val(name));
-         $(".description", element).addClass("edit").html($("<textarea>").val(description));
-         $(".sql .dropdown").html(dropdown(sql_type));
-         
-         
-         // $(".sql .param").html(parameter(sql_type, sql_param));
-         
-         
-         $(".actions", element).show();
-         $(element).attr("_edit", "edit");         
-       }
 
-     });
-     
-     // Element SAVE button jazz
-     $("#resultsPane .element .actions .save").click(function(){
-
-       // get values 
-       var element = $(this).parent().parent().parent();
-       var name = $(".name input", element).val();
-       var description = $(".description textarea", element).val();
-       
-       // save values back to objects
-       var index  = $("#resultsPane .element").index(element);
-       var object = objects[eName][index]
-       object["name"] = name;       
-       object["eDescription"] = description;
-       
-       // remove stupid edit things
-       $(".name", element).removeClass("edit").html(name);
-       $(".description", element).removeClass("edit").html(description);
-       $(".actions", element).hide();
-       $(element).attr("_edit", "");         
-
-       // hide details if there is nothing to show
-       if($(".description").html() == ""  && $(".sql .dropdown").html() == ""){
-         $(".details").hide();
-       } 
-     });
-     
-     
-     // Element CANCEL button jazz
-     $("#resultsPane .element .actions .cancel").click(function(){
+      $(".element").hover(function(){
+        $(".navBar .buttons", this).show();
+      }, function(){
+        $(".navBar .buttons", this).hide();
+      });
       
-       // retrieve element's original values
-       var element = $(this).parent().parent().parent();
-       var index  = $("#resultsPane .element").index(element);
-       var object = objects[eName][index]
-
-       // insert original values back into the DOM
-       var name = object["name"];
-       var description = object["eDescription"];
-
-
-       // insert original values back into the DOM
-       $(".name", element).html(name || "");
-       $(".description", element).html(description || "")
-
-       
-       // remove stupid edit things       
-       $(".name", element).removeClass("edit");
-       $(".description", element).removeClass("edit");
-       $(".actions", element).hide();     
-       $(element).attr("_edit", "");         
-       
-       // hide details if there is nothing to show
-       if($(".description").html() == ""  && $(".sql .dropdown").html() == ""){
-         $(".details").hide();
-       } 
-     });
-     
-     
+      $(".navBar .remove").click(function(){
+        if(confirm("Are you sure you want to deprecate this type?")){
+          $(this).parent().parent().parent().slideUp(200, function() {$(this).remove();})
+        }
+      })
+      
+      $(".navBar .blue").click(function(){
+        var element = $(this).closest(".element");
+        var e = get_element_std_attributes(element);
+      
+        if (e.edit_mode == ""){
+          enter_edit_mode(element, e);
+        }
+      });
+      
+      $(".details .actions .save").click(function(){
+      
+        // get element and element attributes
+        element = $(this).closest(".element");
+        e = get_element_edit_attributes(element);
+      
+        // get and update field object
+        index  = $("#resultsPane .element").index(element);
+        object = objects[eName][index];
+        object = save_to_json(element, e, object);
+      
+        return_to_std_mode(element, e);
+      });
+      
+      $(".details .actions .cancel").click(function(){
+      
+        // get element
+        element = $(this).closest(".element");
+      
+        // get and update field object
+        index  = $("#resultsPane .element").index(element);
+        object = objects[eName][index];
+      
+        return_to_std_mode(element, object);
+      
+      });
+    
+      $(".sql .dropdown").change(function(){
+        element = $(this).closest(".element");
+        sql_param(element, "");
+      });
 	});		
 });
-
 
 
 // RESIZE Windows
@@ -181,6 +113,7 @@ $(window).resize(function() {
 	$("#resultsPane").css("height", (height - 40));
 	$("#table").css("height", (height - 40));
 });
+
 
 
 function elementDiv(element) {
@@ -196,12 +129,12 @@ function elementDiv(element) {
      )
   
      .append($("<div>").addClass("details")
-	     .append($("<div>").addClass("description").html(element.eDescription || ""))
+	     .append($("<div>").addClass("description").html(element.description || ""))
        .append($("<div>").addClass("sql")
          .append($("<ul>").addClass("list")
             .append($("<li>").html("sql: "))
-            .append($("<li>").addClass("dropdown").html(element.sql_type || "sdf"))
-            .append($("<li>").addClass("param").html(element.sql_param || "sf"))
+            .append($("<li>").addClass("dropdown").html(element.sql_type || ""))
+            .append($("<li>").addClass("param").html(element.sql_param || ""))
          )
        )
 	     .append($("<div><ul>").addClass("actions")
@@ -218,6 +151,103 @@ function elementDiv(element) {
   .append($("<div style=\"clear:both\"></div>"));
 }
 
+function panel_heights() {
+  var height = $(window).height();
+  $("#resultsPane").css("height", (height - 40));
+  $("#table").css("height", (height - 40));
+}
+
+function get_element_std_attributes(element){
+  return {
+    name        : $(".name", element).html(),
+    description : $(".description", element).html(),
+    sql_type    : $(".sql .dropdown", element).html(),
+    sql_param   : $(".sql .param", element).html(),
+    edit_mode   : $(element).attr("_edit") || "", 
+  }
+}
+
+function get_element_edit_attributes(element){
+
+  return {
+    name        : $(".name input", element).val(),
+    description : $(".description textarea", element).val(),
+    sql_type    : $(".sql .dropdown select option:selected", element).text(),
+    sql_param   : $(".sql .param input", element).val(),
+    edit_mode   : $(element).attr("_edit") || "", 
+  }
+}
+
+function enter_edit_mode(element, attr){
+
+
+  // FIX element attributes
+  $(".navBar .name", element)
+    .addClass("edit")
+    .html(
+      $("<input>")
+      .val(attr.name)
+    );
+
+  $(".details .description", element)
+    .addClass("edit")
+    .html(
+      $("<textarea>")
+      .val(attr.description)
+    );
+
+  $(".details .sql .dropdown", element)
+    .html(
+      dropdown(attr.sql_type)
+    );
+  
+  sql_param(element, attr.sql_param)
+  
+  
+  // SHOW actions and details pane
+  $(".details", element).show();
+  $(".details .actions", element).show();
+  $(element).attr("_edit", "edit");
+  
+}
+
+function return_to_std_mode(element, attr){
+
+  // FIX element attributes
+  $(".name", element)
+    .removeClass("edit")
+    .html(attr.name);
+  
+  $(".description", element)
+    .removeClass("edit")
+    .html(attr.description || "");
+  
+  $(".sql .dropdown", element)
+    .html(attr.sql_type || "");
+  
+  $(".sql .param", element)
+    .html(attr.sql_param || "");
+  
+  
+  // HIDE actions and details pane
+  if($(".description", element).html() == ""  && $(".sql .dropdown option:selected").text() == "type"){
+    $(".details").hide();
+  }
+  $(".details .actions", element).hide();
+  $(element).attr("_edit", "");
+  
+}
+
+function save_to_json(element, attr, object){
+
+  object.name = attr.name;       
+  object.description = attr.description;
+  object.sql_type = attr.sql_type;
+  object.sql_param = attr.sql_param;
+  
+  return object;
+}
+
 function dropdown(sql_type) {
   
   var dropdown = $("<select>");
@@ -225,20 +255,37 @@ function dropdown(sql_type) {
   
   
 	$.each(types, function(index, type){
-		
+
 		var option = $("<option>").val(type).text(type);
-		if (type == sql_type)
+		if (type == sql_type){
 		  option.attr("selected", "selected");
+		}
+		  
 		$(dropdown).append(option);
-		
+
 	});
-	
+
   return dropdown;
 }
 
-// function parameter (sql_type, sql_param) {
-//   if (sql_type == "string") {
-//     var param = $("<input>").val()
-//   }
-// }
+function sql_param(element, param){
+
+  sql = $(".details .sql", element);
+  option = $(".dropdown select option:selected", sql).text();
+
+  if(option == "string") {
+    $(".param", sql)
+      .html(
+        $("<input>").val(param)
+      );
+  } else {
+    $(".param", sql)
+      .html("");
+  }
+}
+
+
+
+
+
 
