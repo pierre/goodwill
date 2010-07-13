@@ -14,8 +14,5 @@
 
 <h1>Type: ${it.name}</h1>
 
-
-<p>${it.toString}</p>
-
 </body>
 </html>

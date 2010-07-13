@@ -20,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
-@Path("/registrar")
+@Path("registrar")
 public class Registrar
 {
     private GoodwillStore store;
@@ -60,8 +60,9 @@ public class Registrar
     {
         ThriftType typeFound = store.findByName(typeName);
 
+        log.warn(String.format("Found type: %s", typeFound));
         if (typeFound != null) {
-            return new Viewable("type", typeFound);
+            return new Viewable("/registrar/type.jsp", typeFound);
         }
 
         throw new NotFoundException("Type, " + typeName + ", is not found");
