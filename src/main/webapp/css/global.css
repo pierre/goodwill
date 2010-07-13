@@ -60,16 +60,16 @@ table td                        {padding-left:10px;}
 /* Right Column Options Stuff */
 .buttons                {float:right; height:30px; padding:5px;}
 .buttons > div          {float:left; height:20px; width:20px; margin-left:10px; }
-.blue                   {background:url('/goodwill/images/blue2.png') no-repeat;}
-.blue:hover             {background:url('/goodwill/images/blue.png') no-repeat;}
-.remove                 {background:url('/goodwill/images/Remove2.png') no-repeat;}
-.remove:hover           {background:url('/goodwill/images/Remove2-hover.png') no-repeat;}
+.blue                   {background:url('../images/blue2.png') no-repeat;}
+.blue:hover             {background:url('../images/blue.png') no-repeat;}
+.remove                 {background:url('../images/Remove2.png') no-repeat;}
+.remove:hover           {background:url('../images/Remove2-hover.png') no-repeat;}
 
 /* Schema Buttons */
 
 li.sButtons             {float:right; border:1px solid red; z-index:1000;}
 li.sButtons > li        {height:20px; width:20px;}
-li.sButtons #show       {background:url('/goodwill/images/link.png');}
+li.sButtons #show       {background:url('../images/link.png');}
 li.sButtons #depricate  {}
 
 
