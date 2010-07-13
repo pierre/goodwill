@@ -16,7 +16,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -70,9 +69,8 @@ public class Registrar
 
     @GET
     @Produces("application/json")
-    public Response getJson(
-        @QueryParam("type") String typeName
-    ) throws IOException, JSONException
+    @Path("/{type}/")
+    public Response getTypeJson(@PathParam("type") String typeName) throws IOException, JSONException
     {
         if (typeName == null) {
             return Response.ok(store.toJSON().toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
