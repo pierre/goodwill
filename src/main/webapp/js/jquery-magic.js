@@ -1,54 +1,67 @@
-$(document).ready(function(){
 
-	// build objects hash
-	var objects = {};
-	$.each(json, function(i, val) {
-	  objects[val.name] = val.schema; 
-	});
+$(document).ready(function(){	
 
-  // Set the height of the left and right columns
-  panel_heights();
+	var build_objects_hash = function (json) {
+	  objects = {};
+	  
+  	$.each(json, function(i, val) {
+  	  objects[val.name] = val.schema; 
+  	});
+  	
+  	return objects;
+	}
+	
+  var set_panel_heights = function () {
+    var height = $(window).height();
+    $("#resultsPane").css("height", (height - 40));
+    $("#table").css("height", (height - 40));
+  }
   
-	// Build the EventType Table
-  $.each(objects, function(eName, schema){
-    $('table#eventTypes').append(
-      $("<tr>").append(
-        $("<td>").text(eName).attr('name', eName))
-    );					
-  });
+  var build_eventType_table = function() {
+    $.each(objects, function(eventType, schema){
+      $('table#eventTypes').append(
+        $("<tr>").append(
+          $("<td>").text(eventType).attr('name', eventType))
+      );					
+    });
+  }
+  
+  objects = build_objects_hash(json);
+  set_panel_heights();
+  build_eventType_table();
 
-	// click function
 	$('table#eventTypes tbody tr').click(function(){
 
+		  eventType = $('td', this).attr('name');
+      
+      presentation_stuff = function(tr){
+  			$("#resultsPane")
+  			  .children().remove(".element");
 
-		  // get and set the current resultsPane
-			eName   = $('td', this).attr('name');
-			schema  = objects[eName];
-			pane    = $("#resultsPane");
+  			$("#resultsPane #title #name")
+  			  .html("&nbsp;" + eventType);
+  			  
+  		  $(tr)
+  		    .addClass("selected")
+  		    .siblings().removeClass("selected");
+      }
+      
+      create_fields = function(fields){
+        $.each(fields, function(index, field_obj){
 
-			// clear the current results pane
-			pane.children().remove(".element");
+          element = elementDiv(field_obj);
+          e = get_element_std_attributes(element);
 
-			// selected row + schema title
-			$(this).parent().children().removeClass("selected");
-			$(this).addClass("selected");
-			$("#resultsPane #title #name").html("&nbsp;" + eName);
-
-			// create each element
-			$.each(schema, function(index, field_obj){
-
-        // append element to resultsPane
-			  elementDiv(field_obj).appendTo(pane);
-
-        // hide parts of the element
-        $(".navBar .buttons").hide();
-        $(".actions").hide();
-
-        // hide details
-        if( $(".description").html() == ""  && $(".sql .dropdown").html() == "" ) {
-          $(".details").hide();
-        }        
-			});
+  			  element.appendTo($("#resultsPane"));
+          return_to_std_mode(element, e);
+          $(".navBar .buttons", element).hide();
+          
+  			});
+      }
+        
+      presentation_stuff(this);
+      create_fields(objects[eventType]);
+      	
 
       $(".element").hover(function(){
         $(".navBar .buttons", this).show();
@@ -79,20 +92,22 @@ $(document).ready(function(){
       
         // get and update field object
         index  = $("#resultsPane .element").index(element);
-        object = objects[eName][index];
+        object = objects[eventType][index];
         object = save_to_json(element, e, object);
       
         return_to_std_mode(element, e);
       });
       
       $(".details .actions .cancel").click(function(){
+            
+
       
         // get element
         element = $(this).closest(".element");
       
         // get and update field object
         index  = $("#resultsPane .element").index(element);
-        object = objects[eName][index];
+        object = objects[eventType][index];
       
         return_to_std_mode(element, object);
       
@@ -106,18 +121,11 @@ $(document).ready(function(){
 });
 
 
-// RESIZE Windows
-
-$(window).resize(function() {
-  var height = $(window).height();	
-	$("#resultsPane").css("height", (height - 40));
-	$("#table").css("height", (height - 40));
-});
-
-
 
 function elementDiv(element) {
-  return $("<div>").addClass("element").attr("_edit", "")
+  return $("<div>")
+    .addClass("element")
+    .attr("_edit", "")
   
      .append($("<div>").addClass("navBar")
        .append($("<div>").addClass("name").text(element.name || ""))
@@ -149,12 +157,6 @@ function elementDiv(element) {
      )
      
   .append($("<div style=\"clear:both\"></div>"));
-}
-
-function panel_heights() {
-  var height = $(window).height();
-  $("#resultsPane").css("height", (height - 40));
-  $("#table").css("height", (height - 40));
 }
 
 function get_element_std_attributes(element){
@@ -207,6 +209,7 @@ function enter_edit_mode(element, attr){
   // SHOW actions and details pane
   $(".details", element).show();
   $(".details .actions", element).show();
+  $(".navBar .buttons", element).show();
   $(element).attr("_edit", "edit");
   
 }
@@ -230,9 +233,10 @@ function return_to_std_mode(element, attr){
   
   
   // HIDE actions and details pane
-  if($(".description", element).html() == ""  && $(".sql .dropdown option:selected").text() == "type"){
-    $(".details").hide();
+  if($(".description", element).html() == ""  && ($(".sql .dropdown", element).text() == "type" || $(".sql .dropdown", element).text() == "")){
+    $(".details", element).hide();
   }
+  
   $(".details .actions", element).hide();
   $(element).attr("_edit", "");
   
@@ -253,19 +257,22 @@ function dropdown(sql_type) {
   var dropdown = $("<select>");
 	var types = ["type", "string", "bool", "byte", "i16", "i32", "i64", "double", "date", "ip"];
   
+  build_dropdown = function(dropdown, types) {
+    $.each(types, function(index, type){
+
+  		var option = $("<option>").val(type).text(type);
+
+  		if (type == sql_type){
+  		  option.attr("selected", "selected");
+  		}
+
+  		$(dropdown).append(option);
+  	});
+  	
+    return dropdown;
+  }
   
-	$.each(types, function(index, type){
-
-		var option = $("<option>").val(type).text(type);
-		if (type == sql_type){
-		  option.attr("selected", "selected");
-		}
-		  
-		$(dropdown).append(option);
-
-	});
-
-  return dropdown;
+  return build_dropdown(dropdown, types);
 }
 
 function sql_param(element, param){
@@ -284,7 +291,11 @@ function sql_param(element, param){
   }
 }
 
-
+$(window).resize(function() {
+  var height = $(window).height();	
+	$("#resultsPane").css("height", (height - 40));
+	$("#table").css("height", (height - 40));
+});
 
 
 
