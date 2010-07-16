@@ -51,4 +51,28 @@ public class GoodwillConfig
     {
         return null;
     }
+
+    @Config(value = "goodwill.store.db.host")
+    public String getDBHost()
+    {
+        return "localhost";
+    }
+
+    @Config(value = "goodwill.store.db.name")
+    public String getDBName()
+    {
+        return "goodwill";
+    }
+
+    @Config(value = "goodwill.store.db.user")
+    public String getDBUsername()
+    {
+        return "root";
+    }
+
+    @Config(value = "goodwill.store.db.thrift_table.name")
+    public String getDBThriftTableName()
+    {
+        return "ThriftField";
+    }
 }

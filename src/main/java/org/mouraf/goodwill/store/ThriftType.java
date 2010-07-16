@@ -4,11 +4,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class ThriftType
 {
     private String name;
+
     private final HashMap<Integer, ThriftField> thriftItems = new HashMap<Integer, ThriftField>();
 
     public static final String JSON_THRIFT_TYPE_NAME = "name";
@@ -59,6 +61,11 @@ public class ThriftType
     public ThriftField getFieldByPosition(int i)
     {
         return thriftItems.get(i);
+    }
+
+    public Collection<ThriftField> getThriftItems()
+    {
+        return thriftItems.values();
     }
 
     @Override

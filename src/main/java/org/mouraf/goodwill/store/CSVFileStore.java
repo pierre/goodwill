@@ -12,6 +12,7 @@ import org.mouraf.goodwill.binder.config.GoodwillConfig;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Singleton
@@ -85,7 +86,7 @@ public class CSVFileStore implements GoodwillStore
         this.thriftTypes = thriftTypes;
     }
 
-    public List<ThriftType> getTypes()
+    public Collection<ThriftType> getTypes()
     {
         return thriftTypes;
     }
@@ -134,5 +135,18 @@ public class CSVFileStore implements GoodwillStore
     {
         thriftTypes.add(thriftType);
     }
+
+    /**
+     * Update a type to the store
+     *
+     * @param thriftType ThriftType to update
+     */
+    @Override
+    public boolean updateType(ThriftType thriftType)
+    {
+        // Seek etc. Painful here
+        return false;
+    }
+
 
 }

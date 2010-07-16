@@ -2,14 +2,13 @@ package org.mouraf.goodwill.store;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 public interface GoodwillStore
 {
-    public List<ThriftType> getTypes() throws IOException;
+    public Collection<ThriftType> getTypes() throws IOException;
 
     /**
      * Given a Thrift name, find it in the store
@@ -33,4 +32,12 @@ public interface GoodwillStore
      * @param thriftType ThriftType to add
      */
     public void addType(ThriftType thriftType);
+
+    /**
+     * Update a type to the store
+     *
+     * @param thriftType ThriftType to update
+     * @return true is success, false otherwise
+     */
+    public boolean updateType(ThriftType thriftType);
 }

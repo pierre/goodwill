@@ -184,6 +184,31 @@ public class ThriftField
         return position;
     }
 
+    public String getType()
+    {
+        return ThriftField.typeStringfromTType(type);
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public Integer getSqlLength()
+    {
+        return sqlLength;
+    }
+
+    public String getSqlType()
+    {
+        return sqlType;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
     @Override
     public String toString()
     {
