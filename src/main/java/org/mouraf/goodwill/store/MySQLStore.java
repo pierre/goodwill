@@ -13,8 +13,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Types;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MySQLStore implements GoodwillStore
 {
@@ -32,7 +34,7 @@ public class MySQLStore implements GoodwillStore
     private Connection connection;
     private final String tableName;
 
-    private List<ThriftType> thriftTypes;
+    private Map<String, ThriftType> thriftTypes;
 
     @Inject
     public MySQLStore(
@@ -56,22 +58,36 @@ public class MySQLStore implements GoodwillStore
 
     private void buildThrifTtypeList() throws IOException
     {
-        List<ThriftType> thriftTypes = new ArrayList<ThriftType>();
+        HashMap<String, ThriftType> thriftTypes = new HashMap<String, ThriftType>();
         ThriftType currentThriftType = null;
         String currentThriftTypeName = null;
         try {
             Statement select = connection.createStatement();
-            ResultSet result = select.executeQuery(String.format("SELECT event_type,field_name, field_type, field_id, description, sql_type, sql_length FROM %s", tableName));
+            ResultSet result = select.executeQuery(String.format("SELECT event_type, field_name, field_type, field_id, description, sql_type, sql_length FROM %s", tableName));
 
             while (result.next()) {
                 String thriftType = result.getString(1);
-                ThriftField thriftField = new ThriftField(result.getString(2), result.getString(3), result.getInt(4), result.getString(5), result.getString(6), result.getInt(7));
+
+                // Don't conver sqlLength from NULL to 0
+                Integer sqlLength = result.getInt(7);
+                if (result.wasNull()) {
+                    sqlLength = null;
+                }
+
+                ThriftField thriftField = new ThriftField(result.getString(2), result.getString(3), result.getInt(4), result.getString(5), result.getString(6), sqlLength);
 
                 if (currentThriftTypeName == null || !thriftType.equals(currentThriftTypeName)) {
                     currentThriftTypeName = thriftType;
-                    currentThriftType = new ThriftType(currentThriftTypeName);
-                    thriftTypes.add(currentThriftType);
-                    log.debug(String.format("Found new ThriftType thriftField to: %s", currentThriftTypeName));
+
+                    // Do we have records for this Type already?
+                    if (thriftTypes != null && thriftTypes.get(currentThriftTypeName) != null) {
+                        currentThriftType = thriftTypes.get(currentThriftTypeName);
+                    }
+                    else {
+                        currentThriftType = new ThriftType(currentThriftTypeName);
+                        thriftTypes.put(currentThriftTypeName, currentThriftType);
+                        log.debug(String.format("Found new ThriftType: %s", currentThriftTypeName));
+                    }
                 }
 
                 currentThriftType.addThriftField(thriftField);
@@ -92,9 +108,10 @@ public class MySQLStore implements GoodwillStore
     }
 
     @Override
-    public List<ThriftType> getTypes() throws IOException
+    public Collection<ThriftType> getTypes() throws IOException
     {
-        return thriftTypes;
+        buildThrifTtypeList();
+        return thriftTypes.values();
     }
 
     /**
@@ -178,10 +195,24 @@ public class MySQLStore implements GoodwillStore
         statement.setInt(2, field.getPosition());
         statement.setString(3, field.getType());
         statement.setString(4, field.getName());
-        statement.setString(5, field.getSqlType());
-        statement.setInt(6, field.getSqlLength());
-        statement.setString(7, field.getDescription());
-
+        if (field.getSqlType() == null) {
+            statement.setNull(5, Types.VARCHAR);
+        }
+        else {
+            statement.setString(5, field.getSqlType());
+        }
+        if (field.getSqlLength() == null) {
+            statement.setNull(6, Types.INTEGER);
+        }
+        else {
+            statement.setInt(6, field.getSqlLength());
+        }
+        if (field.getDescription() == null) {
+            statement.setNull(7, Types.VARCHAR);
+        }
+        else {
+            statement.setString(7, field.getDescription());
+        }
         statement.addBatch();
     }
 
@@ -191,7 +222,7 @@ public class MySQLStore implements GoodwillStore
      * @param thriftType ThriftType to update
      */
     @Override
-    public void updateType(ThriftType thriftType)
+    public boolean updateType(ThriftType thriftType)
     {
         try {
             Statement select = connection.createStatement();
@@ -223,11 +254,16 @@ public class MySQLStore implements GoodwillStore
                 }
             }
 
+            log.info(String.format("ThriftType updates: %s", updates.executeBatch().toString()));
+            log.info(String.format("ThriftType inserts: %s", inserts.executeBatch().toString()));
             connection.commit();
         }
         catch (SQLException e) {
             log.error(String.format("Unable to modify type [%s]: %s", thriftType, e));
+            return false;
         }
+
+        return true;
     }
 
     private void connectToMySQL(String host, String db, String username) throws SQLException, ClassNotFoundException
