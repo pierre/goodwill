@@ -11,10 +11,13 @@ li {float:left; margin-right:10px; list-style: none;}
 .wrapper                                {padding:0px 20px; margin:0px auto;}
 #main                                   {background-color:#fff; }
 #header                                 {width:100%; height:30px; background:#182740; border-bottom:4px solid black;}
-#header .wrapper                        {line-height:30px;}
-h1                                      {font-size:15px; color:white;}
+#header .wrapper                        {position:relative; line-height:30px;}
 #footer                                 {background-color:#efefef;}
-#title                                  {height:30px; padding-left:10px; line-height:30px; border-bottom:1px solid #ccc; background-color:#969898; }
+#title                                  {}
+
+#header h1                              {font-size:15px; color:white;}
+#header .newET                          {position:absolute; top:0px; right:10px;}
+#header a                              {font-size:13px; font-weight:normal; color:#fff;}
 
 
 /* Left Column Table */                 
@@ -31,32 +34,50 @@ table td                                {padding-left:10px;}
 
 /* Right Column Shit */                 
 #resultsWrapper                         {width:35%; float:left; margin-top:1px;}
-#resultsPane #title                     {height:30px; color:#fff;}
+#resultsPane #title                     {height:30px; padding-left:10px; line-height:30px; color:#fff;  border-bottom:1px solid #ccc;}
+#resultsPane #title a                   {color:#fff; text-decoration:none;}
+#resultsPane #title a:hover             {text-decoration:underline;}
+#resultsPane #title.active              {background-color:#244e85;}
+#resultsPane #title.deprecated          {background-color:#444444;}
 #resultsPane #title li                  {line-height:30px;}
-#resultsPane #title li#name             {width:200px; overflow:hidden;}
+#resultsPane #title li#name             {width:200px; height:30px; overflow:hidden;}
 #resultsPane                            {padding:0px 20px; overflow: -moz-scrollbars-vertical; overflow-y: scroll;}
                                         
                                         
 /* element stuff */
-.element                                {width:100%; min-width:350px; margin-top:20px; color:#fff; line-height:20px; background-color:#8aa9c4; border-bottom:1px solid #ccc;}
+.element                                {width:100%; min-width:350px; margin-top:20px; color:#fff; line-height:20px; border-bottom:1px solid #ccc;}
 .element .navBar                        {height:30px; line-height:30px; padding-left:10px;}
-.element .active                        {background-color:#244e85; border-bottom: 1px solid #1a3b64;}
-.element .deprecated                    {background-color:#858083;}         
 .element .navBar .name                  {float:left; color:#ffffff;}
 .element .navBar .buttons               {float:right;}
-.element .details                       {margin-top:10px; min-height:20px;}
+.element .details                       {padding-top:10px; min-height:20px;}
 .element .description                   {min-height:10px; padding-left:5px;}
-.element .footer                        {height:30px; line-height:30px;background-color:#6e8cac;}
-.element .footer > div                  {float:left; margin-left:10px;}
-.element .sql                           {height:20px; padding-left:5px; margin-top:10px;}
-.element .details .actions              {height:20px; margin-top:10px; padding-left:5px;}
+.element .footer                        {height:30px; line-height:30px;}
+.element .footer > div                  {float:left; padding-left:10px;}
+.element .footer div > div              {float:left; padding-left:10px;}
+
+
+.element .sql                           {height:20px; padding-left:5px; padding-top:10px;}
+.element .details .actions              {height:20px; padding-top:10px; padding-left:5px;}
 .element .details .actions > li:hover   {text-decoration:underline; cursor:pointer;}
+
+
+/* element active/deprecated colors */
+.element .navBar.active                 {background-color:#244e85; border-bottom: 1px solid #1a3b64;}
+
+.element .navBar.active:hover           {background-color:#265693;}
+.element .navBar.deprecated             {background-color:#444444;}         
+
+.element .details.active                {background-color:#8aa9c4;}
+.element .details.deprecated            {background-color:#777777;}
+
+.element .footer.active                 {background-color:#6e8cac;}
+.element .footer.deprecated             {background-color:#999999;}
 
 
 /* Element EDIT mode */
 .element .navBar .edit                  {height:18px; font-size:12px; line-height:18px; margin:5px;}
-.element .navBar .edit input            {height:18px; width:250px; padding-left:5px; color:#fff; background-color:#234d85; border:1px solid #758bac;}
-.element .edit textarea                 {width:90%; height:20px; padding:5px; color:#fff; font-size:12px; background-color:#8aa9c4; border:1px solid #6e8cac;}
+.element .navBar .edit input            {height:18px; width:250px; padding-left:5px; color:#fff; background-color:transparent; border:1px solid #efefef;}
+.element .edit textarea                 {width:90%; height:20px; padding:5px; color:#fff; font-size:12px; background-color:transparent; border:1px solid #efefef;}
 .element .edit input                    {width:50px;}
 
 
@@ -65,21 +86,31 @@ table td                                {padding-left:10px;}
 .buttons > div                          {float:left; height:20px; width:20px; margin-left:10px; }
 .blue                                   {background:url('../images/blue2.png') no-repeat;}
 .blue:hover                             {background:url('../images/blue.png') no-repeat;}
-.remove                                 {background:url('../images/Remove2.png') no-repeat;}
-.remove:hover                           {background:url('../images/Remove2-hover.png') no-repeat;}
+
+.active .deprecate                      {background:url('../images/Remove2.png') no-repeat;}
+.active .deprecate:hover                {background:url('../images/Remove2-hover.png') no-repeat;}
+
+.deprecated .deprecate                  {background:url('../images/blue2.png') no-repeat;}
+.deprecated .deprecate:hover            {background:url('../images/blue.png') no-repeat;}
+                                        
+
                                         
 /* Schema Buttons */                    
                                         
-li#sButtons                          {float:right; padding-top:5px;} 
-#sButtons #show                      {height:20px; width:20px; background:url('../images/link.png');}
-#sButtons #show:hover                {background:url("../images/link-hover.png");}
-#sButtons #add                       {height:20px; width:20px; background:url('../images/add.png');}
-#sButtons #add:hover                 {background:url("../images/add-hover.png");}
-#sButtons #deprecate                 {height:20px; width:20px; background:url('../images/Remove2.png');}
-#sButtons #deprecate:hover           {background:url("../images/Remove2-hover.png");}
+li#sButtons                                   {float:right; padding-top:5px;} 
+                                              
+#sButtons #show_schema                        {height:20px; width:20px; background:url('../images/link.png');}
+#sButtons #show_schema:hover                  {background:url("../images/link-hover.png");}
+                                              
+#sButtons #add                                {height:20px; width:20px; background:url('../images/add.png');}
+#sButtons #add:hover                          {background:url("../images/add-hover.png");}
+
+.active #sButtons #deprecate                  {height:20px; width:20px; background:url('../images/Remove2.png');}
+.active #sButtons #deprecate:hover            {background:url("../images/Remove2-hover.png");}
+.deprecated #sButtons #deprecate              {height:20px; width:20px; background:url('../images/blue2.png');}
+.deprecated #sButtons #deprecate:hover        {background:url("../images/blue.png");}
 
 
-#sButtons #depricate                  {height:20px; width:20px; background:url('../images/Remove2.png');}
 
 
 /* FIXED stuff */                       
