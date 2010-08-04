@@ -12,6 +12,7 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import org.mouraf.goodwill.binder.config.GoodwillConfig;
 import org.mouraf.goodwill.store.CSVFileStore;
 import org.mouraf.goodwill.store.GoodwillStore;
+import org.mouraf.goodwill.store.MySQLStore;
 import org.skife.config.ConfigurationObjectFactory;
 
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class GuiceConfig extends GuiceServletContextListener
                     GoodwillConfig config = new ConfigurationObjectFactory(System.getProperties()).build(GoodwillConfig.class);
                     binder.bind(GoodwillConfig.class).toInstance(config);
 
-                    binder.bind(GoodwillStore.class).to(CSVFileStore.class);
+                    binder.bind(GoodwillStore.class).to(MySQLStore.class);
                 }
             },
             new ServletModule()

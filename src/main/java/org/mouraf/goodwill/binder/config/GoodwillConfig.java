@@ -73,6 +73,6 @@ public class GoodwillConfig
     @Config(value = "goodwill.store.db.thrift_table.name")
     public String getDBThriftTableName()
     {
-        return "ThriftField";
+        return "thrift_types";
     }
 }

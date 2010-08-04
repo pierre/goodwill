@@ -63,18 +63,22 @@ public class MySQLStore implements GoodwillStore
         String currentThriftTypeName = null;
         try {
             Statement select = connection.createStatement();
-            ResultSet result = select.executeQuery(String.format("SELECT event_type, field_name, field_type, field_id, description, sql_type, sql_length FROM %s", tableName));
+            ResultSet result = select.executeQuery(String.format("SELECT event_type, field_name, field_type, field_id, description, sql_type, sql_length, sql_scale, sql_precision FROM %s", tableName));
 
             while (result.next()) {
                 String thriftType = result.getString(1);
 
-                // Don't conver sqlLength from NULL to 0
+                // Don't convert sqlLength from NULL to 0
                 Integer sqlLength = result.getInt(7);
+                Integer sqlScale = result.getInt(8);
+                Integer sqlPrecision = result.getInt(9);
                 if (result.wasNull()) {
                     sqlLength = null;
+                    sqlScale = null;
+                    sqlPrecision = null;
                 }
 
-                ThriftField thriftField = new ThriftField(result.getString(2), result.getString(3), result.getInt(4), result.getString(5), result.getString(6), sqlLength);
+                ThriftField thriftField = new ThriftField(result.getString(2), result.getString(3), result.getInt(4), result.getString(5), result.getString(6), sqlLength, sqlScale, sqlPrecision);
 
                 if (currentThriftTypeName == null || !thriftType.equals(currentThriftTypeName)) {
                     currentThriftTypeName = thriftType;

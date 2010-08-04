@@ -55,7 +55,7 @@ e.events = function(element){
     // reassign the attributes to the schema
     var attributes = e.get_attributes(element, false);
     var index  = $("#resultsPane .element").index(element);
-    schema[index] = e.save_to_json(attributes, schema[index]);
+    schema[index] = attributes;
 
     event.stopPropagation();
   });
@@ -64,20 +64,31 @@ e.events = function(element){
 
     // get element and element attributes
     var element = $(this).closest(".element");
-    var status = e.status(element);
-    var attributes = e.get_attributes(element, status);
+    var new_element = e.status(element);
+    var attributes = e.get_attributes(element, new_element);
     var index  = $("#resultsPane .element").index(element);
-        
-    // adjust the schema
-    if(schema.length > index) {
-      schema[index] = e.save_to_json(attributes, schema[index]);
+      
+      
+    var necessary_fields_missed = ((attributes.name == "") || (attributes.description == "") || (attributes.field_type == ""));
+      
+     
+    if (necessary_fields_missed) {
+      
+      alert("The name, description, and field_typ fields need to be filled out!");
+      
     } else {
-      schema.push(e.save_to_json(attributes, {}));
+
+      // adjust the schema
+      if(schema.length > index) {
+        schema[index] = attributes;
+      } else {
+        schema.push(attributes);
+      }
+
+      element.attr("_status", "");    
+      e.return_to_std_mode(element, attributes);      
     }
-    
-    
-    element.attr("_status", "");    
-    e.return_to_std_mode(element, attributes);
+
   });
 
   $(".details .actions .cancel", element).click(function(){
@@ -91,23 +102,29 @@ e.events = function(element){
 
   });
 
-  $(".sql .dropdown", element).change(function(){
-    element = $(this).closest(".element");
-    var sql_param = $(".details .sql", element);
-    e.param(element, "", sql_param);
-  });
-  
   $(".type .dropdown", element).change(function(){
-    element = $(this).closest(".element");
-    var type_param = $(".footer .type", element);
-    e.param(element, "", type_param);
+    var element = $(this).closest(".element");
+    var attributes = e.get_attributes(element, true);
+    
+    console.log("field type changed")
+    console.log(attributes)
+    
+    // change sql dropdown and add parameter fields
+    var dropdown = $(".sql .dropdown", element)
+      .html(
+        e.dropdown(attributes)
+      );
+
+    var sql = $(".details .sql", element);
+    e.param(attributes, "sql", sql);
+    
+    
+    // e.param("", "field", footer);
   });
-  
-  
+   
 }
 
 e.create_element = function(field_obj){
-
   var elementDiv = function(element) {
     var div = $('<div class="element">')
       .attr("_edit", "")
@@ -127,7 +144,9 @@ e.create_element = function(field_obj){
            .append($('<ul class="list">')
               .append($("<li>").html("sql: "))
               .append($('<li class="dropdown">').html(element.sql_type || ""))
-              .append($('<li class="param">').html(element.sql_param || ""))
+              .append($('<li class="primary_parameter">').html(element.sql_scale || (element.sql_length || "")))
+              .append($('<li class="secondary_parameter">').html(element.sql_precision || ""))
+              
            )
          )
   	     .append($('<div class="actions"><ul>')
@@ -140,8 +159,7 @@ e.create_element = function(field_obj){
          .append($('<div class="type">')
            .append($('<ul class="list">')
               .append($("<li>").html("type: "))
-              .append($('<li class="dropdown">').html(element.eType || ""))
-              .append($('<li class="param">').html(element.eParam || ""))
+              .append($('<li class="dropdown">').html(element.field_type || ""))
            )         
          )
          .append($('<div class="position">')
@@ -163,9 +181,7 @@ e.create_element = function(field_obj){
   
   var element = elementDiv(field_obj);
   var attributes = e.get_attributes(element, true);
-
-  console.log(attributes);
-  
+    
   e.events(element);
   element.appendTo($("#resultsPane"));
   e.return_to_std_mode(element, attributes);
@@ -180,16 +196,29 @@ e.get_attributes = function(element, create){
     
     var attr = {};
     
-    attr.name        = element.find(".name").html();
-    attr.description = $(".description", element).html();
-    attr.sql_type    = $(".sql .dropdown", element).html();
-    attr.sql_param   = $(".sql .param", element).html();
-    attr.eType       = $(".type .dropdown", element).html();
-    attr.eParam      = $(".type .param", element).html();
-    attr.position    = $(".footer .value", element).html();
-    attr.active      = $(".navBar", element).hasClass("active") ? "active" : "deprecated";
-    attr.edit_mode   = $(element).attr("_edit");
+    attr.name             = element.find(".name").html();
+    attr.description      = $(".description", element).html();
+    attr.sql_type         = $(".sql .dropdown", element).html();
+    attr.field_type       = $(".type .dropdown", element).html();
+    attr.position         = $(".footer .value", element).html();
+    attr.active           = $(".navBar", element).hasClass("active") ? "active" : "deprecated";
+    attr.edit_mode        = $(element).attr("_edit");    
     
+    if (attr.field_type == "string") {
+      attr.sql_length     = $(".sql .primary_parameter", element).html() || "";      
+      attr.sql_scale      = "";
+      attr.sql_precision  = "";
+    } else if (attr.field_type == "double") {
+      attr.sql_length       = "";
+      attr.sql_scale        = $(".sql .primary_parameter", element).html();
+      attr.sql_precision    = $(".sql .secondary_parameter", element).html();
+    } else {
+      attr.sql_length = "";
+      attr.sql_scale = "";
+      attr.sql_precision = "";
+    }
+
+      
     return attr;
   }
 
@@ -199,21 +228,35 @@ e.get_attributes = function(element, create){
     
     attr.name        = $(".name input", element).val();
     attr.description = $(".description textarea", element).val();
+    attr.field_type  = create ? $(".type .dropdown select option:selected", element).text() : $(".type .dropdown", element).html();
     attr.sql_type    = $(".sql .dropdown select option:selected", element).text();
-    attr.sql_param   = $(".sql .param input", element).val();
     attr.position    = $(".footer .value", element).html();
     attr.active      = $(".navBar", element).hasClass("active") ? "active" : "deprecated";
     attr.edit_mode   = element.attr("_edit") || "";
     
-    if(create){
-      console.log("create");
-      attr.eType       = $(".type .dropdown select option:selected", element).text();
-      attr.eParam      = $(".type .param input", element).val();
+    // remove default values for name and description
+    attr.name = (attr.name != "name") ? attr.name : "";
+    attr.description = (attr.description != "add a description") ? attr.description : "";
+      
+    
+    // get sql length, scale, and precision
+    console.log("this is a " + attr.field_type);
+    if (attr.field_type == "string") {
+      attr.sql_length     = $(".sql .primary_parameter input", element).val() || ""; 
+      attr.sql_scale      = "";
+      attr.sql_precision  = "";
+    } else if (attr.field_type == "double") {
+      attr.sql_length       = "";
+      attr.sql_scale        = $(".sql .primary_parameter input", element).val();
+      attr.sql_precision    = $(".sql .secondary_parameter input", element).val();
     } else {
-      console.log("other");
-      attr.eType       = $(".type .dropdown", element).html();
-      attr.eParam      = $(".type .param", element).html();
+      attr.sql_length = "";
+      attr.sql_scale = "";
+      attr.sql_precision = "";
     }
+        
+    console.log("fetched attribute values for " + attr.name);
+    console.log(attr);
     
     return attr
   }
@@ -232,67 +275,44 @@ e.status = function(element){
 
 e.enter_edit_mode = function(element, attr, create){
 
-  var dropdown = function(sql_type) {
 
-    var dropdown = $("<select>");
-  	var types = ["type", "string", "bool", "byte", "i16", "i32", "i64", "double", "date", "ip"];
-
-    var build_dropdown = function(dropdown, types) {
-      $.each(types, function(index, type){
-
-    		var option = $("<option>").val(type).text(type);
-
-    		if (type == sql_type){
-    		  option.attr("selected", "selected");
-    		}
-
-    		$(dropdown).append(option);
-    	});
-
-      return dropdown;
-    }
-
-    return build_dropdown(dropdown, types);
-  }
-  
+  console.log("enter edit mode");
 
   // FIX element attributes
   $(".navBar .name", element)
     .addClass("edit")
     .html(
       $('<input class="input_name">')
-      .val(attr.name)
+      .val(attr.name || "name")
     );
 
   $(".details .description", element)
     .addClass("edit")
     .html(
       $("<textarea>")
-      .val(attr.description)
+      .val(attr.description || "add a description")
     );
 
   $(".details .sql .dropdown", element)
     .html(
-      dropdown(attr.sql_type)
+      e.dropdown(attr)
     );
   
-  var sql_param = $(".details .sql", element);
-  e.param(element, attr.sql_param, sql_param);
-  
+  var sql = $(".details .sql", element);
+  e.param(attr, "sql", sql);  
   
   if (create){
     $('.footer .type .dropdown', element)
       .html(
-        dropdown(attr.eType)
+        e.footer_dropdown(attr)
       );
-
-    var type_param = $(".footer .type", element);
-    e.param(element, attr.sql_param, type_param);
+  
+    var footer = $(".footer .type", element);
+    e.param(attr, "field", footer);
   }
 
-  
-  // add event handlers to new elements
-  
+
+  // add event handlers to new elements  
   $('.navBar input', element).click(function(event){
     event.stopPropagation();
   });
@@ -302,6 +322,8 @@ e.enter_edit_mode = function(element, attr, create){
   $(".details .actions", element).show();
   $(".navBar .buttons", element).show();
   $(element).attr("_edit", "edit");
+  
+  
   
 }
 
@@ -320,15 +342,16 @@ e.return_to_std_mode = function(element, attr){
   $(".sql .dropdown", element)
     .html(attr.sql_type || "");
   
-  $(".sql .param", element)
-    .html(attr.sql_param || "");
-  
-  $('.type .dropdown', element)
-    .html(attr.eType || "");
-  
-  $(".type .param", element)
-    .html(attr.eParam || "");
+  $(".sql .primary_parameter", element)
+    .html(attr.sql_length || attr.sql_scale || "");
 
+  $(".sql .secondary_parameter", element)
+    .html(attr.sql_precision || "");
+
+
+  $('.type .dropdown', element)
+    .html(attr.field_type || "");
+  
   // HIDE actions and details pane
   if($(".description", element).html() == ""  && ($(".sql .dropdown", element).text() == "type" || $(".sql .dropdown", element).text() == "")){
     $(".details", element).hide();
@@ -339,33 +362,89 @@ e.return_to_std_mode = function(element, attr){
   
 }
 
-e.save_to_json = function(attr, object){
 
-  object.name = attr.name;       
-  object.description = attr.description;
-  object.sql_type = attr.sql_type;
-  object.sql_param = attr.sql_param;
-  object.eType = attr.eType;
-  object.eParam = attr.eParam;
-  object.active = attr.active;
+e.dropdown = function(attr) {
+
+  var dropdown = $("<select>");
   
-  return object;
+	var type_map = {
+	  ""  : [],
+	  "string" : ["nvarchar", "varchar"],
+	  "bool" : ["bool"],
+	  "byte" : ["byte"],
+	  "i16" : ["i16"],
+	  "i32" : ["i32"],
+	  "i64" : ["i64"],
+	  "double" : ["double", "decimal"],
+	  "date" : ["date", "date and time"],
+	  "ip" : ["ip"]
+	};
+	
+	
+  var build_dropdown = function(dropdown, types, sql_type) {
+    $.each(types, function(index, type){
+
+  		var option = $("<option>").val(type).text(type);
+
+  		if (type == sql_type){
+  		  option.attr("selected", "selected");
+  		}
+
+  		$(dropdown).append(option);
+  	});
+
+    return dropdown;
+  }
+  
+  var possible_types = type_map[attr.field_type];
+  var sql_type = attr.sql_type;
+  
+  return build_dropdown(dropdown, possible_types, sql_type);
 }
 
-e.param = function(element, param, sql){
+e.footer_dropdown = function(){
+  var dropdown = $("<select>");
+  var options = ["", "string", "bool", "byte", "i16", "i32", "i64", "double", "date", "ip"];
+  
+  $.each(options, function(index, option){
+    var row = $("<option>").val(option).text(option);
+    $(dropdown).append(row);
+  })
+  
+  return dropdown;
+}
 
-  option = $(".dropdown select option:selected", sql).text();
+e.param = function(attributes, type, form){
 
-  if(option == "string") {
-    $(".param", sql)
-      .html(
-        $("<input>").val(param)
-      );
+  // var option = $(".dropdown select option:selected", form).text();
+
+  var field_type = attributes.field_type;
+  var length =  eval("attributes." + type + "_length") || "";
+  var scale = eval("attributes." + type + "_scale") || "";
+  var precision = eval("attributes." + type + "_precision") || "";
+
+console.log("length: " + length);
+
+  if(field_type == "string") {
+    $(".primary_parameter", form)
+      .html($("<input>").val(length));
+    $(".secondary_parameter", form)
+      .html("");
+      
+  } else if (field_type == "double") {
+    $(".primary_parameter", form)
+      .html($("<input>").val(scale));
+    $(".secondary_parameter", form)
+      .html($("<input>").val(precision));
+    
   } else {
-    $(".param", sql)
+    $(".primary_parameter", form)
+      .html("");
+    $(".secondary_parameter", form)
       .html("");
   }
 }
+
 
 w.panel_heights = function(){
   var height = $(window).height();
@@ -470,10 +549,12 @@ r.events = function(){
   })
   
   $("#resultsPane #title li#add").click(function(){
+    
     var total_elements = $('#resultsPane .element').length;
     element = e.create_element({position:total_elements, status:"new"});
+    
     attributes = e.get_attributes(element, true);
-    schema.push(e.save_to_json(attributes, {}));
+    schema.push(attributes);
   })
 
   $('#resultsPane #title li#deprecate').toggle(function(){

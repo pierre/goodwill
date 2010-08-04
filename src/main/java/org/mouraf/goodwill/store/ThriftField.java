@@ -14,6 +14,8 @@ public class ThriftField
     private Integer position;
     private String sqlType;
     private Integer sqlLength;
+    private Integer sqlScale;
+    private Integer sqlPrecision;
     private String description;
 
     /* Keys for the JSON representation */
@@ -28,6 +30,9 @@ public class ThriftField
     public static final String JSON_THRIFT_FIELD_SQL_KEY = "sql";
     public static final String JSON_THRIFT_FIELD_SQL_TYPE = "type";
     public static final String JSON_THRIFT_FIELD_SQL_LENGTH = "length";
+    public static final String JSON_THRIFT_FIELD_SQL_SCALE = "scale";
+    public static final String JSON_THRIFT_FIELD_SQL_PRECISION = "precision";
+
 
     /* Human readable representation of Thrift internal types */
     private static final String TTYPE_STRING = "string";
@@ -39,42 +44,44 @@ public class ThriftField
     private static final String TTYPE_DOUBLE = "double";
 
     public ThriftField(
-        String name,
-        String typeString,
-        Integer position
+            String name,
+            String typeString,
+            Integer position
     )
     {
-        this(name, typeString, position, null, null, null);
+        this(name, typeString, position, null, null, null, null, null);
     }
 
     public ThriftField(
-        String name,
-        String typeString,
-        Integer position,
-        String description
+            String name,
+            String typeString,
+            Integer position,
+            String description
     )
     {
-        this(name, typeString, position, description, null, null);
+        this(name, typeString, position, description, null, null, null, null);
     }
 
     public ThriftField(
-        String name,
-        String typeString,
-        Integer position,
-        String sqlType,
-        Integer sqlLength
+            String name,
+            String typeString,
+            Integer position,
+            String sqlType,
+            Integer sqlLength
     )
     {
-        this(name, typeString, position, null, sqlType, sqlLength);
+        this(name, typeString, position, null, sqlType, sqlLength, null, null);
     }
 
     public ThriftField(
-        String name,
-        String typeString,
-        Integer position,
-        String description,
-        String sqlType,
-        Integer sqlLength
+            String name,
+            String typeString,
+            Integer position,
+            String description,
+            String sqlType,
+            Integer sqlLength,
+            Integer sqlScale,
+            Integer sqlPrecision
     )
     {
         if (name == null) {
@@ -87,29 +94,53 @@ public class ThriftField
         if (position == null) {
             throw new IllegalArgumentException("ThriftField position can't be null");
         }
+
+        if ((sqlType == null || sqlType.equals("string")) && (sqlScale != null || sqlPrecision != null)) {
+            throw new IllegalArgumentException("Strings cannot have a scale or precision");
+        }
+
+
         this.position = position;
 
         // Optional fields
         this.description = description;
         this.sqlType = sqlType;
         this.sqlLength = sqlLength;
+        this.sqlScale = sqlScale;
+        this.sqlPrecision = sqlPrecision;
     }
 
     public ThriftField(
-        JSONObject thriftItemJSONObject
+            JSONObject thriftItemJSONObject
     ) throws JSONException
     {
-        this(thriftItemJSONObject.getString(JSON_THRIFT_FIELD_NAME),
-            thriftItemJSONObject.getString(JSON_THRIFT_FIELD_TYPE),
-            thriftItemJSONObject.getInt(JSON_THRIFT_FIELD_POSITION),
-            thriftItemJSONObject.has(JSON_THRIFT_FIELD_DESCRIPTION) ?
-                thriftItemJSONObject.getString(JSON_THRIFT_FIELD_DESCRIPTION) : null,
-            thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_TYPE) ?
-                    thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getString(JSON_THRIFT_FIELD_SQL_TYPE) : null) : null,
-            thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_LENGTH) ?
-                    thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_LENGTH) : null) : null);
+        this(
+
+                thriftItemJSONObject.getString(JSON_THRIFT_FIELD_NAME),
+
+                thriftItemJSONObject.getString(JSON_THRIFT_FIELD_TYPE),
+
+                thriftItemJSONObject.getInt(JSON_THRIFT_FIELD_POSITION),
+
+                thriftItemJSONObject.has(JSON_THRIFT_FIELD_DESCRIPTION) ?
+                        thriftItemJSONObject.getString(JSON_THRIFT_FIELD_DESCRIPTION) : null,
+
+                thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
+                        (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_TYPE) ?
+                                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getString(JSON_THRIFT_FIELD_SQL_TYPE) : null) : null,
+
+                thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
+                        (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_LENGTH) ?
+                                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_LENGTH) : null) : null,
+
+                thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
+                        (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_SCALE) ?
+                                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_SCALE) : null) : null,
+
+                thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
+                        (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_PRECISION) ?
+                                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_PRECISION) : null) : null
+        );
     }
 
     /**
@@ -175,7 +206,8 @@ public class ThriftField
     }
 
     /**
-     * Return the field position of the described ThriftField in the associated ThriftType.
+     * Return the field position of the described ThriftField in the associated
+     * ThriftType.
      *
      * @return the field position
      */
@@ -217,19 +249,22 @@ public class ThriftField
         }
         catch (JSONException e) {
             return "ThriftField{" +
-                JSON_THRIFT_FIELD_NAME + "='" + name + '\'' +
-                ", " + JSON_THRIFT_FIELD_TYPE + "='" + ThriftField.typeStringfromTType(type) + '\'' +
-                ", " + JSON_THRIFT_FIELD_POSITION + "=" + position +
-                ", " + JSON_THRIFT_FIELD_SQL_TYPE + "='" + sqlType + '\'' +
-                ", " + JSON_THRIFT_FIELD_SQL_LENGTH + "=" + sqlLength +
-                ", " + JSON_THRIFT_FIELD_DESCRIPTION + "=" + description +
-                '}';
+                    JSON_THRIFT_FIELD_NAME + "='" + name + '\'' +
+                    ", " + JSON_THRIFT_FIELD_TYPE + "='" + ThriftField.typeStringfromTType(type) + '\'' +
+                    ", " + JSON_THRIFT_FIELD_POSITION + "=" + position +
+                    ", " + JSON_THRIFT_FIELD_SQL_TYPE + "='" + sqlType + '\'' +
+                    ", " + JSON_THRIFT_FIELD_SQL_LENGTH + "=" + sqlLength +
+                    ", " + JSON_THRIFT_FIELD_SQL_SCALE + "=" + sqlScale +
+                    ", " + JSON_THRIFT_FIELD_SQL_PRECISION + "=" + sqlPrecision +
+                    ", " + JSON_THRIFT_FIELD_DESCRIPTION + "=" + description +
+                    '}';
         }
     }
 
     /**
-     * Create a JSON representation of the ThriftField. It will always contain the name, type and position.
-     * Description and SQL attributes are however optional.
+     * Create a JSON representation of the ThriftField. It will always contain
+     * the name, type and position. Description and SQL attributes are however
+     * optional.
      *
      * @return JSONObject containing all fields
      * @throws JSONException if a serialization exception occurs
@@ -237,9 +272,9 @@ public class ThriftField
     public JSONObject toJSON() throws JSONException
     {
         JSONObject tFieldJSON = new JSONObject()
-            .put(JSON_THRIFT_FIELD_NAME, name)
-            .put(JSON_THRIFT_FIELD_TYPE, ThriftField.typeStringfromTType(type))
-            .put(JSON_THRIFT_FIELD_POSITION, position);
+                .put(JSON_THRIFT_FIELD_NAME, name)
+                .put(JSON_THRIFT_FIELD_TYPE, ThriftField.typeStringfromTType(type))
+                .put(JSON_THRIFT_FIELD_POSITION, position);
 
         if (description != null) {
             tFieldJSON.put(JSON_THRIFT_FIELD_DESCRIPTION, description);
@@ -255,6 +290,15 @@ public class ThriftField
             if (sqlLength != null) {
                 tFieldSQLJSON.put(JSON_THRIFT_FIELD_SQL_LENGTH, sqlLength);
             }
+
+            if (sqlScale != null) {
+                tFieldSQLJSON.put(JSON_THRIFT_FIELD_SQL_SCALE, sqlScale);
+            }
+
+            if (sqlPrecision != null) {
+                tFieldSQLJSON.put(JSON_THRIFT_FIELD_SQL_PRECISION, sqlPrecision);
+            }
+
 
             tFieldJSON.put(JSON_THRIFT_FIELD_SQL_KEY, tFieldSQLJSON);
         }

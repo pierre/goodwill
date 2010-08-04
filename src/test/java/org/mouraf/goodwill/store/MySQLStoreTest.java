@@ -9,20 +9,22 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 
-/**
- * CREATE TABLE `thrift_types` (
- * `event_type` varchar(255) DEFAULT NULL,
- * `field_id` int(11) DEFAULT NULL,
- * `field_type` varchar(255) DEFAULT NULL,
- * `field_name` varchar(255) DEFAULT NULL,
- * `sql_type` varchar(255) DEFAULT NULL,
- * `sql_length` int(11) DEFAULT NULL,
- * `description` varchar(255) DEFAULT NULL,
- * `id` int(11) NOT NULL AUTO_INCREMENT,
- * PRIMARY KEY (`id`),
- * UNIQUE KEY `unique_fields` (`event_type`,`field_id`)
- * ) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8
- */
+
+// CREATE TABLE `thrift_types` (
+//   `event_type` varchar(255) DEFAULT NULL,
+//   `field_id` int(11) DEFAULT NULL,
+//   `field_type` varchar(255) DEFAULT NULL,
+//   `field_name` varchar(255) DEFAULT NULL,
+//   `sql_type` varchar(255) DEFAULT NULL,
+//   `sql_length` int(11) DEFAULT NULL,
+//      `sql_scale` int(11) DEFAULT NULL,
+//      `sql_precision` int(11) DEFAULT NULL,
+//   `description` varchar(255) DEFAULT NULL,
+//   `id` int(11) NOT NULL AUTO_INCREMENT,
+//   PRIMARY KEY (`id`),
+//   UNIQUE KEY `unique_fields` (`event_type`,`field_id`)
+// ) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8
+
 public class MySQLStoreTest
 {
     private MySQLStore store;
@@ -58,6 +60,20 @@ public class MySQLStoreTest
     {
         store.close();
     }
+
+    @Test
+    public void testInvalidThriftField()
+    {
+        try {
+            new ThriftField("test", "string", 1, "", null, 2, 23, 5);
+            Assert.fail();
+        }
+        catch (IllegalArgumentException e) {
+            Assert.assertTrue(true);
+
+        }
+    }
+
 
     @Test
     public void testAddUpdateType() throws Exception

@@ -15,38 +15,42 @@
 	    <link rel="stylesheet" href="/goodwill/css/global.css" type="text/css">
 	</head>
 	<body>
-		
+
 		<div id="header">
 			<div class="wrapper">
-				<h1>Thrift Query Server</h1>				
+				<h1>Thrift Query Server</h1>
+				<div class="newET"><a>Create an Event Type</a></div>
 			</div>
 		</div>
-		
-		
+
+
 		<div id="main">
 			<div id="table">
 				<table id="eventTypes">
 					<thead><tr><th>Event Type</th></tr></thead>
-				</table>				
+				</table>
 			</div>
-			
-			<div id="resultsWrapper">	
+
+			<div id="resultsWrapper">
 				<div id="resultsPane">
-					<div id="title">
+					<div id="title" class="active">
 						<ul>
 							<li>Schema:</li>
-							<li id="name">&nbsp;</li>
+							<li id="name"></li>
 							<li id="sButtons">
 								<ul>
-									<li id="show"></li>
-									<li id="depricate"></li>
+									<li id="show_schema"></li>
+									<li id="add"></li>
+									<li id="deprecate"></li>
 								</ul>
-							</li>
+						  </li>
+							<div style="clear:both;"></div>
+
 					</div>
 				</div>
 				<div style="clear:both;"></div>
 			</div>
-			
+
 		</div>
 
 
