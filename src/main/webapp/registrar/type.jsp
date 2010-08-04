@@ -12,6 +12,7 @@
 	    <script type="text/javascript">var json = ${it};</script>
 			<script type="text/javascript" src="/goodwill/js/jquery-1.3.2.min.js"></script>
 			<script type="text/javascript" src="/goodwill/js/jquery-magic.js"></script>
+			<script type="text/javascript" src="/goodwill/js/jquery.json-2.2.js"></script>
 	    <link rel="stylesheet" href="/goodwill/css/global.css" type="text/css">
 	</head>
 	<body>
