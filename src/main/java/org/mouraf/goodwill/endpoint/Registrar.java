@@ -13,6 +13,7 @@ import org.mouraf.goodwill.store.ThriftType;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -69,6 +70,13 @@ public class Registrar
 
     @GET
     @Produces("application/json")
+    public Response getAllJson() throws IOException, JSONException
+    {
+        return Response.ok(store.toJSON().toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
+
+    @GET
+    @Produces("application/json")
     @Path("/{type}/")
     public Response getTypeJson(@PathParam("type") String typeName) throws IOException, JSONException
     {
@@ -102,7 +110,26 @@ public class Registrar
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    @PUT
+    @Consumes("application/json")
+    public Response put(
+        String jsonThriftTypeString
+    )
+    {
+        try {
+            JSONObject eventJSON = new JSONObject(jsonThriftTypeString);
+            ThriftType thriftType = new ThriftType(eventJSON);
+            store.updateType(thriftType);
+            log.info(String.format("Updated ThriftType <%s> from JSON <%s>", thriftType.toString(), jsonThriftTypeString));
+        }
+        catch (JSONException e) {
+            log.warn(String.format("Malformatted JSON: %s", jsonThriftTypeString));
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         return Response.status(Response.Status.ACCEPTED).build();
     }
 }
-
