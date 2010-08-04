@@ -22,4 +22,4 @@ mvn package
 
 h2. License
 
-See COPYING file.
+See LICENSE-2.0.txt file.
