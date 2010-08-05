@@ -14,13 +14,13 @@
  * under the License.
  */
 
-package org.mouraf.goodwill.store;
+package com.ning.metrics.goodwill.store;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.mouraf.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 
 import java.io.IOException;
 import java.sql.Connection;

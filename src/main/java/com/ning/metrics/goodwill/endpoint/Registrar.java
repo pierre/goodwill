@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.mouraf.goodwill.endpoint;
+package com.ning.metrics.goodwill.endpoint;
 
 import com.google.inject.Inject;
 import com.sun.jersey.api.NotFoundException;
@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mouraf.goodwill.store.GoodwillStore;
-import org.mouraf.goodwill.store.ThriftType;
+import com.ning.metrics.goodwill.store.GoodwillStore;
+import com.ning.metrics.goodwill.store.ThriftType;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;

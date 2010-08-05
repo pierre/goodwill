@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.mouraf.goodwill.store;
+package com.ning.metrics.goodwill.store;
 
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.inject.Inject;
@@ -23,7 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.mouraf.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 
 import java.io.FileReader;
 import java.io.IOException;

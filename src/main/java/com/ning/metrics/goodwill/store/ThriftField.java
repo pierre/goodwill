@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.mouraf.goodwill.store;
+package com.ning.metrics.goodwill.store;
 
 import org.apache.thrift.protocol.TType;
 import org.json.JSONException;

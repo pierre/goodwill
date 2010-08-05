@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.mouraf.goodwill.binder.modules;
+package com.ning.metrics.goodwill.binder.modules;
 
 import com.google.inject.Binder;
 import com.google.inject.Guice;
@@ -25,10 +25,9 @@ import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
-import org.mouraf.goodwill.binder.config.GoodwillConfig;
-import org.mouraf.goodwill.store.CSVFileStore;
-import org.mouraf.goodwill.store.GoodwillStore;
-import org.mouraf.goodwill.store.MySQLStore;
+import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.store.CSVFileStore;
+import com.ning.metrics.goodwill.store.GoodwillStore;
 import org.skife.config.ConfigurationObjectFactory;
 
 import java.util.HashMap;
@@ -41,7 +40,7 @@ public class GuiceConfig extends GuiceServletContextListener
     {
         /* Scan for Jersey endpoints */
         final Map<String, String> params = new HashMap<String, String>();
-        params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "org.mouraf.goodwill.endpoint");
+        params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.ning.metrics.goodwill.endpoint");
 
         return Guice.createInjector(
             Stage.PRODUCTION,
@@ -53,7 +52,7 @@ public class GuiceConfig extends GuiceServletContextListener
                     GoodwillConfig config = new ConfigurationObjectFactory(System.getProperties()).build(GoodwillConfig.class);
                     binder.bind(GoodwillConfig.class).toInstance(config);
 
-                    binder.bind(GoodwillStore.class).to(MySQLStore.class);
+                    binder.bind(GoodwillStore.class).to(CSVFileStore.class);
                 }
             },
             new ServletModule()

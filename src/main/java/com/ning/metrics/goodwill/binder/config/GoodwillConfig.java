@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package org.mouraf.goodwill.binder.config;
+package com.ning.metrics.goodwill.binder.config;
 
 import org.skife.config.Config;
 
