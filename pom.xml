@@ -6,7 +6,7 @@
     <groupId>com.ning</groupId>
     <artifactId>metrics.goodwill</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <!-- Required by guice 2.0 -->
