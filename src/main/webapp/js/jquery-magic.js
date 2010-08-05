@@ -21,8 +21,8 @@ t = {};
 
 
 $(document).ready(function(){	
-
-  objects = json;
+  console.log(json);
+  objects = w.json_to_objects(json);
   w.panel_heights();
   w.build_eventType_table();
   r.events();
@@ -38,6 +38,38 @@ $(window).resize(function() {
 	$("#table").css("height", (height - 40));
 });
 
+
+w.json_to_objects = function(json){
+  
+  var objects = {};
+  $.each(json, function(index, eventType){
+    
+    var name = eventType.name;
+    var schema = $.map(eventType.schema, function(s, index){
+      
+      return {
+        active: 'active',
+        description: s.description,
+        field_type: s.type,
+        name: s.name,
+        position: s.position,
+        sql_length: s.sql_length,
+        sql_scale: s.sql_scale,
+        sql_precision: s.sql_precision,
+        sql_type: s.sql_type
+      };
+      
+    });
+    
+    objects[name] = 
+     {
+       schema: schema,
+       active: 'active'
+     }
+  })
+  
+  return objects;
+}
 
 e.events = function(element){
   $(element).hover(function(){
@@ -100,11 +132,12 @@ e.events = function(element){
       } else {
         schema.push(attributes);
       }
-
+      
+      w.request(new_element);
       element.attr("_status", "");    
       e.return_to_std_mode(element, attributes);      
     }
-
+      
   });
 
   $(".details .actions .cancel", element).click(function(){
@@ -650,3 +683,63 @@ keys = function(obj){
   }
   return accumalator;
 }
+
+
+
+
+
+w.request = function(new_element){
+  
+  
+  transformed_schema = $.map(schema, function(s, index){
+    return {
+      name: s.name,
+      type: s.field_type,
+      position: s.position + "",
+      description: s.description,
+      sql: {
+        scale: s.sql_scale + "",
+        precision: s.sql_precision + "",
+        length: s.sql_length + "",
+        type: s.sql_type + ""
+      },
+    }
+  });
+    
+   if (new_element) {
+      console.log("create eventType");
+      $.ajax({
+        type: 'POST',
+        url: '/goodwill/registrar', 
+        data: $.toJSON({name: eventType, schema: {key: "test"}}),
+        success: function(){
+          console.log("successfully posted eventType")
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown){
+          console.log("failed");
+          console.log(textStatus);
+        },
+        dataType: "json"
+      });
+      
+    } else {
+      console.log("updating eventType");
+      $.ajax({
+        type: 'POST',
+        url: '/goodwill/registrar', 
+        data: $.toJSON({name: eventType, schema: transformed_schema}),
+        success: function(){
+          console.log("successfully put eventType")
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown){
+          console.log(textStatus);
+          console.log(XMLHttpRequest);
+          console.log(errorThrown);
+        },
+        dataType: "json",
+        contentType: "application/json"
+      });
+    }  
+}
+
+
