@@ -23,11 +23,11 @@ import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
+import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.store.GoodwillStore;
+import com.ning.metrics.goodwill.store.MySQLStore;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
-import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
-import com.ning.metrics.goodwill.store.CSVFileStore;
-import com.ning.metrics.goodwill.store.GoodwillStore;
 import org.skife.config.ConfigurationObjectFactory;
 
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public class GuiceConfig extends GuiceServletContextListener
                     GoodwillConfig config = new ConfigurationObjectFactory(System.getProperties()).build(GoodwillConfig.class);
                     binder.bind(GoodwillConfig.class).toInstance(config);
 
-                    binder.bind(GoodwillStore.class).to(CSVFileStore.class);
+                    binder.bind(GoodwillStore.class).to(MySQLStore.class);
                 }
             },
             new ServletModule()
