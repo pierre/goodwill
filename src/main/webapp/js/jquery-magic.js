@@ -19,6 +19,7 @@ e = {};
 r = {};
 t = {};
 
+const DEFAULT_DESCRIPTION = "add a description";
 
 $(document).ready(function()
 {
@@ -170,6 +171,13 @@ e.events = function(element)
         // e.param("", "field", footer);
     });
 
+    $(".details .description", element).focus(function()
+    {
+        alert(this);
+        if ($(this).text == DEFAULT_DESCRIPTION) {
+            $(this).text = "";
+        }
+    });
 }
 
 e.create_element = function(field_obj)
@@ -289,7 +297,7 @@ e.get_attributes = function(element, create)
 
         // remove default values for name and description
         attr.name = (attr.name != "name") ? attr.name : "";
-        attr.description = (attr.description != "add a description") ? attr.description : "";
+        attr.description = (attr.description != DEFAULT_DESCRIPTION) ? attr.description : "";
 
         // get sql length, scale, and precision
         console.log("this is a " + attr.field_type);
@@ -595,7 +603,7 @@ t.events = function()
 
     $('table#eventTypes tbody tr').click(function()
     {
-        eventType = $(el).attr('name');
+        eventType = $(this).attr('name');
 
         defineObjectAndSchema(this);
 
