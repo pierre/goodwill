@@ -51,7 +51,6 @@ w.json_to_objects = function(json)
         var name = eventType.name;
         var schema = $.map(eventType.schema, function(s, index)
         {
-
             return {
                 active: 'active',
                 description: s.description,
@@ -181,7 +180,6 @@ e.events = function(element)
         var sql = $(".details .sql", element);
         e.param(attributes, "sql", sql);
 
-
         // e.param("", "field", footer);
     });
 
@@ -223,12 +221,12 @@ e.create_element = function(field_obj)
                 .append($('<div class="footer">')
                 .append($('<div class="type">')
                 .append($('<ul class="list">')
-                .append($("<li>").html("type: "))
+                .append($("<li>").html("Thrift type: "))
                 .append($('<li class="dropdown">').html(element.field_type || ""))
                 )
                 )
                 .append($('<div class="position">')
-                .append($('<div class="text">').text("position: "))
+                .append($('<div class="text">').text("Thrift position: "))
                 .append($('<div class="value">').html(element.position + "" || ""))
                 )
                 )
@@ -446,14 +444,14 @@ e.dropdown = function(attr)
     var type_map = {
         ""  : [],
         "string" : ["nvarchar", "varchar"],
-        "bool" : ["bool"],
-        "byte" : ["byte"],
-        "i16" : ["i16"],
-        "i32" : ["i32"],
-        "i64" : ["i64"],
-        "double" : ["double", "decimal"],
-        "date" : ["date", "date and time"],
-        "ip" : ["ip"]
+        "bool" : ["boolean"],
+        "byte" : ["byteint"],
+        "i16" : ["smallint"],
+        "i32" : ["integer"],
+        "i64" : ["bigint"],
+        "double" : ["numeric", "decimal"],
+        "date" : ["date", "datetime"],
+        "ip" : ["IP-TODO?"]
     };
 
 
@@ -602,6 +600,7 @@ r.create_fields = function(fields)
     });
 
     r.actions.set_rp_schema();
+    r.actions.set_rp_sqlSchema();
 }
 
 t.events = function()
@@ -617,7 +616,6 @@ t.events = function()
 
         r.presentation_stuff(this);
         r.create_fields(schema);
-
     });
 
 }
@@ -719,6 +717,53 @@ r.actions = {
         $(div).appendTo($("#resultsPane"));
     },
 
+
+    set_rp_sqlSchema:function()
+    {
+        // build string
+        var string = "CREATE TABLE thrift_type_" + eventType.toLowerCase().replace(/ /g, "_") + " (<br />";
+        $.each(schema, function(index, field)
+        {
+            var sql_type = null;
+            if (field.sql_type == "decimal" || field.sql_type == "numeric") {
+                if (field.sql_precision) {
+                    if (field.sql_scale) {
+                        sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_precision + ")";
+                    }
+                    else {
+                        sql_type = field.sql_type + "(" + field.sql_precision + ")";
+
+                    }
+                }
+                else {
+                    sql_type = field.sql_type;
+                }
+            }
+            else {
+                if (field.sql_type == "nvarchar" || field.sql_type == "varchar") {
+                    if (field.sql_length) {
+                        sql_type = field.sql_type + "(" + field.sql_length + ")";
+                    }
+                }
+                else {
+                    sql_type = field.sql_type;
+                }
+            }
+            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.name + " " + sql_type + ",<br />";
+        });
+        string += ");";
+
+        // build schema div
+        var div = $('<div class="element" id="schema">')
+                .append($('<div class="navBar active">').text("Schema"))
+                .append($('<div class="details active" style="padding:10px;">')
+                .html(string)
+                );
+
+        // append schema to resultsPane
+        $(div).appendTo($("#resultsPane"));
+    },
+
     showButtons:function()
     {
         $("#resultsPane #sButtons")
@@ -747,8 +792,6 @@ keys = function(obj)
 
 w.request = function(new_element)
 {
-
-
     transformed_schema = $.map(schema, function(s, index)
     {
         return {
@@ -770,7 +813,7 @@ w.request = function(new_element)
         $.ajax({
             type: 'POST',
             url: '/goodwill/registrar',
-            data: $.toJSON({name: eventType, schema: {key: "test"}}),
+            data: $.toJSON({name: eventType, schema: transformed_schema}),
             success: function()
             {
                 console.log("successfully posted eventType")

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 
-
 // CREATE TABLE `thrift_types` (
 //   `event_type` varchar(255) DEFAULT NULL,
 //   `field_id` int(11) DEFAULT NULL,
@@ -33,8 +32,8 @@ import java.util.Collection;
 //   `field_name` varchar(255) DEFAULT NULL,
 //   `sql_type` varchar(255) DEFAULT NULL,
 //   `sql_length` int(11) DEFAULT NULL,
-//      `sql_scale` int(11) DEFAULT NULL,
-//      `sql_precision` int(11) DEFAULT NULL,
+//   `sql_scale` int(11) DEFAULT NULL,
+//   `sql_precision` int(11) DEFAULT NULL,
 //   `description` varchar(255) DEFAULT NULL,
 //   `id` int(11) NOT NULL AUTO_INCREMENT,
 //   PRIMARY KEY (`id`),

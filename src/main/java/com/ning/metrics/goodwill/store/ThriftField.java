@@ -60,44 +60,44 @@ public class ThriftField
     private static final String TTYPE_DOUBLE = "double";
 
     public ThriftField(
-            String name,
-            String typeString,
-            Integer position
+        String name,
+        String typeString,
+        Integer position
     )
     {
         this(name, typeString, position, null, null, null, null, null);
     }
 
     public ThriftField(
-            String name,
-            String typeString,
-            Integer position,
-            String description
+        String name,
+        String typeString,
+        Integer position,
+        String description
     )
     {
         this(name, typeString, position, description, null, null, null, null);
     }
 
     public ThriftField(
-            String name,
-            String typeString,
-            Integer position,
-            String sqlType,
-            Integer sqlLength
+        String name,
+        String typeString,
+        Integer position,
+        String sqlType,
+        Integer sqlLength
     )
     {
         this(name, typeString, position, null, sqlType, sqlLength, null, null);
     }
 
     public ThriftField(
-            String name,
-            String typeString,
-            Integer position,
-            String description,
-            String sqlType,
-            Integer sqlLength,
-            Integer sqlScale,
-            Integer sqlPrecision
+        String name,
+        String typeString,
+        Integer position,
+        String description,
+        String sqlType,
+        Integer sqlLength,
+        Integer sqlScale,
+        Integer sqlPrecision
     )
     {
         if (name == null) {
@@ -127,35 +127,34 @@ public class ThriftField
     }
 
     public ThriftField(
-            JSONObject thriftItemJSONObject
+        JSONObject thriftItemJSONObject
     ) throws JSONException
     {
         this(
+            thriftItemJSONObject.getString(JSON_THRIFT_FIELD_NAME),
 
-                thriftItemJSONObject.getString(JSON_THRIFT_FIELD_NAME),
+            thriftItemJSONObject.getString(JSON_THRIFT_FIELD_TYPE),
 
-                thriftItemJSONObject.getString(JSON_THRIFT_FIELD_TYPE),
+            thriftItemJSONObject.getInt(JSON_THRIFT_FIELD_POSITION),
 
-                thriftItemJSONObject.getInt(JSON_THRIFT_FIELD_POSITION),
+            thriftItemJSONObject.has(JSON_THRIFT_FIELD_DESCRIPTION) ?
+                thriftItemJSONObject.getString(JSON_THRIFT_FIELD_DESCRIPTION) : null,
 
-                thriftItemJSONObject.has(JSON_THRIFT_FIELD_DESCRIPTION) ?
-                        thriftItemJSONObject.getString(JSON_THRIFT_FIELD_DESCRIPTION) : null,
+            thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
+                (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_TYPE) ?
+                    thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getString(JSON_THRIFT_FIELD_SQL_TYPE) : null) : null,
 
-                thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                        (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_TYPE) ?
-                                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getString(JSON_THRIFT_FIELD_SQL_TYPE) : null) : null,
+            thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
+                (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_LENGTH) ?
+                    thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_LENGTH) : null) : null,
 
-                thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                        (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_LENGTH) ?
-                                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_LENGTH) : null) : null,
+            thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
+                (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_SCALE) ?
+                    thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_SCALE) : null) : null,
 
-                thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                        (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_SCALE) ?
-                                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_SCALE) : null) : null,
-
-                thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                        (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_PRECISION) ?
-                                thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_PRECISION) : null) : null
+            thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
+                (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_PRECISION) ?
+                    thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_PRECISION) : null) : null
         );
     }
 
@@ -247,6 +246,16 @@ public class ThriftField
         return sqlLength;
     }
 
+    public Integer getSqlScale()
+    {
+        return sqlScale;
+    }
+
+    public Integer getSqlPrecision()
+    {
+        return sqlPrecision;
+    }
+
     public String getSqlType()
     {
         return sqlType;
@@ -265,15 +274,15 @@ public class ThriftField
         }
         catch (JSONException e) {
             return "ThriftField{" +
-                    JSON_THRIFT_FIELD_NAME + "='" + name + '\'' +
-                    ", " + JSON_THRIFT_FIELD_TYPE + "='" + ThriftField.typeStringfromTType(type) + '\'' +
-                    ", " + JSON_THRIFT_FIELD_POSITION + "=" + position +
-                    ", " + JSON_THRIFT_FIELD_SQL_TYPE + "='" + sqlType + '\'' +
-                    ", " + JSON_THRIFT_FIELD_SQL_LENGTH + "=" + sqlLength +
-                    ", " + JSON_THRIFT_FIELD_SQL_SCALE + "=" + sqlScale +
-                    ", " + JSON_THRIFT_FIELD_SQL_PRECISION + "=" + sqlPrecision +
-                    ", " + JSON_THRIFT_FIELD_DESCRIPTION + "=" + description +
-                    '}';
+                JSON_THRIFT_FIELD_NAME + "='" + name + '\'' +
+                ", " + JSON_THRIFT_FIELD_TYPE + "='" + ThriftField.typeStringfromTType(type) + '\'' +
+                ", " + JSON_THRIFT_FIELD_POSITION + "=" + position +
+                ", " + JSON_THRIFT_FIELD_SQL_TYPE + "='" + sqlType + '\'' +
+                ", " + JSON_THRIFT_FIELD_SQL_LENGTH + "=" + sqlLength +
+                ", " + JSON_THRIFT_FIELD_SQL_SCALE + "=" + sqlScale +
+                ", " + JSON_THRIFT_FIELD_SQL_PRECISION + "=" + sqlPrecision +
+                ", " + JSON_THRIFT_FIELD_DESCRIPTION + "=" + description +
+                '}';
         }
     }
 
@@ -288,9 +297,9 @@ public class ThriftField
     public JSONObject toJSON() throws JSONException
     {
         JSONObject tFieldJSON = new JSONObject()
-                .put(JSON_THRIFT_FIELD_NAME, name)
-                .put(JSON_THRIFT_FIELD_TYPE, ThriftField.typeStringfromTType(type))
-                .put(JSON_THRIFT_FIELD_POSITION, position);
+            .put(JSON_THRIFT_FIELD_NAME, name)
+            .put(JSON_THRIFT_FIELD_TYPE, ThriftField.typeStringfromTType(type))
+            .put(JSON_THRIFT_FIELD_POSITION, position);
 
         if (description != null) {
             tFieldJSON.put(JSON_THRIFT_FIELD_DESCRIPTION, description);

@@ -17,10 +17,10 @@
 package com.ning.metrics.goodwill.store;
 
 import com.google.inject.Inject;
+import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
-import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -45,6 +45,8 @@ public class MySQLStore implements GoodwillStore
             "field_name = ?, " +
             "sql_type = ?, " +
             "sql_length = ?, " +
+            "sql_precision = ?, " +
+            "sql_scale = ?, " +
             "description = ?";
 
     private Connection connection;
@@ -227,11 +229,23 @@ public class MySQLStore implements GoodwillStore
         else {
             statement.setInt(6, field.getSqlLength());
         }
-        if (field.getDescription() == null) {
-            statement.setNull(7, Types.VARCHAR);
+        if (field.getSqlPrecision() == null) {
+            statement.setNull(7, Types.INTEGER);
         }
         else {
-            statement.setString(7, field.getDescription());
+            statement.setInt(7, field.getSqlPrecision());
+        }
+        if (field.getSqlScale() == null) {
+            statement.setNull(8, Types.INTEGER);
+        }
+        else {
+            statement.setInt(8, field.getSqlScale());
+        }
+        if (field.getDescription() == null) {
+            statement.setNull(9, Types.VARCHAR);
+        }
+        else {
+            statement.setString(9, field.getDescription());
         }
         statement.addBatch();
     }
@@ -265,7 +279,8 @@ public class MySQLStore implements GoodwillStore
 
                     int key = result.getInt(1);
 
-                    updates.setInt(8, key);
+                    // Needs to be changed if TABLE_STRING_DESCRIPTOR changes!
+                    updates.setInt(10, key);
                     addSQLStatementToBatch(updates, thriftType, field);
                 }
 
