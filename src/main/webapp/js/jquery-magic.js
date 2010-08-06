@@ -133,7 +133,7 @@ e.events = function(element)
 
         if (necessary_fields_missed) {
 
-            alert("The name, description, and field_typ fields need to be filled out!");
+            alert("The name, description, and field_type fields need to be filled out!");
 
         }
         else {
