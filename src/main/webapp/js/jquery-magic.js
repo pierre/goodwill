@@ -520,7 +520,6 @@ w.panel_heights = function()
 
 w.build_eventType_table = function()
 {
-
     sorted_keys = keys(objects).sort();
 
     for (i in sorted_keys) {
@@ -537,7 +536,6 @@ w.events = function()
 {
     $('#header .newET a').click(function()
     {
-
         eventType = prompt("Event Type:");
         var types = keys(objects);
         var not_repeated = $.grep(types, function(t, i)
@@ -546,26 +544,27 @@ w.events = function()
         }, true)
 
         if (eventType && (not_repeated.length == types.length)) {
-            object = {
+            objects[eventType] = {
                 active: "active",
                 created_date: new Date(),
                 schema: new Array()
             };
 
-            objects[eventType] = object;
+            defineObjectAndSchema();
 
             // rebuilt event type table
             $('#eventTypes tr').remove();
             w.build_eventType_table();
 
+            // Register events
             t.events();
             var tr = $('#eventTypes tr.' + eventType)
-            r.presentation_stuff(tr);
+            r.updatePaneOnSelectEvent(tr);
         }
     });
 }
 
-r.presentation_stuff = function(tr)
+r.updatePaneOnSelectEvent = function(tr)
 {
     r.actions.wipe_rp();
     r.actions.set_rp_title();
@@ -584,20 +583,25 @@ r.create_fields = function(fields)
     r.actions.set_rp_sqlSchema();
 }
 
+function defineObjectAndSchema()
+{
+    object = objects[eventType]
+    schema = object.schema;
+}
+
 t.events = function()
 {
     $("#resultsPane #sButtons").hide();
 
     $('table#eventTypes tbody tr').click(function()
     {
-        eventType = $(this).attr('name');
-        object = objects[eventType]
-        schema = object.schema;
+        eventType = $(el).attr('name');
 
-        r.presentation_stuff(this);
+        defineObjectAndSchema(this);
+
+        r.updatePaneOnSelectEvent(this);
         r.create_fields(schema);
     });
-
 }
 
 r.events = function()
@@ -609,7 +613,7 @@ r.events = function()
 
         attributes = e.get_attributes(element, true);
         schema.push(attributes);
-    })
+    });
 
     $('#resultsPane #title li#deprecate').toggle(function()
     {
