@@ -695,13 +695,13 @@ w.request = function(new_element){
     return {
       name: s.name,
       type: s.field_type,
-      position: s.position + "",
+      position: parseInt(s.position),
       description: s.description,
       sql: {
-        scale: s.sql_scale + "",
-        precision: s.sql_precision + "",
-        length: s.sql_length + "",
-        type: s.sql_type + ""
+        scale: parseInt(s.sql_scale),
+        precision: parseInt(s.sql_precision),
+        length: parseInt(s.sql_length),
+        type: s.sql_type
       },
     }
   });
