@@ -260,10 +260,10 @@ e.get_attributes = function(element, create)
             attr.sql_precision = "";
         }
         else {
-            if (attr.field_type == "double") {
+            if (attr.field_type == "decimal" || attr.field_type == "numeric") {
                 attr.sql_length = "";
-                attr.sql_scale = $(".sql .primary_parameter", element).html();
-                attr.sql_precision = $(".sql .secondary_parameter", element).html();
+                attr.sql_precision = $(".sql .primary_parameter", element).html();
+                attr.sql_scale = $(".sql .secondary_parameter", element).html();
             }
             else {
                 attr.sql_length = "";
@@ -421,7 +421,6 @@ e.return_to_std_mode = function(element, attr)
 
 e.dropdown = function(attr)
 {
-
     var dropdown = $("<select>");
 
     // Netezza specific!
@@ -443,7 +442,6 @@ e.dropdown = function(attr)
     {
         $.each(types, function(index, type)
         {
-
             var option = $("<option>").val(type).text(type);
 
             if (type == sql_type) {
@@ -496,7 +494,7 @@ e.param = function(attributes, type, form)
 
     }
     else {
-        if (field_type == "double") {
+        if (field_type == "double" || field_type == "decimal") {
             $(".primary_parameter", form)
                     .html($("<input>").val(scale));
             $(".secondary_parameter", form)
@@ -564,7 +562,6 @@ w.events = function()
             var tr = $('#eventTypes tr.' + eventType)
             r.presentation_stuff(tr);
         }
-
     });
 }
 
@@ -638,8 +635,6 @@ r.events = function()
         {
             field.active = "active";
         })
-
-
     });
 }
 
@@ -707,7 +702,7 @@ r.actions = {
             if (field.sql_type == "decimal" || field.sql_type == "numeric") {
                 if (field.sql_precision) {
                     if (field.sql_scale) {
-                        sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_precision + ")";
+                        sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_scale + ")";
                     }
                     else {
                         sql_type = field.sql_type + "(" + field.sql_precision + ")";
