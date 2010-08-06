@@ -142,19 +142,19 @@ public class ThriftField
                         thriftItemJSONObject.getString(JSON_THRIFT_FIELD_DESCRIPTION) : null,
 
                 thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                        (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_TYPE) ?
+                        (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_TYPE) ?
                                 thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getString(JSON_THRIFT_FIELD_SQL_TYPE) : null) : null,
 
                 thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                        (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_LENGTH) ?
+                        (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_LENGTH) ?
                                 thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_LENGTH) : null) : null,
 
                 thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                        (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_SCALE) ?
+                        (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_SCALE) ?
                                 thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_SCALE) : null) : null,
 
                 thriftItemJSONObject.has(JSON_THRIFT_FIELD_SQL_KEY) ?
-                        (thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).has(JSON_THRIFT_FIELD_SQL_PRECISION) ?
+                        (!thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).isNull(JSON_THRIFT_FIELD_SQL_PRECISION) ?
                                 thriftItemJSONObject.getJSONObject(JSON_THRIFT_FIELD_SQL_KEY).getInt(JSON_THRIFT_FIELD_SQL_PRECISION) : null) : null
         );
     }
