@@ -43,11 +43,9 @@ $(window).resize(function()
 
 w.json_to_objects = function(json)
 {
-
     var objects = {};
     $.each(json, function(index, eventType)
     {
-
         var name = eventType.name;
         var schema = $.map(eventType.schema, function(s, index)
         {
@@ -57,10 +55,10 @@ w.json_to_objects = function(json)
                 field_type: s.type,
                 name: s.name,
                 position: s.position,
-                sql_length: s.sql_length,
-                sql_scale: s.sql_scale,
-                sql_precision: s.sql_precision,
-                sql_type: s.sql_type
+                sql_length: s.sql == null ? null : s.sql.length,
+                sql_scale: s.sql == null ? null : s.sql.scale,
+                sql_precision: s.sql == null ? null : s.sql.precision,
+                sql_type: s.sql == null ? null : s.sql.type
             };
 
         });
@@ -94,12 +92,10 @@ e.events = function(element)
 
         var status = e.status(element);
         e.std_mode(element) ? e.enter_edit_mode(element, attributes, status) : e.return_to_std_mode(element, object);
-
     });
 
     $(".navBar .deprecate", element).click(function(event)
     {
-
         // get element and attributes
         var element = $(this).closest(".element");
         var attributes = e.get_attributes(element, false);
@@ -118,24 +114,18 @@ e.events = function(element)
 
     $(".details .actions .save", element).click(function()
     {
-
         // get element and element attributes
         var element = $(this).closest(".element");
         var new_element = e.status(element);
         var attributes = e.get_attributes(element, new_element);
         var index = $("#resultsPane .element").index(element);
 
-
         var necessary_fields_missed = ((attributes.name == "") || (attributes.description == "") || (attributes.field_type == ""));
 
-
         if (necessary_fields_missed) {
-
             alert("The name, description, and field_type fields need to be filled out!");
-
         }
         else {
-
             // adjust the schema
             if (schema.length > index) {
                 schema[index] = attributes;
@@ -153,7 +143,6 @@ e.events = function(element)
 
     $(".details .actions .cancel", element).click(function()
     {
-
         // get element
         var element = $(this).closest(".element");
         var index = $("#resultsPane .element").index(element);
@@ -173,9 +162,7 @@ e.events = function(element)
 
         // change sql dropdown and add parameter fields
         var dropdown = $(".sql .dropdown", element)
-                .html(
-                e.dropdown(attributes)
-                );
+                .html(e.dropdown(attributes));
 
         var sql = $(".details .sql", element);
         e.param(attributes, "sql", sql);
@@ -257,7 +244,6 @@ e.get_attributes = function(element, create)
 
     var std_attributes = function()
     {
-
         var attr = {};
 
         attr.name = element.find(".name").html();
@@ -286,13 +272,11 @@ e.get_attributes = function(element, create)
             }
         }
 
-
         return attr;
     }
 
     var edit_attributes = function(create)
     {
-
         var attr = {};
 
         attr.name = $(".name input", element).val();
@@ -306,7 +290,6 @@ e.get_attributes = function(element, create)
         // remove default values for name and description
         attr.name = (attr.name != "name") ? attr.name : "";
         attr.description = (attr.description != "add a description") ? attr.description : "";
-
 
         // get sql length, scale, and precision
         console.log("this is a " + attr.field_type);
@@ -441,6 +424,7 @@ e.dropdown = function(attr)
 
     var dropdown = $("<select>");
 
+    // Netezza specific!
     var type_map = {
         ""  : [],
         "string" : ["nvarchar", "varchar"],
@@ -609,7 +593,6 @@ t.events = function()
 
     $('table#eventTypes tbody tr').click(function()
     {
-
         eventType = $(this).attr('name');
         object = objects[eventType]
         schema = object.schema;
@@ -624,7 +607,6 @@ r.events = function()
 {
     $("#resultsPane #title li#add").click(function()
     {
-
         var total_elements = $('#resultsPane .element').length;
         element = e.create_element({position:total_elements, status:"new"});
 
@@ -634,8 +616,6 @@ r.events = function()
 
     $('#resultsPane #title li#deprecate').toggle(function()
     {
-
-
         // update DOM
         $('#resultsPane #title, .element .navBar, .element .details, .element .footer').addClass("deprecated").removeClass("active");
 
@@ -665,7 +645,6 @@ r.events = function()
 
 
 r.actions = {
-
     wipe_rp:function()
     {
         $("#resultsPane")
@@ -699,7 +678,7 @@ r.actions = {
     set_rp_schema:function()
     {
         // build string
-        var string = eventType + " &nbsp; {<br />";
+        var string = "struct " + eventType + " &nbsp; {<br />";
         $.each(schema, function(index, field)
         {
             string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ":" + field.field_type + " " + field.name + ",<br />";
@@ -708,13 +687,13 @@ r.actions = {
 
         // build schema div
         var div = $('<div class="element" id="schema">')
-                .append($('<div class="navBar active">').text("Schema"))
+                .append($('<div class="navBar active">').text("Thrift schema"))
                 .append($('<div class="details active" style="padding:10px;">')
                 .html(string)
                 );
 
-        // append schema to resultsPane
-        $(div).appendTo($("#resultsPane"));
+        // append schema to resultsWrapper, not resultsPane (affect Thrift fields positions)
+        $(div).appendTo($("#resultsWrapper"));
     },
 
 
@@ -755,21 +734,20 @@ r.actions = {
 
         // build schema div
         var div = $('<div class="element" id="schema">')
-                .append($('<div class="navBar active">').text("Schema"))
+                .append($('<div class="navBar active">').text("SQL create statement"))
                 .append($('<div class="details active" style="padding:10px;">')
                 .html(string)
                 );
 
         // append schema to resultsPane
-        $(div).appendTo($("#resultsPane"));
+        $(div).appendTo($("#resultsWrapper"));
     },
 
     showButtons:function()
     {
         $("#resultsPane #sButtons")
                 .show();
-    }
-    ,
+    },
 
     highlightSelectedRow:function(tr)
     {
@@ -811,7 +789,7 @@ w.request = function(new_element)
     if (new_element) {
         console.log("create eventType");
         $.ajax({
-            type: 'POST',
+            type: 'PUT',
             url: '/goodwill/registrar',
             data: $.toJSON({name: eventType, schema: transformed_schema}),
             success: function()
@@ -823,7 +801,8 @@ w.request = function(new_element)
                 console.log("failed");
                 console.log(textStatus);
             },
-            dataType: "json"
+            dataType: "json",
+            contentType: "application/json"
         });
 
     }
