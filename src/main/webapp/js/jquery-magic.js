@@ -725,7 +725,7 @@ w.request = function(new_element){
     } else {
       console.log("updating eventType");
       $.ajax({
-        type: 'POST',
+        type: 'PUT',
         url: '/goodwill/registrar', 
         data: $.toJSON({name: eventType, schema: transformed_schema}),
         success: function(){
