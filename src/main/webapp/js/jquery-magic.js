@@ -88,7 +88,6 @@ e.events = function(element)
 
     $(".navBar", element).click(function()
     {
-
         var element = $(this).closest(".element");
         var attributes = e.get_attributes(element, false);
         var index = $("#resultsPane .element").index(element);
@@ -196,7 +195,7 @@ e.create_element = function(field_obj)
                 .attr("_edit", "")
                 .attr("_status", element.status || "")
 
-                .append($('<div class="navBar">')
+                .append($('<div class="navBar" style="cursor:pointer")">')
                 .append($('<div class="name">').text(element.name || ""))
                 .append($('<div class="buttons">')
                 .append($('<div class="deprecate">'))
@@ -353,8 +352,6 @@ e.status = function(element)
 
 e.enter_edit_mode = function(element, attr, create)
 {
-
-
     console.log("enter edit mode");
 
     // FIX element attributes
@@ -408,8 +405,6 @@ e.enter_edit_mode = function(element, attr, create)
 
 e.return_to_std_mode = function(element, attr)
 {
-
-
     // FIX element attributes
     $(".name", element)
             .removeClass("edit")
@@ -551,7 +546,7 @@ w.build_eventType_table = function()
     for (i in sorted_keys) {
         key = sorted_keys[i];
         $('table#eventTypes').append(
-                $('<tr>')
+                $('<tr style="cursor:pointer")">')
                         .attr('name', key)
                         .append($('<td>').text(key))
                 );
@@ -766,7 +761,7 @@ w.request = function(new_element)
                 precision: parseInt(s.sql_precision),
                 length: parseInt(s.sql_length),
                 type: s.sql_type
-            },
+            }
         }
     });
 
