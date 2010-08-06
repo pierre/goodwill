@@ -122,7 +122,7 @@ public class Registrar
             log.info(String.format("Created new ThriftType <%s> from JSON <%s>", thriftType.toString(), jsonThriftTypeString));
         }
         catch (JSONException e) {
-            log.warn(String.format("Malformatted JSON: %s", jsonThriftTypeString));
+            log.warn(String.format("Malformatted JSON: %s (%s)", jsonThriftTypeString, e));
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
