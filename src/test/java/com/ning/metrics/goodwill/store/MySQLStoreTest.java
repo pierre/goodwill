@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 
-// CREATE TABLE `thrift_types` (
+//CREATE TABLE `thrift_types_tests` (
 //   `event_type` varchar(255) DEFAULT NULL,
 //   `field_id` int(11) DEFAULT NULL,
 //   `field_type` varchar(255) DEFAULT NULL,
@@ -38,7 +38,7 @@ import java.util.Collection;
 //   `id` int(11) NOT NULL AUTO_INCREMENT,
 //   PRIMARY KEY (`id`),
 //   UNIQUE KEY `unique_fields` (`event_type`,`field_id`)
-// ) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8
+//) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8
 
 public class MySQLStoreTest
 {
@@ -51,7 +51,7 @@ public class MySQLStoreTest
     @BeforeTest(alwaysRun = false)
     public void setUp() throws SQLException, IOException, ClassNotFoundException
     {
-        store = new MySQLStore("localhost", "goodwill", "root", "thrift_types");
+        store = new MySQLStore("localhost", "goodwill", "root", "thrift_types_tests");
 
         type1 = new ThriftType(TYPE1_NAME);
         type1.addThriftField(new ThriftField("chair", "i32", 0));
@@ -94,7 +94,7 @@ public class MySQLStoreTest
     public void testAddUpdateType() throws Exception
     {
         Collection<ThriftType> types = store.getTypes();
-        Assert.assertEquals(types.size(), 0, "Run delete from thrift_types; in your DB");
+        Assert.assertEquals(types.size(), 0, "You need to cleanup your test db");
 
         // Inserts
 
