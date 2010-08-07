@@ -189,25 +189,9 @@ public class MySQLStore implements GoodwillStore
     @Override
     public void addType(ThriftType thriftType)
     {
-        try {
-            PreparedStatement sqlInsert = connection.prepareStatement(String.format("insert into %s set %s", tableName, TABLE_STRING_DESCRIPTOR));
-
-            for (ThriftField field : thriftType.getThriftItems()) {
-                addSQLStatementToBatch(sqlInsert, thriftType, field);
-            }
-
-            sqlInsert.executeBatch();
-            connection.commit();
-        }
-        catch (SQLException e) {
-            log.error(String.format("Unable to add type [%s]: %s", thriftType, e));
-            try {
-                connection.rollback();
-            }
-            catch (SQLException e1) {
-                log.error("Got a SQLException during a rollback!");
-            }
-        }
+        // Creating a new Schema is really the same as updating/extending one, since the data model we use define schemas
+        // as a list of fields.
+        updateType(thriftType);
     }
 
     private void addSQLStatementToBatch(PreparedStatement statement, ThriftType thriftType, ThriftField field)
