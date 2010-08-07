@@ -47,7 +47,7 @@
         <table id="eventTypes">
             <thead>
             <tr>
-                <th>Event Type</th>
+                <th>Event Types</th>
             </tr>
             </thead>
         </table>
@@ -57,7 +57,7 @@
         <div id="resultsPane">
             <div id="title" class="active">
                 <ul>
-                    <li>Schema:</li>
+                    <li id="schema_title">Click on a schema on the left to see its definition</li>
                     <li id="name"></li>
                     <li id="sButtons">
                         <ul>
@@ -66,7 +66,6 @@
                         </ul>
                     </li>
                     <div style="clear:both;"></div>
-
             </div>
         </div>
         <div style="clear:both;"></div>
