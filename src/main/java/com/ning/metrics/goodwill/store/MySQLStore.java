@@ -30,7 +30,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -133,7 +136,18 @@ public class MySQLStore implements GoodwillStore
     public Collection<ThriftType> getTypes() throws IOException
     {
         buildThrifTtypeList();
-        return thriftTypes.values();
+
+        final ArrayList thriftTypesList = new ArrayList(thriftTypes.values());
+        Collections.sort(thriftTypesList, new Comparator<ThriftType>()
+        {
+            @Override
+            public int compare(ThriftType o, ThriftType o1)
+            {
+                return o.getName().compareTo(o1.getName());
+            }
+        });
+
+        return thriftTypesList;
     }
 
     /**
