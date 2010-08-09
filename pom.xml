@@ -7,6 +7,22 @@
     <artifactId>metrics.goodwill</artifactId>
     <packaging>war</packaging>
     <version>1.0.0-SNAPSHOT</version>
+    <url>http://github.com/pierre/goodwill</url>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git://github.com/pierre/goodwill.git</connection>
+        <developerConnection>scm:git:git://github.com/pierre/goodwill.git</developerConnection>
+        <url>http://github.com/pierre/goodwill/tree/master</url>
+    </scm>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <dependencies>
         <dependency>
             <!-- Required by guice 2.0 -->
@@ -153,4 +169,11 @@
             </plugin>
         </plugins>
     </build>
+    <developers>
+        <developer>
+            <id>pierre</id>
+            <name>Pierre-Alexandre Meyer</name>
+            <email>pierre@mouraf.org</email>
+        </developer>
+    </developers>
 </project>
