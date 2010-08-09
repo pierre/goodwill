@@ -412,7 +412,6 @@ e.return_to_std_mode = function(element, attr)
     $(".sql .secondary_parameter", element)
             .html(attr.sql_precision || "");
 
-
     $('.type .dropdown', element)
             .html(attr.field_type || "");
 
