@@ -61,6 +61,16 @@ function camelizeString(string)
     return s;
 }
 
+function sanitizeString(stringToSanitize)
+{
+    return stringToSanitize.toLowerCase().replace(/ /g, "_");
+}
+
+function createTableForEvent(name)
+{
+    return "xe_" + sanitizeString(name).replace(/_/g, "");
+}
+
 $(document).ready(function()
 {
     console.log(json);
@@ -677,11 +687,6 @@ r.events = function()
     });
 };
 
-function sanitizeString(stringToSanitize)
-{
-    return stringToSanitize.toLowerCase().replace(/ /g, "_");
-}
-
 r.actions = {
     wipe_rp:function()
     {
@@ -739,7 +744,7 @@ r.actions = {
     set_rp_sqlSchema:function()
     {
         // build string
-        var string = "CREATE TABLE thrift_type_" + sanitizeString(eventType) + " (<br />";
+        var string = "CREATE TABLE " + createTableForEvent(eventType) + " (<br />";
         $.each(schema, function(index, field)
         {
             var sql_type = prettyPrintSQLType(field);
