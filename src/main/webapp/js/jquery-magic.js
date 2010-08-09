@@ -697,7 +697,7 @@ r.actions = {
         var string = "struct " + camelizeString(sanitizeString(eventType)) + " &nbsp; {<br />";
         $.each(schema, function(index, field)
         {
-            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ": " + field.field_type + " " + sanitizeString(field.name) + ",<br />";
+            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ": " + field.field_type + " " + sanitizeString(field.name) + (index == schema.length - 1 ? "" : ",") + "<br />";
         });
         string += "}";
 
@@ -831,7 +831,7 @@ w.request = function(new_element)
         console.log("create eventType");
         $.ajax({
             type: 'PUT',
-            url: '/goodwill/registrar',
+            url: '/registrar',
             data: $.toJSON({name: eventType, schema: transformed_schema}),
             success: function()
             {
@@ -851,7 +851,7 @@ w.request = function(new_element)
         console.log("updating eventType");
         $.ajax({
             type: 'PUT',
-            url: '/goodwill/registrar',
+            url: '/registrar',
             data: $.toJSON({name: eventType, schema: transformed_schema}),
             success: function()
             {
