@@ -70,6 +70,8 @@
             </div>
             <div id="schema">
             </div>
+				<div id="schema-information">
+				</div>
         </div>
         <div style="clear:both;"></div>
     </div>

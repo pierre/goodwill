@@ -22,57 +22,6 @@ t = {};
 const DEFAULT_DESCRIPTION = "add a description";
 const DEFAULT_NAME = "add event type name"
 
-
-function prettyPrintSQLType(field)
-{
-    var sql_type = null;
-
-    if (field.sql_type == "decimal" || field.sql_type == "numeric") {
-        if (field.sql_precision) {
-            if (field.sql_scale) {
-                sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_scale + ")";
-            }
-            else {
-                sql_type = field.sql_type + "(" + field.sql_precision + ")";
-            }
-        }
-    }
-    else {
-        if (field.sql_type == "nvarchar" || field.sql_type == "varchar") {
-            if (field.sql_length) {
-                sql_type = field.sql_type + "(" + field.sql_length + ")";
-            }
-        }
-    }
-
-    if (sql_type == null) {
-        sql_type = field.sql_type;
-    }
-
-    return sql_type;
-}
-
-function camelizeString(string)
-{
-    var a = string.split('_'), i;
-    var s = [];
-    for (i = 0; i < a.length; i++) {
-        s.push(a[i].charAt(0).toUpperCase() + a[i].substring(1));
-    }
-    s = s.join('');
-    return s;
-}
-
-function sanitizeString(stringToSanitize)
-{
-    return stringToSanitize.toLowerCase().replace(/ /g, "_");
-}
-
-function createTableForEvent(name)
-{
-    return "xe_" + sanitizeString(name).replace(/_/g, "");
-}
-
 $(document).ready(function()
 {
     console.log(json);
@@ -624,7 +573,7 @@ w.events = function()
         }
     });
 
- };
+};
 
 r.updatePaneOnSelectEvent = function(tr)
 {
@@ -707,8 +656,10 @@ r.events = function()
 r.actions = {
     wipe_rp:function()
     {
-        $("#resultsPane")
-                .children().remove(".element");
+        $("#schema")
+          .children().remove(".element");
+        $("#schema-information")
+          .children().remove(".element");
     },
 
     set_rp_title:function()
@@ -754,9 +705,8 @@ r.actions = {
                 );
 
         // append schema to resultsWrapper, not resultsPane (affect Thrift fields positions)
-        $(div).appendTo($("#resultsPane"));
+        $(div).appendTo($("#schema-information"));
     },
-
 
     set_rp_sqlSchema:function()
     {
@@ -777,7 +727,7 @@ r.actions = {
                 );
 
         // Append schema to resultsPane
-        $(div).appendTo($("#resultsPane"));
+        $(div).appendTo($("#schema-information"));
     },
 
     showButtons:function()
@@ -832,6 +782,28 @@ function prettyPrintSQLType(field)
 
     return sql_type;
 }
+
+function camelizeString(string)
+{
+    var a = string.split('_'), i;
+    var s = [];
+    for (i = 0; i < a.length; i++) {
+        s.push(a[i].charAt(0).toUpperCase() + a[i].substring(1));
+    }
+    s = s.join('');
+    return s;
+}
+
+function sanitizeString(stringToSanitize)
+{
+    return stringToSanitize.toLowerCase().replace(/ /g, "_");
+}
+
+function createTableForEvent(name)
+{
+    return "xe_" + sanitizeString(name).replace(/_/g, "");
+}
+
 
 w.request = function(new_element)
 {
