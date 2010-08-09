@@ -29,7 +29,7 @@
     <script type="text/javascript" src="/js/jquery-1.3.2.min.js"></script>
     <script type="text/javascript" src="/js/jquery-magic.js"></script>
     <script type="text/javascript" src="/js/jquery.json-2.2.js"></script>
-    <link rel="stylesheet" href="/goodwill/css/global.css" type="text/css">
+    <link rel="stylesheet" href="/css/global.css" type="text/css">
 </head>
 <body>
 
