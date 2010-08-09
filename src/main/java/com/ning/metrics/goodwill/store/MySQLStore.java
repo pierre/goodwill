@@ -62,18 +62,20 @@ public class MySQLStore implements GoodwillStore
         GoodwillConfig config
     ) throws SQLException, IOException, ClassNotFoundException
     {
-        this(config.getDBHost(), config.getDBName(), config.getDBUsername(), config.getDBThriftTableName());
+        this(config.getDBHost(), config.getDBPort(), config.getDBName(), config.getDBUsername(), config.getDBPassword(), config.getDBThriftTableName());
     }
 
     public MySQLStore(
         String DBHost,
+        int DBPort,
         String DBName,
         String DBUsername,
+        String DBPassword,
         String DBTableName
     ) throws SQLException, IOException, ClassNotFoundException
     {
         tableName = DBTableName;
-        connectToMySQL(DBHost, DBName, DBUsername);
+        connectToMySQL(DBHost, DBPort, DBName, DBUsername, DBPassword);
         buildThrifTtypeList();
     }
 
@@ -303,10 +305,10 @@ public class MySQLStore implements GoodwillStore
         return true;
     }
 
-    private void connectToMySQL(String host, String db, String username) throws SQLException, ClassNotFoundException
+    private void connectToMySQL(String host, int port, String db, String username, String password) throws SQLException, ClassNotFoundException
     {
         Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection(String.format("jdbc:mysql://%s/%s?user=%s", host, db, username));
+        connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?user=%s&pass=%s", host, port, db, username, password));
         connection.setAutoCommit(false);
     }
 }

@@ -51,7 +51,7 @@ public class MySQLStoreTest
     @BeforeTest(alwaysRun = false)
     public void setUp() throws SQLException, IOException, ClassNotFoundException
     {
-        store = new MySQLStore("localhost", "goodwill", "root", "thrift_types_tests");
+        store = new MySQLStore("localhost", 3306, "goodwill", "root", "", "thrift_types_tests");
 
         type1 = new ThriftType(TYPE1_NAME);
         type1.addThriftField(new ThriftField("chair", "i32", 0));
