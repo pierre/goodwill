@@ -212,10 +212,13 @@ e.create_element = function(field_obj)
                     .append($('<li class="secondary_parameter">'))
                   )
                 )
-                .append($('<div class="actions"><ul>')
-                  .append($('<li class="save">').text("save"))
-                  .append($('<li class="cancel">').text("cancel"))
+                .append($('<div class="actions">')
+                  .append($('<ul>')
+                    .append($('<li class="save">').text("save"))
+                    .append($('<li class="cancel">').text("cancel"))
+                  )
                 )
+                .append('<div style="clear:both"></div>')
                 )
 
                 .append($('<div class="footer">')
@@ -226,6 +229,7 @@ e.create_element = function(field_obj)
                       .html(element.field_type || "")
                     )
                   )
+
                 )
                 .append($('<div class="position">')
                 .append($('<div class="text">').text("Thrift position: "))
@@ -619,7 +623,7 @@ r.events = function()
 {
     $("#resultsPane #title li#add").click(function()
     {
-        var total_elements = $('#resultsPane .element.field').length;
+        var total_elements = $('#resultsPane .element.field').length + 1;
         element = e.create_element({position:total_elements, status:"new"});
 
         attributes = e.get_attributes(element, true);

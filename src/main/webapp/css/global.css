@@ -49,7 +49,7 @@ table td                                {padding-left:10px;}
 
 
 /* Right Column Shit */                 
-#resultsWrapper                         {width:35%; float:left; margin-top:1px;}
+#resultsWrapper                         {width:35%; min-width:500px; float:left; margin-top:1px;}
 #resultsPane #title                     {height:30px; padding-left:10px; line-height:30px; color:#fff;  border-bottom:1px solid #ccc;}
 #resultsPane #title a                   {color:#fff; text-decoration:none;}
 #resultsPane #title a:hover             {text-decoration:underline;}
@@ -74,8 +74,12 @@ table td                                {padding-left:10px;}
 
 .element .details .type                           {height:20px; padding-left:5px; padding-top:10px;}
 .element .sql                           {height:20px; padding-left:5px; padding-top:10px;}
-.element .details .actions              {height:20px; padding-top:10px; padding-left:5px;}
+.element .details .actions              {float:right; height:30px; padding-top:10px; padding-left:5px;}
 .element .details .actions > li:hover   {text-decoration:underline; cursor:pointer;}
+
+.actions li {padding:2px; background-color:#fff;}
+.actions li.save {color:#55b002;}
+.actions li.cancel {color:#d80e07;}
 
 
 /* element active/deprecated colors */
