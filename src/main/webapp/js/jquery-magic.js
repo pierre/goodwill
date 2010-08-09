@@ -717,7 +717,7 @@ r.actions = {
             var sql_type = prettyPrintSQLType(field);
             string += "&nbsp;&nbsp;&nbsp;&nbsp;" + sanitizeString(field.name) + " " + sql_type + (index == schema.length - 1 ? "" : ",") + "<br />";
         });
-        string += ");";
+        string += ") DISTRIBUTE ON RANDOM;";
 
         // Build schema div
         var div = $('<div class="element" id="schema">')
