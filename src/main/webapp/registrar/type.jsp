@@ -68,6 +68,10 @@
                     <div style="clear:both;"></div>
                 </ul>
             </div>
+            <div id="schema">
+            </div>
+				<div id="schema-information">
+				</div>
         </div>
         <div style="clear:both;"></div>
     </div>

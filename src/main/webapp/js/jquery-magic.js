@@ -20,56 +20,7 @@ r = {};
 t = {};
 
 const DEFAULT_DESCRIPTION = "add a description";
-
-function prettyPrintSQLType(field)
-{
-    var sql_type = null;
-
-    if (field.sql_type == "decimal" || field.sql_type == "numeric") {
-        if (field.sql_precision) {
-            if (field.sql_scale) {
-                sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_scale + ")";
-            }
-            else {
-                sql_type = field.sql_type + "(" + field.sql_precision + ")";
-            }
-        }
-    }
-    else {
-        if (field.sql_type == "nvarchar" || field.sql_type == "varchar") {
-            if (field.sql_length) {
-                sql_type = field.sql_type + "(" + field.sql_length + ")";
-            }
-        }
-    }
-
-    if (sql_type == null) {
-        sql_type = field.sql_type;
-    }
-
-    return sql_type;
-}
-
-function camelizeString(string)
-{
-    var a = string.split('_'), i;
-    var s = [];
-    for (i = 0; i < a.length; i++) {
-        s.push(a[i].charAt(0).toUpperCase() + a[i].substring(1));
-    }
-    s = s.join('');
-    return s;
-}
-
-function sanitizeString(stringToSanitize)
-{
-    return stringToSanitize.toLowerCase().replace(/ /g, "_");
-}
-
-function createTableForEvent(name)
-{
-    return "xe_" + sanitizeString(name).replace(/_/g, "");
-}
+const DEFAULT_NAME = "add event type name"
 
 $(document).ready(function()
 {
@@ -171,9 +122,11 @@ e.events = function(element)
         var index = $("#resultsPane .element").index(element);
 
         var necessary_fields_missed = ((attributes.name == "") || (attributes.description == "") || (attributes.field_type == ""));
-
+        
         if (necessary_fields_missed) {
             alert("The name, description, and field_type fields need to be filled out!");
+            console.log("attributes missing");
+            console.log(attributes);
         }
         else {
             // adjust the schema
@@ -220,20 +173,16 @@ e.events = function(element)
         // e.param("", "field", footer);
     });
 
-    $(".details .description", element).focus(function()
-    {
-        alert(this);
-        if ($(this).text == DEFAULT_DESCRIPTION) {
-            $(this).text = "";
-        }
-    });
+
+
+
 };
 
 e.create_element = function(field_obj)
 {
     var elementDiv = function(element)
     {
-        var div = $('<div class="element">')
+        var div = $('<div class="element field">')
                 .attr("_edit", "")
                 .attr("_status", element.status || "")
 
@@ -247,24 +196,36 @@ e.create_element = function(field_obj)
 
                 .append($('<div class="details">')
                 .append($('<div class="description">').html(element.description || ""))
-                .append($('<div class="sql">')
-                .append($('<ul class="list">')
-                .append($("<li>").html("SQL type: "))
-                .append($('<li class="dropdown">').html(prettyPrintSQLType(element) || ""))
+                
+                .append($('<div class="type">')
+                  .append($('<ul class="list">')
+                    .append($("<li>").html("Thrift type: "))
+                    .append($('<li class="dropdown">').html(element.field_type || ""))
+                  )
                 )
+                
+                .append($('<div class="sql">')
+                  .append($('<ul class="list">')
+                    .append($("<li>").html("SQL type: "))
+                    .append($('<li class="dropdown">').html(prettyPrintSQLType(element) || ""))
+                    .append($('<li class="primary_parameter">'))
+                    .append($('<li class="secondary_parameter">'))
+                  )
                 )
                 .append($('<div class="actions"><ul>')
-                .append($('<li class="save">').text("save"))
-                .append($('<li class="cancel">').text("cancel"))
+                  .append($('<li class="save">').text("save"))
+                  .append($('<li class="cancel">').text("cancel"))
                 )
                 )
 
                 .append($('<div class="footer">')
                 .append($('<div class="type">')
-                .append($('<ul class="list">')
-                .append($("<li>").html("Thrift type: "))
-                .append($('<li class="dropdown">').html(element.field_type || ""))
-                )
+                  .append($('<ul class="list">')
+                    .append($("<li>").html("Thrift type: "))
+                    .append($('<li class="dropdown">')
+                      .html(element.field_type || "")
+                    )
+                  )
                 )
                 .append($('<div class="position">')
                 .append($('<div class="text">').text("Thrift position: "))
@@ -283,7 +244,7 @@ e.create_element = function(field_obj)
     var attributes = e.get_attributes(element, true);
 
     e.events(element);
-    element.appendTo($("#resultsPane"));
+    element.appendTo($("#schema"));
     e.return_to_std_mode(element, attributes);
     $(".navBar .buttons", element).hide();
 
@@ -328,6 +289,7 @@ e.get_attributes = function(element, create)
     var edit_attributes = function(create)
     {
         var attr = {};
+        console.log("edit mode")
 
         attr.name = $(".name input", element).val();
         attr.description = $(".description textarea", element).val();
@@ -338,7 +300,7 @@ e.get_attributes = function(element, create)
         attr.edit_mode = element.attr("_edit") || "";
 
         // remove default values for name and description
-        attr.name = (attr.name != "name") ? attr.name : "";
+        attr.name = (attr.name != DEFAULT_NAME) ? attr.name : "";
         attr.description = (attr.description != DEFAULT_DESCRIPTION) ? attr.description : "";
 
         // get sql length, scale, and precision
@@ -389,7 +351,7 @@ e.enter_edit_mode = function(element, attr, create)
             .addClass("edit")
             .html(
             $('<input class="input_name">')
-                    .val(attr.name || "name")
+                    .val(attr.name || DEFAULT_NAME)
             );
 
     $(".details .description", element)
@@ -408,13 +370,12 @@ e.enter_edit_mode = function(element, attr, create)
     e.param(attr, "sql", sql);
 
     if (create) {
-        $('.footer .type .dropdown', element)
-                .html(
-                e.footer_dropdown(attr)
-                );
-
-        var footer = $(".footer .type", element);
-        e.param(attr, "field", footer);
+      $('.details .type', element)
+        .show()
+      $('.details .type .dropdown', element)
+        .html(
+          e.footer_dropdown(attr)
+        );
     }
 
     // add event handlers to new elements
@@ -428,6 +389,9 @@ e.enter_edit_mode = function(element, attr, create)
     $(".details .actions", element).show();
     $(".navBar .buttons", element).show();
     $(element).attr("_edit", "edit");
+
+
+
 };
 
 e.return_to_std_mode = function(element, attr)
@@ -437,9 +401,11 @@ e.return_to_std_mode = function(element, attr)
             .removeClass("edit")
             .html(attr.name || "");
 
-    $(".description", element)
+    $(".details .description", element)
             .removeClass("edit")
             .html(attr.description || "");
+            
+    $(".details .type", element).hide();
 
     $(".sql .dropdown", element)
             .html(attr.sql_type || "");
@@ -449,7 +415,6 @@ e.return_to_std_mode = function(element, attr)
 
     $(".sql .secondary_parameter", element)
             .html(attr.sql_precision || "");
-
 
     $('.type .dropdown', element)
             .html(attr.field_type || "");
@@ -607,6 +572,7 @@ w.events = function()
             r.updatePaneOnSelectEvent(tr);
         }
     });
+
 };
 
 r.updatePaneOnSelectEvent = function(tr)
@@ -653,7 +619,7 @@ r.events = function()
 {
     $("#resultsPane #title li#add").click(function()
     {
-        var total_elements = $('#resultsPane .element').length;
+        var total_elements = $('#resultsPane .element.field').length;
         element = e.create_element({position:total_elements, status:"new"});
 
         attributes = e.get_attributes(element, true);
@@ -690,8 +656,10 @@ r.events = function()
 r.actions = {
     wipe_rp:function()
     {
-        $("#resultsPane")
-                .children().remove(".element");
+        $("#schema")
+          .children().remove(".element");
+        $("#schema-information")
+          .children().remove(".element");
     },
 
     set_rp_title:function()
@@ -737,9 +705,8 @@ r.actions = {
                 );
 
         // append schema to resultsWrapper, not resultsPane (affect Thrift fields positions)
-        $(div).appendTo($("#resultsWrapper"));
+        $(div).appendTo($("#schema-information"));
     },
-
 
     set_rp_sqlSchema:function()
     {
@@ -760,7 +727,7 @@ r.actions = {
                 );
 
         // Append schema to resultsPane
-        $(div).appendTo($("#resultsWrapper"));
+        $(div).appendTo($("#schema-information"));
     },
 
     showButtons:function()
@@ -785,6 +752,57 @@ keys = function(obj)
     }
     return accumalator;
 };
+
+function prettyPrintSQLType(field)
+{
+    var sql_type = null;
+
+    if (field.sql_type == "decimal" || field.sql_type == "numeric") {
+        if (field.sql_precision) {
+            if (field.sql_scale) {
+                sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_scale + ")";
+            }
+            else {
+                sql_type = field.sql_type + "(" + field.sql_precision + ")";
+            }
+        }
+    }
+    else {
+        if (field.sql_type == "nvarchar" || field.sql_type == "varchar") {
+            if (field.sql_length) {
+                sql_type = field.sql_type + "(" + field.sql_length + ")";
+            }
+//            alert(field.sql_length);
+        }
+    }
+
+    if (sql_type == null) {
+        sql_type = field.sql_type;
+    }
+
+    return sql_type;
+}
+
+function camelizeString(string)
+{
+    var a = string.split('_'), i;
+    var s = [];
+    for (i = 0; i < a.length; i++) {
+        s.push(a[i].charAt(0).toUpperCase() + a[i].substring(1));
+    }
+    s = s.join('');
+    return s;
+}
+
+function sanitizeString(stringToSanitize)
+{
+    return stringToSanitize.toLowerCase().replace(/ /g, "_");
+}
+
+function createTableForEvent(name)
+{
+    return "xe_" + sanitizeString(name).replace(/_/g, "");
+}
 
 
 w.request = function(new_element)
