@@ -89,13 +89,17 @@ public class MySQLStore implements GoodwillStore
             while (result.next()) {
                 String thriftType = result.getString(1);
 
-                // Don't convert sqlLength from NULL to 0
+                // Don't convert int from NULL to 0
                 Integer sqlLength = result.getInt(7);
-                Integer sqlScale = result.getInt(8);
-                Integer sqlPrecision = result.getInt(9);
                 if (result.wasNull()) {
                     sqlLength = null;
+                }
+                Integer sqlScale = result.getInt(8);
+                if (result.wasNull()) {
                     sqlScale = null;
+                }
+                Integer sqlPrecision = result.getInt(9);
+                if (result.wasNull()) {
                     sqlPrecision = null;
                 }
 

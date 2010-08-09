@@ -21,6 +21,36 @@ t = {};
 
 const DEFAULT_DESCRIPTION = "add a description";
 
+function prettyPrintSQLType(field)
+{
+    var sql_type = null;
+
+    if (field.sql_type == "decimal" || field.sql_type == "numeric") {
+        if (field.sql_precision) {
+            if (field.sql_scale) {
+                sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_scale + ")";
+            }
+            else {
+                sql_type = field.sql_type + "(" + field.sql_precision + ")";
+            }
+        }
+    }
+    else {
+        if (field.sql_type == "nvarchar" || field.sql_type == "varchar") {
+            if (field.sql_length) {
+                sql_type = field.sql_type + "(" + field.sql_length + ")";
+            }
+            alert(field.sql_length);
+        }
+    }
+
+    if (sql_type == null) {
+        sql_type = field.sql_type;
+    }
+
+    return sql_type;
+}
+
 $(document).ready(function()
 {
     console.log(json);
@@ -199,11 +229,8 @@ e.create_element = function(field_obj)
                 .append($('<div class="description">').html(element.description || ""))
                 .append($('<div class="sql">')
                 .append($('<ul class="list">')
-                .append($("<li>").html("sql: "))
-                .append($('<li class="dropdown">').html(element.sql_type || ""))
-                .append($('<li class="primary_parameter">').html(element.sql_scale || (element.sql_length || "")))
-                .append($('<li class="secondary_parameter">').html(element.sql_precision || ""))
-
+                .append($("<li>").html("SQL type: "))
+                .append($('<li class="dropdown">').html(prettyPrintSQLType(element) || ""))
                 )
                 )
                 .append($('<div class="actions"><ul>')
@@ -226,7 +253,6 @@ e.create_element = function(field_obj)
                 )
 
                 .append('<div style="clear:both"></div>');
-
 
         (element.active == "deprecated") ? $(".navBar, .details, .footer", div).addClass("deprecated") : $(".navBar, .details, .footer", div).addClass("active");
 
@@ -641,6 +667,10 @@ r.events = function()
     });
 };
 
+function sanitizeString(stringToSanitize)
+{
+    return stringToSanitize.toLowerCase().replace(/ /g, "_");
+}
 
 r.actions = {
     wipe_rp:function()
@@ -699,35 +729,11 @@ r.actions = {
     set_rp_sqlSchema:function()
     {
         // build string
-        var string = "CREATE TABLE thrift_type_" + eventType.toLowerCase().replace(/ /g, "_") + " (<br />";
+        var string = "CREATE TABLE thrift_type_" + sanitizeString(eventType) + " (<br />";
         $.each(schema, function(index, field)
         {
-            var sql_type = null;
-            if (field.sql_type == "decimal" || field.sql_type == "numeric") {
-                if (field.sql_precision) {
-                    if (field.sql_scale) {
-                        sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_scale + ")";
-                    }
-                    else {
-                        sql_type = field.sql_type + "(" + field.sql_precision + ")";
-
-                    }
-                }
-                else {
-                    sql_type = field.sql_type;
-                }
-            }
-            else {
-                if (field.sql_type == "nvarchar" || field.sql_type == "varchar") {
-                    if (field.sql_length) {
-                        sql_type = field.sql_type + "(" + field.sql_length + ")";
-                    }
-                }
-                else {
-                    sql_type = field.sql_type;
-                }
-            }
-            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.name + " " + sql_type + ",<br />";
+            var sql_type = prettyPrintSQLType(field);
+            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + sanitizeString(field.name) + " " + sql_type + (index == schema.length - 1 ? "" : ",") + "<br />";
         });
         string += ");";
 
