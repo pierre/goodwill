@@ -105,7 +105,13 @@ public class MySQLStore implements GoodwillStore
                     sqlPrecision = null;
                 }
 
-                ThriftField thriftField = new ThriftField(result.getString(2), result.getString(3), result.getInt(4), result.getString(5), result.getString(6), sqlLength, sqlScale, sqlPrecision);
+                try {
+                    ThriftField thriftField = new ThriftField(result.getString(2), result.getString(3), result.getInt(4), result.getString(5), result.getString(6), sqlLength, sqlScale, sqlPrecision);
+                }
+                catch (IllegalArgumentException e) {
+                    log.warn(e);
+                    continue;
+                }
 
                 if (currentThriftTypeName == null || !thriftType.equals(currentThriftTypeName)) {
                     currentThriftTypeName = thriftType;
