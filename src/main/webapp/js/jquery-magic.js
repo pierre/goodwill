@@ -61,7 +61,6 @@ w.json_to_objects = function(json)
                 sql_precision: s.sql == null ? null : s.sql.precision,
                 sql_type: s.sql == null ? null : s.sql.type
             };
-
         });
 
         objects[name] =
@@ -69,10 +68,10 @@ w.json_to_objects = function(json)
             schema: schema,
             active: 'active'
         }
-    })
+    });
 
     return objects;
-}
+};
 
 e.events = function(element)
 {
@@ -97,16 +96,16 @@ e.events = function(element)
 
     $(".navBar .deprecate", element).click(function(event)
     {
-        // get element and attributes
+        // Get element and attributes
         var element = $(this).closest(".element");
         var attributes = e.get_attributes(element, false);
 
-        // change the divs' classes
+        // Change the divs' classes
         var divs = $('.navBar, .details, .footer', element);
         (attributes.active == "active") ? divs.removeClass("active").addClass("deprecated") : divs.removeClass("deprecated").addClass("active");
 
-        // reassign the attributes to the schema
-        var attributes = e.get_attributes(element, false);
+        // Reassign the attributes to the schema
+        attributes = e.get_attributes(element, false);
         var index = $("#resultsPane .element").index(element);
         schema[index] = attributes;
 
@@ -158,10 +157,10 @@ e.events = function(element)
         var element = $(this).closest(".element");
         var attributes = e.get_attributes(element, true);
 
-        console.log("field type changed")
-        console.log(attributes)
+        console.log("field type changed");
+        console.log(attributes);
 
-        // change sql dropdown and add parameter fields
+        // Change sql dropdown and add parameter fields
         var dropdown = $(".sql .dropdown", element)
                 .html(e.dropdown(attributes));
 
@@ -178,7 +177,7 @@ e.events = function(element)
             $(this).text = "";
         }
     });
-}
+};
 
 e.create_element = function(field_obj)
 {
@@ -226,15 +225,13 @@ e.create_element = function(field_obj)
                 )
                 )
 
-
                 .append('<div style="clear:both"></div>');
 
 
         (element.active == "deprecated") ? $(".navBar, .details, .footer", div).addClass("deprecated") : $(".navBar, .details, .footer", div).addClass("active");
 
         return div;
-
-    }
+    };
 
     var element = elementDiv(field_obj);
     var attributes = e.get_attributes(element, true);
@@ -245,11 +242,10 @@ e.create_element = function(field_obj)
     $(".navBar .buttons", element).hide();
 
     return element;
-}
+};
 
 e.get_attributes = function(element, create)
 {
-
     var std_attributes = function()
     {
         var attr = {};
@@ -281,7 +277,7 @@ e.get_attributes = function(element, create)
         }
 
         return attr;
-    }
+    };
 
     var edit_attributes = function(create)
     {
@@ -323,21 +319,20 @@ e.get_attributes = function(element, create)
         console.log(attr);
 
         return attr
-    }
+    };
 
-    var attr = e.std_mode(element) ? std_attributes() : edit_attributes(create);
-    return attr;
-}
+    return e.std_mode(element) ? std_attributes() : edit_attributes(create);
+};
 
 e.std_mode = function(element)
 {
     return element.attr("_edit") == "";
-}
+};
 
 e.status = function(element)
 {
     return element.attr("_status") == "new";
-}
+};
 
 e.enter_edit_mode = function(element, attr, create)
 {
@@ -355,7 +350,7 @@ e.enter_edit_mode = function(element, attr, create)
             .addClass("edit")
             .html(
             $("<textarea>")
-                    .val(attr.description || "add a description")
+                    .val(attr.description || DEFAULT_DESCRIPTION)
             );
 
     $(".details .sql .dropdown", element)
@@ -376,7 +371,6 @@ e.enter_edit_mode = function(element, attr, create)
         e.param(attr, "field", footer);
     }
 
-
     // add event handlers to new elements
     $('.navBar input', element).click(function(event)
     {
@@ -388,9 +382,7 @@ e.enter_edit_mode = function(element, attr, create)
     $(".details .actions", element).show();
     $(".navBar .buttons", element).show();
     $(element).attr("_edit", "edit");
-
-
-}
+};
 
 e.return_to_std_mode = function(element, attr)
 {
@@ -423,7 +415,7 @@ e.return_to_std_mode = function(element, attr)
     $(".details .actions", element).hide();
     $(element).attr("_edit", "");
 
-}
+};
 
 
 e.dropdown = function(attr)
@@ -459,7 +451,7 @@ e.dropdown = function(attr)
         });
 
         return dropdown;
-    }
+    };
 
     var possible_types = type_map[attr.field_type];
     var sql_type = attr.sql_type;
@@ -476,10 +468,10 @@ e.footer_dropdown = function()
     {
         var row = $("<option>").val(option).text(option);
         $(dropdown).append(row);
-    })
+    });
 
     return dropdown;
-}
+};
 
 e.param = function(attributes, type, form)
 {
@@ -515,21 +507,20 @@ e.param = function(attributes, type, form)
                     .html("");
         }
     }
-}
-
+};
 
 w.panel_heights = function()
 {
     var height = $(window).height();
     $("#resultsPane").css("height", (height - 40));
     $("#table").css("height", (height - 40));
-}
+};
 
 w.build_eventType_table = function()
 {
     sorted_keys = keys(objects).sort();
 
-    for (i in sorted_keys) {
+    for (var i in sorted_keys) {
         key = sorted_keys[i];
         $('table#eventTypes').append(
                 $('<tr style="cursor:pointer")">')
@@ -537,7 +528,7 @@ w.build_eventType_table = function()
                         .append($('<td>').text(key))
                 );
     }
-}
+};
 
 w.events = function()
 {
@@ -548,7 +539,7 @@ w.events = function()
         var not_repeated = $.grep(types, function(t, i)
         {
             return t == eventType
-        }, true)
+        }, true);
 
         if (eventType && (not_repeated.length == types.length)) {
             objects[eventType] = {
@@ -565,11 +556,11 @@ w.events = function()
 
             // Register events
             t.events();
-            var tr = $('#eventTypes tr.' + eventType)
+            var tr = $('#eventTypes tr.' + eventType);
             r.updatePaneOnSelectEvent(tr);
         }
     });
-}
+};
 
 r.updatePaneOnSelectEvent = function(tr)
 {
@@ -577,7 +568,7 @@ r.updatePaneOnSelectEvent = function(tr)
     r.actions.set_rp_title();
     r.actions.showButtons();
     r.actions.highlightSelectedRow(tr);
-}
+};
 
 r.create_fields = function(fields)
 {
@@ -588,11 +579,11 @@ r.create_fields = function(fields)
 
     r.actions.set_rp_schema();
     r.actions.set_rp_sqlSchema();
-}
+};
 
 function defineObjectAndSchema()
 {
-    object = objects[eventType]
+    object = objects[eventType];
     schema = object.schema;
 }
 
@@ -609,7 +600,7 @@ t.events = function()
         r.updatePaneOnSelectEvent(this);
         r.create_fields(schema);
     });
-}
+};
 
 r.events = function()
 {
@@ -647,7 +638,7 @@ r.events = function()
             field.active = "active";
         })
     });
-}
+};
 
 
 r.actions = {
@@ -660,6 +651,8 @@ r.actions = {
     set_rp_title:function()
     {
         var rp_title = $("#resultsPane #title");
+        // Remove the help text
+        $("#resultsPane #title #schema_title").remove();
 
         if (object.active == "active") {
             rp_title
@@ -678,7 +671,6 @@ r.actions = {
                 .attr("target", "_blank")
                 .attr("href", ("http://action.ninginc.com:8080/rest/1.0/hdfs?dir=/events/ning/" + eventType))
                 .text(eventType));
-
     },
 
     set_rp_schema:function()
@@ -738,14 +730,14 @@ r.actions = {
         });
         string += ");";
 
-        // build schema div
+        // Build schema div
         var div = $('<div class="element" id="schema">')
                 .append($('<div class="navBar active">').text("SQL create statement"))
                 .append($('<div class="details active" style="padding:10px;">')
                 .html(string)
                 );
 
-        // append schema to resultsPane
+        // Append schema to resultsPane
         $(div).appendTo($("#resultsWrapper"));
     },
 
@@ -761,8 +753,7 @@ r.actions = {
                 .addClass("selected")
                 .siblings().removeClass("selected");
     }
-
-}
+};
 
 keys = function(obj)
 {
@@ -771,7 +762,7 @@ keys = function(obj)
         accumalator.push(key);
     }
     return accumalator;
-}
+};
 
 
 w.request = function(new_element)
@@ -832,6 +823,4 @@ w.request = function(new_element)
             contentType: "application/json"
         });
     }
-}
-
-
+};
