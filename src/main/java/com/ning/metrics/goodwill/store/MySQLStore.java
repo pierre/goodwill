@@ -308,7 +308,7 @@ public class MySQLStore implements GoodwillStore
     private void connectToMySQL(String host, int port, String db, String username, String password) throws SQLException, ClassNotFoundException
     {
         Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?user=%s&pass=%s", host, port, db, username, password));
+        connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s", host, port, db), username, password);
         connection.setAutoCommit(false);
     }
 }
