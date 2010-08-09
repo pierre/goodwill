@@ -74,6 +74,12 @@ public class GoodwillConfig
         return "localhost";
     }
 
+    @Config(value = "goodwill.store.db.port")
+    public int getDBPort()
+    {
+        return 3306;
+    }
+
     @Config(value = "goodwill.store.db.name")
     public String getDBName()
     {
@@ -84,6 +90,12 @@ public class GoodwillConfig
     public String getDBUsername()
     {
         return "root";
+    }
+
+    @Config(value = "goodwill.store.db.password")
+    public String getDBPassword()
+    {
+        return "";
     }
 
     @Config(value = "goodwill.store.db.thrift_table.name")
