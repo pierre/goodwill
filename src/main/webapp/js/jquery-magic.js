@@ -40,7 +40,6 @@ function prettyPrintSQLType(field)
             if (field.sql_length) {
                 sql_type = field.sql_type + "(" + field.sql_length + ")";
             }
-            alert(field.sql_length);
         }
     }
 
@@ -49,6 +48,17 @@ function prettyPrintSQLType(field)
     }
 
     return sql_type;
+}
+
+function camelizeString(string)
+{
+    var a = string.split('_'), i;
+    var s = [];
+    for (i = 0; i < a.length; i++) {
+        s.push(a[i].charAt(0).toUpperCase() + a[i].substring(1));
+    }
+    s = s.join('');
+    return s;
 }
 
 $(document).ready(function()
@@ -707,10 +717,10 @@ r.actions = {
     set_rp_schema:function()
     {
         // build string
-        var string = "struct " + eventType + " &nbsp; {<br />";
+        var string = "struct " + camelizeString(sanitizeString(eventType)) + " &nbsp; {<br />";
         $.each(schema, function(index, field)
         {
-            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ":" + field.field_type + " " + field.name + ",<br />";
+            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ": " + field.field_type + " " + sanitizeString(field.name) + ",<br />";
         });
         string += "}";
 
