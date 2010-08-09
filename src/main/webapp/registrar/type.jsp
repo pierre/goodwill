@@ -66,6 +66,7 @@
                         </ul>
                     </li>
                     <div style="clear:both;"></div>
+                </ul>
             </div>
         </div>
         <div style="clear:both;"></div>
