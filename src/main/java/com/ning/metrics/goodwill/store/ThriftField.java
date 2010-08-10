@@ -330,4 +330,37 @@ public class ThriftField
 
         return tFieldJSON;
     }
+
+    // TODO: add layer of abstraction, too Netezza specific
+    public String getFullSQLType()
+    {
+        String fullSQLType = null;
+
+        if (sqlType == null) {
+            return null;
+        }
+        else if ((sqlType.equals("decimal")) || sqlType.equals("numeric")) {
+            if (sqlPrecision != null) {
+                if (sqlScale != null) {
+                    fullSQLType = sqlType + "(" + sqlPrecision + ", " + sqlScale + ")";
+                }
+                else {
+                    fullSQLType = sqlType + "(" + sqlPrecision + ")";
+                }
+            }
+        }
+        else {
+            if (sqlType.equals("nvarchar") || sqlType.equals("varchar")) {
+                if (sqlLength != null) {
+                    fullSQLType = sqlType + "(" + sqlLength + ")";
+                }
+            }
+        }
+
+        if (fullSQLType == null) {
+            fullSQLType = sqlType;
+        }
+
+        return fullSQLType;
+    }
 }

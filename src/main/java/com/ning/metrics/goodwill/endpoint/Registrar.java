@@ -17,14 +17,16 @@
 package com.ning.metrics.goodwill.endpoint;
 
 import com.google.inject.Inject;
+import com.google.inject.internal.Nullable;
+import com.ning.metrics.goodwill.sink.GoodwillSink;
+import com.ning.metrics.goodwill.store.GoodwillStore;
+import com.ning.metrics.goodwill.store.ThriftType;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.view.Viewable;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.ning.metrics.goodwill.store.GoodwillStore;
-import com.ning.metrics.goodwill.store.ThriftType;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -40,15 +42,19 @@ import java.io.IOException;
 @Path("registrar")
 public class Registrar
 {
-    private GoodwillStore store;
     private Logger log = Logger.getLogger(Registrar.class);
+
+    private GoodwillStore store;
+    private final GoodwillSink sink;
 
     @Inject
     public Registrar(
-        GoodwillStore store
+        GoodwillStore store,
+        @Nullable GoodwillSink sink
     )
     {
         this.store = store;
+        this.sink = sink;
     }
 
     /*
@@ -59,7 +65,26 @@ public class Registrar
     @Produces(MediaType.TEXT_HTML)
     public Viewable getAll() throws JSONException
     {
-        return new Viewable("/registrar/type.jsp", store.toJSON());
+        JSONArray storeInJSON = store.toJSON();
+
+        // If we are using a sink, populate some extra information for visual display.
+        // A common usecase is to see the CREATE TABLE statement for a SQL based sink.
+        if (sink != null) {
+            for (int i = 0; i < storeInJSON.length(); i++) {
+                JSONObject type = (JSONObject) storeInJSON.get(i);
+                String typeName = (String) type.get(ThriftType.JSON_THRIFT_TYPE_NAME);
+
+                if (typeName != null) {
+                    ThriftType thriftType = store.findByName(typeName);
+                    if (thriftType != null) {
+                        type.put("sinkAddInfo", sink.addTypeInfo(thriftType));
+                        storeInJSON.put(i, type);
+                    }
+                }
+            }
+        }
+
+        return new Viewable("/registrar/type.jsp", storeInJSON);
     }
 
     @GET

@@ -23,7 +23,10 @@ import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
+import com.google.inject.util.Providers;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.sink.GoodwillSink;
+import com.ning.metrics.goodwill.sink.NetezzaSink;
 import com.ning.metrics.goodwill.store.CSVFileStore;
 import com.ning.metrics.goodwill.store.GoodwillStore;
 import com.ning.metrics.goodwill.store.MySQLStore;
@@ -58,7 +61,6 @@ public class GuiceConfig extends GuiceServletContextListener
 
 
                     final String storeType = config.getStoreType();
-
                     if (storeType.equals("mysql")) {
                         binder.bind(GoodwillStore.class).to(MySQLStore.class);
                         log.info("Enabled MySQL store");
@@ -68,7 +70,19 @@ public class GuiceConfig extends GuiceServletContextListener
                         log.info("Enabled CSV store");
                     }
                     else {
-                        throw new IllegalStateException("Unknown type " + storeType);
+                        throw new IllegalStateException("Unknown store type " + storeType);
+                    }
+
+                    final String sinkType = config.getSinkType();
+                    if (sinkType == null) {
+                        binder.bind(GoodwillSink.class).toProvider(Providers.<GoodwillSink>of(null));
+                    }
+                    else if (sinkType.equals("netezza")) {
+                        binder.bind(GoodwillSink.class).to(NetezzaSink.class);
+                        log.info("Enabled Netezza sink");
+                    }
+                    else {
+                        throw new IllegalStateException("Unknown sink type " + sinkType);
                     }
                 }
             },

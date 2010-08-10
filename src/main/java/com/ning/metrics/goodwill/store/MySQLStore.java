@@ -62,7 +62,7 @@ public class MySQLStore implements GoodwillStore
         GoodwillConfig config
     ) throws SQLException, IOException, ClassNotFoundException
     {
-        this(config.getDBHost(), config.getDBPort(), config.getDBName(), config.getDBUsername(), config.getDBPassword(), config.getDBThriftTableName());
+        this(config.getStoreDBHost(), config.getStoreDBPort(), config.getStoreDBName(), config.getStoreDBUsername(), config.getStoreDBPassword(), config.getStoreDBThriftTableName());
     }
 
     public MySQLStore(

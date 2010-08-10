@@ -64,6 +64,8 @@ w.json_to_objects = function(json)
             };
         });
 
+        schema['sink_add_info'] = eventType.sinkAddInfo;
+
         objects[name] =
         {
             schema: schema,
@@ -122,7 +124,7 @@ e.events = function(element)
         var index = $("#resultsPane .element").index(element);
 
         var necessary_fields_missed = ((attributes.name == "") || (attributes.description == "") || (attributes.field_type == ""));
-        
+
         if (necessary_fields_missed) {
             alert("The name, description, and field_type fields need to be filled out!");
             console.log("attributes missing");
@@ -174,8 +176,6 @@ e.events = function(element)
     });
 
 
-
-
 };
 
 e.create_element = function(field_obj)
@@ -196,39 +196,39 @@ e.create_element = function(field_obj)
 
                 .append($('<div class="details">')
                 .append($('<div class="description">').html(element.description || ""))
-                
+
                 .append($('<div class="type">')
-                  .append($('<ul class="list">')
-                    .append($("<li>").html("Thrift type: "))
-                    .append($('<li class="dropdown">').html(element.field_type || ""))
-                  )
+                .append($('<ul class="list">')
+                .append($("<li>").html("Thrift type: "))
+                .append($('<li class="dropdown">').html(element.field_type || ""))
                 )
-                
+                )
+
                 .append($('<div class="sql">')
-                  .append($('<ul class="list">')
-                    .append($("<li>").html("SQL type: "))
-                    .append($('<li class="dropdown">').html(prettyPrintSQLType(element) || ""))
-                    .append($('<li class="primary_parameter">'))
-                    .append($('<li class="secondary_parameter">'))
-                  )
+                .append($('<ul class="list">')
+                .append($("<li>").html("SQL type: "))
+                .append($('<li class="dropdown">').html(element.sql_type || ""))
+                .append($('<li class="primary_parameter">').html(element.sql_precision || ""))
+                .append($('<li class="secondary_parameter">').html(element.sql_scale || ""))
+                )
                 )
                 .append($('<div class="actions">')
-                  .append($('<ul>')
-                    .append($('<li class="save" style="cursor:pointer">').text("save"))
-                    .append($('<li class="cancel" style="cursor:pointer">').text("cancel"))
-                  )
+                .append($('<ul>')
+                .append($('<li class="save" style="cursor:pointer">').text("save"))
+                .append($('<li class="cancel" style="cursor:pointer">').text("cancel"))
+                )
                 )
                 .append('<div style="clear:both"></div>')
                 )
 
                 .append($('<div class="footer">')
                 .append($('<div class="type">')
-                  .append($('<ul class="list">')
-                    .append($("<li>").html("Thrift type: "))
-                    .append($('<li class="dropdown">')
-                      .html(element.field_type || "")
-                    )
-                  )
+                .append($('<ul class="list">')
+                .append($("<li>").html("Thrift type: "))
+                .append($('<li class="dropdown">')
+                .html(element.field_type || "")
+                )
+                )
 
                 )
                 .append($('<div class="position">')
@@ -374,12 +374,12 @@ e.enter_edit_mode = function(element, attr, create)
     e.param(attr, "sql", sql);
 
     if (create) {
-      $('.details .type', element)
-        .show()
-      $('.details .type .dropdown', element)
-        .html(
-          e.footer_dropdown(attr)
-        );
+        $('.details .type', element)
+                .show()
+        $('.details .type .dropdown', element)
+                .html(
+                e.footer_dropdown(attr)
+                );
     }
 
     // add event handlers to new elements
@@ -395,7 +395,6 @@ e.enter_edit_mode = function(element, attr, create)
     $(element).attr("_edit", "edit");
 
 
-
 };
 
 e.return_to_std_mode = function(element, attr)
@@ -408,7 +407,7 @@ e.return_to_std_mode = function(element, attr)
     $(".details .description", element)
             .removeClass("edit")
             .html(attr.description || "");
-            
+
     $(".details .type", element).hide();
 
     $(".sql .dropdown", element)
@@ -661,9 +660,9 @@ r.actions = {
     wipe_rp:function()
     {
         $("#schema")
-          .children().remove(".element");
+                .children().remove(".element");
         $("#schema-information")
-          .children().remove(".element");
+                .children().remove(".element");
     },
 
     set_rp_title:function()
@@ -714,31 +713,27 @@ r.actions = {
 
     set_rp_sqlSchema:function()
     {
-        // build string
-        var string = "CREATE TABLE " + createTableForEvent(eventType) + " (<br />";
-        $.each(schema, function(index, field)
-        {
-            var sql_type = prettyPrintSQLType(field);
-            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + sanitizeString(field.name) + " " + sql_type + (index == schema.length - 1 ? "" : ",") + "<br />";
-        });
-        string += ") DISTRIBUTE ON RANDOM;";
+        if (schema.sink_add_info) {
+            // Build schema div
+            var div = $('<div class="element" id="schema">')
+                    .append($('<div class="navBar active">').text("SQL create statement"))
+                    .append($('<div class="details active" style="padding:10px;">')
+                    .html(schema.sink_add_info)
+                    );
 
-        // Build schema div
-        var div = $('<div class="element" id="schema">')
-                .append($('<div class="navBar active">').text("SQL create statement"))
-                .append($('<div class="details active" style="padding:10px;">')
-                .html(string)
-                );
-
-        // Append schema to resultsPane
-        $(div).appendTo($("#schema-information"));
+            // Append schema to resultsPane
+            $(div).appendTo($("#schema-information"));
+        }
     },
 
-    showButtons:function()
-    {
-        $("#resultsPane #sButtons")
-                .show();
-    },
+    showButtons
+            :
+            function()
+            {
+                $("#resultsPane #sButtons")
+                        .show();
+            }
+    ,
 
     highlightSelectedRow:function(tr)
     {
@@ -746,7 +741,8 @@ r.actions = {
                 .addClass("selected")
                 .siblings().removeClass("selected");
     }
-};
+}
+        ;
 
 keys = function(obj)
 {
@@ -756,36 +752,6 @@ keys = function(obj)
     }
     return accumalator;
 };
-
-function prettyPrintSQLType(field)
-{
-    var sql_type = null;
-
-    if (field.sql_type == "decimal" || field.sql_type == "numeric") {
-        if (field.sql_precision) {
-            if (field.sql_scale) {
-                sql_type = field.sql_type + "(" + field.sql_precision + ", " + field.sql_scale + ")";
-            }
-            else {
-                sql_type = field.sql_type + "(" + field.sql_precision + ")";
-            }
-        }
-    }
-    else {
-        if (field.sql_type == "nvarchar" || field.sql_type == "varchar") {
-            if (field.sql_length) {
-                sql_type = field.sql_type + "(" + field.sql_length + ")";
-            }
-//            alert(field.sql_length);
-        }
-    }
-
-    if (sql_type == null) {
-        sql_type = field.sql_type;
-    }
-
-    return sql_type;
-}
 
 function camelizeString(string)
 {
@@ -802,12 +768,6 @@ function sanitizeString(stringToSanitize)
 {
     return stringToSanitize.toLowerCase().replace(/ /g, "_");
 }
-
-function createTableForEvent(name)
-{
-    return "xe_" + sanitizeString(name).replace(/_/g, "");
-}
-
 
 w.request = function(new_element)
 {

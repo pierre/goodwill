@@ -48,6 +48,17 @@ You can now run Goodwill via
 
     mvn jetty:run
 
+
+You can configure your sink via Goodwill. A sink is where the data described in Goodwill is stored. For instance, it can
+JDBC to your data warehouse to create the tables that will hold the events. For now, only Netezza is supported:
+
+    mvn -Dgoodwill.sink.type=netezza -Dgoodwill.sink.db.host=netezza.company.com -Dgoodwill.sink.db.name=company \
+        -Dgoodwill.sink.db.user=pierre -Dgoodwill.sink.db.password=pierre -Dgoodwill.sink.db.port=5480 jetty:run
+
+
+You may want to look at the configuration parameter goodwill.sink.db.extra_sql in GoodwillConfig.java to see how to customize
+it.
+
 == Configuration
 
 See http://github.com/pierre/goodwill/blob/master/src/main/java/com/ning/metrics/goodwill/binder/config/GoodwillConfig.java.

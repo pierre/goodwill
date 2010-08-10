@@ -33,38 +33,86 @@ public class GoodwillConfig
     }
 
     @Config(value = "goodwill.store.db.host")
-    public String getDBHost()
+    public String getStoreDBHost()
     {
         return "localhost";
     }
 
     @Config(value = "goodwill.store.db.port")
-    public int getDBPort()
+    public int getStoreDBPort()
     {
         return 3306;
     }
 
     @Config(value = "goodwill.store.db.name")
-    public String getDBName()
+    public String getStoreDBName()
     {
         return "goodwill";
     }
 
     @Config(value = "goodwill.store.db.user")
-    public String getDBUsername()
+    public String getStoreDBUsername()
     {
         return "root";
     }
 
     @Config(value = "goodwill.store.db.password")
-    public String getDBPassword()
+    public String getStoreDBPassword()
     {
         return "";
     }
 
     @Config(value = "goodwill.store.db.thrift_table.name")
-    public String getDBThriftTableName()
+    public String getStoreDBThriftTableName()
     {
         return "thrift_types";
+    }
+
+    @Config(value = "goodwill.sink.type")
+    public String getSinkType()
+    {
+        return null;
+    }
+
+    @Config(value = "goodwill.sink.db.host")
+    public String getSinkDBHost()
+    {
+        return "localhost";
+    }
+
+    @Config(value = "goodwill.sink.db.port")
+    public int getSinkDBPort()
+    {
+        return 3306;
+    }
+
+    @Config(value = "goodwill.sink.db.name")
+    public String getSinkDBName()
+    {
+        return "goodwill_sink";
+    }
+
+    @Config(value = "goodwill.sink.db.user")
+    public String getSinkDBUsername()
+    {
+        return "root";
+    }
+
+    @Config(value = "goodwill.sink.db.password")
+    public String getSinkDBPassword()
+    {
+        return "";
+    }
+
+    @Config(value = "goodwill.sink.db.table_name_format")
+    public String getSinkDBTableNameFormat()
+    {
+        return "xe_%s";
+    }
+
+    @Config(value = "goodwill.sink.db.extra_sql")
+    public String getSinkExtraSQL()
+    {
+        return String.format("GRANT ALL ON %s.? TO 'someuser'@'somehost'; CREATE OR REPLACE VIEW v_count_? as SELECT COUNT(*) FROM ?;", getSinkDBName());
     }
 }
