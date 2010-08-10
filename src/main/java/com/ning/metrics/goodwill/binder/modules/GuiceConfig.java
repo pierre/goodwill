@@ -65,7 +65,7 @@ public class GuiceConfig extends GuiceServletContextListener
                     }
                     else if (storeType.equals("csv")) {
                         binder.bind(GoodwillStore.class).to(CSVFileStore.class);
-                        log.info("enabled CSV store");
+                        log.info("Enabled CSV store");
                     }
                     else {
                         throw new IllegalStateException("Unknown type " + storeType);
