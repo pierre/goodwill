@@ -96,10 +96,7 @@ public class Registrar
 
         log.debug(String.format("Found type: %s", typeFound));
         if (typeFound != null) {
-            // Return a JSON array (JS code expects it)
-            JSONArray array = new JSONArray();
-            array.put(typeFound.toJSON());
-            return new Viewable("/registrar/type.jsp", array);
+            return new Viewable("/registrar/show.jsp", typeFound);
         }
 
         throw new NotFoundException("Type, " + typeName + ", is not found");
