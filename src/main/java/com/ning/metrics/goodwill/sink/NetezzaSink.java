@@ -42,7 +42,8 @@ public class NetezzaSink implements GoodwillSink
     ) throws SQLException, IOException, ClassNotFoundException
     {
         connectToNetezza(DBHost, DBPort, DBName, DBUsername, DBPassword);
-        this.extraSQL = extraSQL;
+        // TODO: hack. Maven escapes strangely parameters on the command line, replace manually \* with *.
+        this.extraSQL = StringUtils.replace(extraSQL, "\\*", "*");
         this.tableNameFormat = tableNameFormat;
     }
 
@@ -65,24 +66,30 @@ public class NetezzaSink implements GoodwillSink
 
             PreparedStatement extraStatement = null;
             if (extraSQL != null) {
-                extraStatement = connection.prepareStatement(extraSQL);
-                int i = 0;
-                while (i < extraStatement.getParameterMetaData().getParameterCount()) {
-                    extraStatement.setString(i, thriftType.getName());
-                }
+                // TODO: hack. We do a manual replacement first because escaping can do strange things. More thoughts needed here.
+                extraStatement = connection.prepareStatement(StringUtils.replace(extraSQL, "?", getTableName(thriftType)));
+//                int i = 1;
+//                while (i <= extraStatement.getParameterMetaData().getParameterCount()) {
+//                    extraStatement.setString(i, thriftType.getName());
+//                    i++;
+//                }
                 extraStatement.addBatch();
             }
 
-            log.info(String.format("Netezza sink: %s", statement.executeBatch().toString()));
+            // We need to commit in two stages unfortunately, because the free-form SQL snippet may refer to the table in the first
+            // statement (e.g. to create a view).
+            log.info(String.format("Adding Thrift to Netezza: %s", statement.executeBatch().toString()));
+            connection.commit();
+
             if (extraStatement != null) {
-                log.info(String.format("Netezza sink extra SQL: %s", extraStatement.executeBatch().toString()));
+                log.info(String.format("Running extra SQL in Netezza: %s", extraStatement.executeBatch().toString()));
+                connection.commit();
             }
 
-            connection.commit();
             return true;
         }
         catch (SQLException e) {
-            log.warn(e);
+            log.warn(String.format("Unable to add Type to Netezza: %s", e));
             return false;
         }
     }
