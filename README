@@ -1,25 +1,77 @@
-h1. Goodwill, a Thrift types store
+= Goodwill, a Thrift types store
 
-h2. Usage
+Goodwill is a store to share Thrift schemas.
 
-mvn -Dgoodwill.store.csv.file.path=examples/file_store.csv jetty:run
-
-This creates a store with a single type Awesomeness:
-
-   curl -H'Accept: text/html' http://127.0.0.1:8080/goodwill/registrar/Awesomeness
-   curl -H'Accept: application/json' http://127.0.0.1:8080/goodwill/registrar/Awesomeness
+It provides an HTML-based UI and a JSON API to create and document them. Goodwill is fully integrated with the action-core
+(http://github.com/pierre/action-core) to browse Thrift-based sequence files on HDFS. Another usecase is to export Thrift
+data from HDFS to a SQL-based data warehouse: Goodwill is the middle-man that defines field types and does the translation
+between Thrift types and SQL types.
 
 
-To debug:
+= Usage
 
-mvn -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -Dgoodwill.store.csv.file.path=examples/file_store.csv jetty:run
+To get started, one can use the CSV file store:
+
+    mvn -Dgoodwill.store.type=csv -Dgoodwill.store.csv.file.path=examples/file_store.csv jetty:run
+
+This creates a store with a single type Awesomeness. You can browse it at:
+
+   http://127.0.0.1:8080/registrar
+
+To access the API, specify the Accept header:
+
+   curl -H'Accept: application/json' http://127.0.0.1:8080/registrar/Awesomeness
 
 
-h2. Build
+Note: the CSV file store is currently read-only. If you want to fix it, look at updateType in
+http://github.com/pierre/goodwill/blob/master/src/main/java/com/ning/metrics/goodwill/store/CSVFileStore.java.
 
-mvn package
+A more common usecase is to use the MySQL backend. Simply create a goodwill database and create the following table:
+
+    CREATE TABLE `thrift_types` (
+    `event_type` varchar(255) DEFAULT NULL,
+    `field_id` int(11) DEFAULT NULL,
+    `field_type` varchar(255) DEFAULT NULL,
+    `field_name` varchar(255) DEFAULT NULL,
+    `sql_type` varchar(255) DEFAULT NULL,
+    `sql_length` int(11) DEFAULT NULL,
+    `sql_scale` int(11) DEFAULT NULL,
+    `sql_precision` int(11) DEFAULT NULL,
+    `description` varchar(255) DEFAULT NULL,
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `unique_fields` (`event_type`,`field_id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8
 
 
-h2. License
+You can now run Goodwill via
 
-See LICENSE-2.0.txt file.
+    mvn jetty:run
+
+== Configuration
+
+See http://github.com/pierre/goodwill/blob/master/src/main/java/com/ning/metrics/goodwill/binder/config/GoodwillConfig.java.
+
+
+= To build
+
+    mvn package
+
+will create a war.
+
+
+= License (see LICENSE-2.0.txt file for full license)
+
+Copyright 2010 Ning
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
