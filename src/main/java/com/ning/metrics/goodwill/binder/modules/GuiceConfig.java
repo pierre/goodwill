@@ -24,10 +24,12 @@ import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.store.CSVFileStore;
 import com.ning.metrics.goodwill.store.GoodwillStore;
 import com.ning.metrics.goodwill.store.MySQLStore;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import org.apache.log4j.Logger;
 import org.skife.config.ConfigurationObjectFactory;
 
 import java.util.HashMap;
@@ -35,6 +37,8 @@ import java.util.Map;
 
 public class GuiceConfig extends GuiceServletContextListener
 {
+    private static final Logger log = Logger.getLogger(GuiceConfig.class);
+
     @Override
     protected Injector getInjector()
     {
@@ -52,7 +56,20 @@ public class GuiceConfig extends GuiceServletContextListener
                     GoodwillConfig config = new ConfigurationObjectFactory(System.getProperties()).build(GoodwillConfig.class);
                     binder.bind(GoodwillConfig.class).toInstance(config);
 
-                    binder.bind(GoodwillStore.class).to(MySQLStore.class);
+
+                    final String storeType = config.getStoreType();
+
+                    if (storeType.equals("mysql")) {
+                        binder.bind(GoodwillStore.class).to(MySQLStore.class);
+                        log.info("Enabled MySQL store");
+                    }
+                    else if (storeType.equals("csv")) {
+                        binder.bind(GoodwillStore.class).to(CSVFileStore.class);
+                        log.info("enabled CSV store");
+                    }
+                    else {
+                        throw new IllegalStateException("Unknown type " + storeType);
+                    }
                 }
             },
             new ServletModule()
@@ -62,10 +79,8 @@ public class GuiceConfig extends GuiceServletContextListener
                 {
                     //serve("/*").with(GuiceContainer.class, params);
                     filter("/*").through(GuiceContainer.class, params);
-
                 }
             }
         );
-
     }
 }

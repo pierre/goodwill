@@ -20,16 +20,16 @@ import org.skife.config.Config;
 
 public class GoodwillConfig
 {
+    @Config(value = "goodwill.store.type")
+    public String getStoreType()
+    {
+        return "mysql";
+    }
+
     @Config(value = "goodwill.store.csv.file.path")
     public String getCSVFilePath()
     {
         return "";
-    }
-
-    @Config(value = "goodwill.log.conf.file.path")
-    public String getLogConfFilePath()
-    {
-        return null;
     }
 
     @Config(value = "goodwill.store.db.host")
