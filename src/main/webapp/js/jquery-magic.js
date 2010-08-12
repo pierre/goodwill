@@ -445,10 +445,8 @@ e.dropdown = function(attr)
         "byte" : ["byteint"],
         "i16" : ["smallint"],
         "i32" : ["integer"],
-        "i64" : ["bigint"],
-        "double" : ["numeric", "decimal"],
-        "date" : ["date", "datetime"],
-        "ip" : ["IP-TODO?"]
+        "i64" : ["bigint", "date", "datetime", "timestamp"],
+        "double" : ["numeric", "decimal"]
     };
 
 
@@ -477,7 +475,7 @@ e.dropdown = function(attr)
 e.footer_dropdown = function()
 {
     var dropdown = $("<select>");
-    var options = ["", "string", "bool", "byte", "i16", "i32", "i64", "double", "date", "ip"];
+    var options = ["", "string", "bool", "byte", "i16", "i32", "i64", "double"];
 
     $.each(options, function(index, option)
     {
