@@ -48,7 +48,7 @@ public class MySQLStoreTest
     private ThriftType type2;
     private static final String TYPE1_NAME = "The Shawshank Redemption";
 
-    @BeforeTest(alwaysRun = false)
+    @BeforeTest(alwaysRun = false, enabled = false)
     public void setUp() throws SQLException, IOException, ClassNotFoundException
     {
         store = new MySQLStore("localhost", 3306, "goodwill", "root", "", "thrift_types_tests");
@@ -70,13 +70,13 @@ public class MySQLStoreTest
         type2.addThriftField(new ThriftField("city", "string", 5));
     }
 
-    @AfterTest(alwaysRun = false)
+    @AfterTest(alwaysRun = false, enabled = false)
     public void tearDown() throws SQLException
     {
         store.close();
     }
 
-    @Test
+    @Test(enabled = false)
     public void testInvalidThriftField()
     {
         try {
@@ -90,7 +90,7 @@ public class MySQLStoreTest
     }
 
 
-    @Test
+    @Test(enabled = false)
     public void testAddUpdateType() throws Exception
     {
         Collection<ThriftType> types = store.getTypes();
