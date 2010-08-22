@@ -9,7 +9,7 @@ public interface GoodwillSink
      *
      * @param thriftType ThriftType to add
      */
-    public boolean addType(ThriftType thriftType);
+    public boolean addType(ThriftType thriftType) throws Exception;
 
     /**
      * Update a type to the sink

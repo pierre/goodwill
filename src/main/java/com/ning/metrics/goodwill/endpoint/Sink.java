@@ -35,7 +35,7 @@ public class Sink
     @POST
     @Path("/{type}/")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response addTypeToSink(@PathParam("type") String typeName)
+    public Response addTypeToSink(@PathParam("type") String typeName) throws Exception
     {
         ThriftType typeFound = store.findByName(typeName);
 

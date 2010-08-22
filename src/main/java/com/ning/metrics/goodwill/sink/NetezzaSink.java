@@ -21,11 +21,16 @@ public class NetezzaSink implements GoodwillSink
     private Connection connection;
     private final String extraSQL;
     private final String tableNameFormat;
+    private final String DBHost;
+    private final int DBPort;
+    private final String DBName;
+    private final String DBUsername;
+    private final String DBPassword;
 
     @Inject
     public NetezzaSink(
         GoodwillConfig config
-    ) throws SQLException, IOException, ClassNotFoundException
+    )
     {
         this(config.getSinkDBHost(), config.getSinkDBPort(), config.getSinkDBName(), config.getSinkDBUsername(), config.getSinkDBPassword(),
             config.getSinkExtraSQL(), config.getSinkDBTableNameFormat());
@@ -39,9 +44,14 @@ public class NetezzaSink implements GoodwillSink
         String DBPassword,
         String extraSQL,
         String tableNameFormat
-    ) throws SQLException, IOException, ClassNotFoundException
+    )
     {
-        connectToNetezza(DBHost, DBPort, DBName, DBUsername, DBPassword);
+        this.DBHost = DBHost;
+        this.DBPort = DBPort;
+        this.DBName = DBName;
+        this.DBUsername = DBUsername;
+        this.DBPassword = DBPassword;
+
         // TODO: hack. Maven escapes strangely parameters on the command line, replace manually \* with *.
         this.extraSQL = StringUtils.replace(extraSQL, "\\*", "*");
         this.tableNameFormat = tableNameFormat;
@@ -57,7 +67,10 @@ public class NetezzaSink implements GoodwillSink
      */
     @Override
     public boolean addType(ThriftType thriftType)
+        throws SQLException, IOException, ClassNotFoundException
     {
+        connectToNetezza(DBHost, DBPort, DBName, DBUsername, DBPassword);
+
         String createTableStatement = getCreateTableStatement(thriftType);
 
         try {
