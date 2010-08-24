@@ -24,7 +24,7 @@
 <html>
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    <title>thrift - mock</title>
+    <title>Goodwill - a Thrift types store</title>
     <script type="text/javascript">var json = ${it};</script>
     <script type="text/javascript" src="/js/jquery-1.3.2.min.js"></script>
     <script type="text/javascript" src="/js/jquery-magic.js"></script>
@@ -35,7 +35,7 @@
 
 <div id="header">
     <div class="wrapper">
-        <h1>Thrift Query Server</h1>
+        <h1>Thrift Registrar</h1>
 
         <div class="newET"><a>Create an Event Type</a></div>
     </div>
@@ -68,10 +68,10 @@
                     <div style="clear:both;"></div>
                 </ul>
             </div>
+            <div id="schema-information">
+            </div>
             <div id="schema">
             </div>
-				<div id="schema-information">
-				</div>
         </div>
         <div style="clear:both;"></div>
     </div>

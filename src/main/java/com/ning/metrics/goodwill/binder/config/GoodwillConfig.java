@@ -113,6 +113,6 @@ public class GoodwillConfig
     @Config(value = "goodwill.sink.db.extra_sql")
     public String getSinkExtraSQL()
     {
-        return String.format("GRANT ALL ON %s.? TO 'someuser'@'somehost'; CREATE OR REPLACE VIEW v_count_? as SELECT COUNT(*) FROM ?;", getSinkDBName());
+        return String.format("GRANT ALL ON %s.? TO 'someuser'@'somehost';\nCREATE OR REPLACE VIEW v_count_? as SELECT COUNT(*) FROM ?;\n", getSinkDBName());
     }
 }

@@ -42,6 +42,10 @@ $(window).resize(function()
     $("#table").css("height", (height - 40));
 });
 
+function scrollToElement(el)
+{
+    el[0].scrollIntoView(true);
+}
 
 w.json_to_objects = function(json)
 {
@@ -186,7 +190,7 @@ e.create_element = function(field_obj)
                 .attr("_edit", "")
                 .attr("_status", element.status || "")
 
-                .append($('<div class="navBar" style="cursor:pointer")">')
+                .append($('<div class="navBar" style="cursor:pointer">')
                 .append($('<div class="name">').text(element.name || ""))
                 .append($('<div class="buttons">')
                 .append($('<div class="deprecate">'))
@@ -213,10 +217,8 @@ e.create_element = function(field_obj)
                 )
                 )
                 .append($('<div class="actions">')
-                .append($('<ul>')
-                .append($('<li class="save" style="cursor:pointer">').text("save"))
-                .append($('<li class="cancel" style="cursor:pointer">').text("cancel"))
-                )
+                .append($('<button class="cancel">').text("cancel"))
+                .append($('<button class="save">').text("save"))
                 )
                 .append('<div style="clear:both"></div>')
                 )
@@ -293,7 +295,7 @@ e.get_attributes = function(element, create)
     var edit_attributes = function(create)
     {
         var attr = {};
-        console.log("edit mode")
+        console.log("edit mode");
 
         attr.name = $(".name input", element).val();
         attr.description = $(".description textarea", element).val();
@@ -356,6 +358,12 @@ e.enter_edit_mode = function(element, attr, create)
             .html(
             $('<input class="input_name">')
                     .val(attr.name || DEFAULT_NAME)
+                    .focus(function()
+            {
+                if ($(this).val() == DEFAULT_NAME) {
+                    $(this).val("");
+                }
+            })
             );
 
     $(".details .description", element)
@@ -363,7 +371,12 @@ e.enter_edit_mode = function(element, attr, create)
             .html(
             $("<textarea>")
                     .val(attr.description || DEFAULT_DESCRIPTION)
-            );
+                    .focus(function()
+            {
+                if ($(this).val() == DEFAULT_DESCRIPTION) {
+                    $(this).val("");
+                }
+            }));
 
     $(".details .sql .dropdown", element)
             .html(
@@ -375,7 +388,7 @@ e.enter_edit_mode = function(element, attr, create)
 
     if (create) {
         $('.details .type', element)
-                .show()
+                .show();
         $('.details .type .dropdown', element)
                 .html(
                 e.footer_dropdown(attr)
@@ -393,8 +406,6 @@ e.enter_edit_mode = function(element, attr, create)
     $(".details .actions", element).show();
     $(".navBar .buttons", element).show();
     $(element).attr("_edit", "edit");
-
-
 };
 
 e.return_to_std_mode = function(element, attr)
@@ -536,7 +547,7 @@ w.build_eventType_table = function()
     for (var i in sorted_keys) {
         key = sorted_keys[i];
         $('table#eventTypes').append(
-                $('<tr style="cursor:pointer")">')
+                $('<tr style="cursor:pointer">')
                         .attr('name', key)
                         .append($('<td>').text(key))
                 );
@@ -620,11 +631,18 @@ r.events = function()
 {
     $("#resultsPane #title li#add").click(function()
     {
-        var total_elements = $('#resultsPane .element.field').length + 1;
+        var total_elements = $('#resultsPane .element.field').length + 1; // Thrift fields start at 1, not 0
         element = e.create_element({position:total_elements, status:"new"});
 
+        // Update internal (volatile) database
         attributes = e.get_attributes(element, true);
         schema.push(attributes);
+
+        // Enter edit mode
+        e.enter_edit_mode(element, e.get_attributes(element, false), e.status(element));
+
+        // Scroll UI (we need to enter edit mode first as it changes the height of the box)
+        scrollToElement(element);
     });
 
     $('#resultsPane #title li#deprecate').toggle(function()
@@ -641,7 +659,6 @@ r.events = function()
 
     }, function()
     {
-
         // update DOM
         $('#resultsPane #title, .element .navBar, .element .details, .element .footer').addClass("active").removeClass("deprecated");
 
@@ -688,6 +705,7 @@ r.actions = {
                 .text(eventType));
     },
 
+    // Create box with Thrift DSL
     set_rp_schema:function()
     {
         // build string
@@ -699,27 +717,25 @@ r.actions = {
         string += "}";
 
         // build schema div
-        var div = $('<div class="element" id="schema">')
-                .append($('<div class="navBar active">').text("Thrift schema"))
-                .append($('<div class="details active" style="padding:10px;">')
+        var div = $('<div class="element globalElement" id="thriftSchema">')
+                .append($('<pre>')
                 .html(string)
                 );
 
-        // append schema to resultsWrapper, not resultsPane (affect Thrift fields positions)
         $(div).appendTo($("#schema-information"));
     },
 
+    // Create box with the Sink information
+    // See GoodwillConfig#getSinkExtraSQL()
     set_rp_sqlSchema:function()
     {
         if (schema.sink_add_info) {
             // Build schema div
-            var div = $('<div class="element" id="schema">')
-                    .append($('<div class="navBar active">').text("SQL create statement"))
-                    .append($('<div class="details active" style="padding:10px;">')
+            var div = $('<div class="element globalElement" id="sinkInformation">')
+                    .append($('<pre>')
                     .html(schema.sink_add_info)
                     );
 
-            // Append schema to resultsPane
             $(div).appendTo($("#schema-information"));
         }
     },
@@ -739,8 +755,7 @@ r.actions = {
                 .addClass("selected")
                 .siblings().removeClass("selected");
     }
-}
-        ;
+};
 
 keys = function(obj)
 {
