@@ -25,7 +25,14 @@
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <title>Goodwill - a Thrift types store</title>
-    <script type="text/javascript">var json = ${it};</script>
+    <jsp:useBean id="it"
+                 type="com.ning.metrics.goodwill.modules.ThriftRegistrar"
+                 scope="request">
+    </jsp:useBean>
+    <script type="text/javascript">
+        var json = <%= it.getStoreInJSON() %>;
+        var actionCoreURL = "<%= it.getActionCoreURL() %>";
+    </script>
     <script type="text/javascript" src="/js/jquery-1.3.2.min.js"></script>
     <script type="text/javascript" src="/js/jquery-magic.js"></script>
     <script type="text/javascript" src="/js/jquery.json-2.2.js"></script>

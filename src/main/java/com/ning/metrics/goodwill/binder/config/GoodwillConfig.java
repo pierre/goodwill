@@ -115,4 +115,10 @@ public class GoodwillConfig
     {
         return String.format("GRANT ALL ON %s.? TO 'someuser'@'somehost';\nCREATE OR REPLACE VIEW v_count_? as SELECT COUNT(*) FROM ?;\n", getSinkDBName());
     }
+
+    @Config(value = "goodwill.action.url")
+    public String getActionCoreURL()
+    {
+        return null;
+    }
 }

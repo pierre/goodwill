@@ -18,6 +18,8 @@ package com.ning.metrics.goodwill.endpoint;
 
 import com.google.inject.Inject;
 import com.google.inject.internal.Nullable;
+import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.modules.ThriftRegistrar;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
 import com.ning.metrics.goodwill.store.GoodwillStore;
 import com.ning.metrics.goodwill.store.ThriftType;
@@ -46,13 +48,16 @@ public class Registrar
 
     private GoodwillStore store;
     private final GoodwillSink sink;
+    private final GoodwillConfig config;
 
     @Inject
     public Registrar(
+        GoodwillConfig config,
         GoodwillStore store,
         @Nullable GoodwillSink sink
     )
     {
+        this.config = config;
         this.store = store;
         this.sink = sink;
     }
@@ -84,7 +89,10 @@ public class Registrar
             }
         }
 
-        return new Viewable("/registrar/type.jsp", storeInJSON);
+        ThriftRegistrar registrar = new ThriftRegistrar(storeInJSON);
+        registrar.setActionCoreURL(config.getActionCoreURL());
+
+        return new Viewable("/registrar/type.jsp", registrar);
     }
 
     @GET
