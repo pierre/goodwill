@@ -146,8 +146,10 @@ e.events = function(element)
             w.request(new_element);
             element.attr("_status", "");
             e.return_to_std_mode(element, attributes);
-        }
 
+            // Hide the schema information as they need to be updated on the server side
+            $('#schema-information').hide();
+        }
     });
 
     $(".details .actions .cancel", element).click(function()
@@ -733,9 +735,8 @@ r.actions = {
             // Build schema div
             var div = $('<div class="element globalElement" id="sinkInformation">')
                     .append($('<pre>')
-                    .html(schema.sink_add_info)
+                    .html(schema.sink_add_info.split(";").join(";\n")) // Split on ; for pretty printing
                     );
-
             $(div).appendTo($("#schema-information"));
         }
     },
