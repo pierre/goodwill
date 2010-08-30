@@ -86,7 +86,7 @@ public class MySQLStore implements GoodwillStore
         String currentThriftTypeName = null;
         try {
             Statement select = connection.createStatement();
-            ResultSet result = select.executeQuery(String.format("SELECT event_type, field_name, field_type, field_id, description, sql_type, sql_length, sql_scale, sql_precision FROM %s", tableName));
+            ResultSet result = select.executeQuery(String.format("SELECT event_type, field_name, field_type, field_id, description, sql_type, sql_length, sql_scale, sql_precision FROM %s ORDER BY field_id ASC", tableName));
 
             while (result.next()) {
                 String thriftType = result.getString(1);
