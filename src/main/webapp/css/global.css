@@ -47,7 +47,7 @@ table td                                {padding-left:10px;}
 
 /* Right Column */
 #resultsWrapper                         {width:70%; min-width:500px; float:left; margin-top:1px;}
-#resultsPane #title                     {height:30px; padding-left:10px; line-height:30px; color:#fff;  border-bottom:1px solid #ccc;}
+#resultsPane #title                     {height:30px; padding-left:10px; line-height:30px; color:#fff;  border-bottom:1px solid #ccc; position:fixed; bottom: 0;}
 #resultsPane #title a                   {color:#fff; text-decoration:none;}
 #resultsPane #title a:hover             {text-decoration:underline;}
 #resultsPane #title.active              {background-color:#244e85;}
@@ -132,6 +132,10 @@ li#sButtons                                   {float:right; padding-top:5px;}
 
 /* Global element boxes */
 .globalElement                          {border-bottom: none;}
+
+#schema {
+    margin-bottom: 60px;
+}
 
 pre {
         padding: 10px 15px;

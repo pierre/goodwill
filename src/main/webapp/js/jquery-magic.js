@@ -591,6 +591,14 @@ w.events = function()
 
 r.updatePaneOnSelectEvent = function(tr)
 {
+    // If fields were added, the schema information was hidden
+    $('#schema-information').show();
+
+    // Sroll back to top
+    // TODO
+    scrollToElement($('#resultsWrapper'));
+
+    // Redraw right pane
     r.actions.wipe_rp();
     r.actions.set_rp_title();
     r.actions.showButtons();
@@ -711,10 +719,10 @@ r.actions = {
     set_rp_schema:function()
     {
         // build string
-        var string = "struct " + camelizeString(sanitizeString(eventType)) + " &nbsp; {<br />";
+        var string = "struct " + eventType + " &nbsp; {<br />";
         $.each(schema, function(index, field)
         {
-            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ": " + field.field_type + " " + sanitizeString(field.name) + (index == schema.length - 1 ? "" : ",") + "<br />";
+            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ":" + field.field_type + " " + sanitizeString(field.name) + (index == schema.length - 1 ? "" : ",") + "<br />";
         });
         string += "}";
 
