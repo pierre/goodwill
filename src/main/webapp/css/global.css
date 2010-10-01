@@ -14,137 +14,448 @@
  * under the License.
  */
 
-body {background:#efefef;font-family: 'Trebuchet MS', helvetica, arial, sans-serif; color:#000; font-size:13px; }
-body, form, h1, h2, h3, h4, h5, h6, ul, li, p {margin:0; padding:0; font-family: 'Trebuchet MS', helvetica, arial, sans-serif}
-a, a:link, a:visited {text-decoration:none; color:#0066cc; cursor:pointer; outline-style:none}
-a:hover, a:focus {text-decoration:underline; color:#0066cc;}
-a img {border:none;}
-ul {}
-li {float:left; margin-right:10px; list-style: none;}
+body {
+    background: #efefef;
+    font-family: 'Trebuchet MS', helvetica, arial, sans-serif;
+    color: #000;
+    font-size: 13px;
+}
 
+body, form, h1, h2, h3, h4, h5, h6, ul, li, p {
+    margin: 0;
+    padding: 0;
+    font-family: 'Trebuchet MS', helvetica, arial, sans-serif
+}
 
-/* General DOM Shit */                  
-.wrapper                                {padding:0px 20px; margin:0px auto;}
-#main                                   {background-color:#fff; }
-#header                                 {width:100%; height:30px; background:#182740; border-bottom:4px solid black;}
-#header .wrapper                        {position:relative; line-height:30px;}
-#footer                                 {background-color:#efefef;}
-#title                                  {}
+a, a:link, a:visited {
+    text-decoration: none;
+    color: #0066cc;
+    cursor: pointer;
+    outline-style: none
+}
 
-#header h1                              {font-size:15px; color:white;}
-#header .newET                          {position:absolute; top:0px; right:10px;}
-#header a                              {font-size:13px; font-weight:normal; color:#fff;}
+a:hover, a:focus {
+    text-decoration: underline;
+    color: #0066cc;
+}
 
+a img {
+    border: none;
+}
 
-/* Left Column Table */                 
-#table                                  {float:left; width:30%; overflow:auto;}
-table                                   {width:100%; background-color:#efefef;border-collapse: collapse;}
-table th                                {background-color:#969898; color:#fff; }
-table tr                                {height:30px; background-color:#fff; border:1px solid #ccc;}
-table tr:hover                          {background-color:#59a5ee;}
-table td                                {padding-left:10px;}
-.selected                               {background-color:#d7d7d7;}
+ul {
+}
+
+li {
+    float: left;
+    margin-right: 10px;
+    list-style: none;
+}
+
+/* General DOM Shit */
+.wrapper {
+    padding: 0px 20px;
+    margin: 0px auto;
+}
+
+#main {
+    background-color: #fff;
+}
+
+#header {
+    width: 100%;
+    height: 30px;
+    background: #182740;
+    border-bottom: 4px solid black;
+}
+
+#header .wrapper {
+    position: relative;
+    line-height: 30px;
+}
+
+#footer {
+    background-color: #efefef;
+}
+
+#title {
+}
+
+#header h1 {
+    font-size: 15px;
+    color: white;
+}
+
+#header .newET {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+}
+
+#header a {
+    font-size: 13px;
+    font-weight: normal;
+    color: #fff;
+}
+
+/* Left Column Table */
+#table {
+    float: left;
+    width: 30%;
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+    background-color: #efefef;
+    border-collapse: collapse;
+}
+
+table th {
+    background-color: #969898;
+    color: #fff;
+}
+
+table tr {
+    height: 30px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+table tr:hover {
+    background-color: #59a5ee;
+}
+
+table td {
+    padding-left: 10px;
+}
+
+table td .eventName {
+    width: 50%;
+}
+
+.selected {
+    background-color: #d7d7d7;
+}
+
+#ajax_message {
+    height: 30px;
+}
+
+#ajax_success {
+    background-color: #DDFFDD;
+    font-size: 13px;
+    padding: 5px;
+    text-align: center;
+    width: 100%;
+}
 
 /* Right Column */
-#resultsWrapper                         {width:70%; min-width:500px; float:left; margin-top:1px;}
-#resultsPane #title                     {height:30px; padding-left:10px; line-height:30px; color:#fff;  border-bottom:1px solid #ccc; position:fixed; bottom: 0;}
-#resultsPane #title a                   {color:#fff; text-decoration:none;}
-#resultsPane #title a:hover             {text-decoration:underline;}
-#resultsPane #title.active              {background-color:#244e85;}
-#resultsPane #title.deprecated          {background-color:#444444;}
-#resultsPane #title li                  {line-height:30px;}
-#resultsPane #title li#name             {width:200px; height:30px; overflow:hidden;}
-#resultsPane                            {padding:0px 20px; overflow: -moz-scrollbars-vertical; overflow-y: scroll;}
-                                        
-                                        
+#resultsWrapper {
+    width: 70%;
+    min-width: 500px;
+    float: left;
+    margin-top: 1px;
+}
+
+#title {
+    color: #fff;
+    border-bottom: 1px solid #ccc;
+}
+
+#title a {
+    color: #fff;
+    text-decoration: none;
+}
+
+#title a:hover {
+    text-decoration: underline;
+}
+
+#title.active {
+    background-color: #244e85;
+}
+
+#title.deprecated {
+    background-color: #444444;
+}
+
+#title li {
+    line-height: 30px;
+}
+
+#title li#name {
+    height: 30px;
+    overflow: hidden;
+}
+
+#resultsPane {
+    padding: 0px 20px;
+    overflow: -moz-scrollbars-vertical;
+    overflow-y: scroll;
+}
+
 /* element stuff */
-.element                                {width:100%; min-width:350px; margin-top:20px; color:#fff; line-height:20px; border-bottom:1px solid #ccc;}
-.element .navBar                        {height:30px; line-height:30px; padding-left:10px;}
-.element .navBar .name                  {float:left; color:#ffffff;}
-.element .navBar .buttons               {float:right;}
-.element .details                       {padding-top:10px; min-height:20px;}
-.element .description                   {min-height:10px; padding-left:5px;}
-.element .footer                        {height:30px; line-height:30px;}
-.element .footer > div                  {float:left; padding-left:10px;}
-.element .footer div > div              {float:left; padding-left:10px;}
+.element {
+    width: 100%;
+    min-width: 350px;
+    margin-top: 20px;
+    color: #fff;
+    line-height: 20px;
+    border-bottom: 1px solid #ccc;
+}
 
+.element .navBar {
+    height: 30px;
+    line-height: 30px;
+    padding-left: 10px;
+}
 
-.element .details .type                           {height:20px; padding-left:5px; padding-top:10px;}
-.element .sql                           {height:20px; padding-left:5px; padding-top:10px;}
-.element .details .actions              {float:right; height:30px; padding-top:10px; padding-left:5px;}
-.element .details .actions > li:hover   {text-decoration:underline; cursor:pointer;}
+.element .navBar .name {
+    float: left;
+    color: #ffffff;
+}
 
-.actions                                {padding-right: 20px;}
-.actions .cancel                        {margin-right: 10px;}
+.element .navBar .buttons {
+    float: right;
+}
+
+.element .details {
+    padding-top: 10px;
+    min-height: 20px;
+}
+
+.element .description {
+    min-height: 10px;
+    padding-left: 5px;
+}
+
+.element .footer {
+    height: 30px;
+    line-height: 30px;
+}
+
+.element .footer > div {
+    float: left;
+    padding-left: 10px;
+}
+
+.element .footer div > div {
+    float: left;
+    padding-left: 10px;
+}
+
+.element .details .type {
+    height: 20px;
+    padding-left: 5px;
+    padding-top: 10px;
+}
+
+.element .sql {
+    height: 20px;
+    padding-left: 5px;
+    padding-top: 10px;
+}
+
+.element .details .actions {
+    float: right;
+    height: 30px;
+    padding-top: 10px;
+    padding-left: 5px;
+}
+
+.element .details .actions > li:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.actions {
+    padding-right: 20px;
+}
+
+.actions .cancel {
+    margin-right: 10px;
+}
 
 /* element active/deprecated colors */
-.element .navBar.active                 {background-color:#244e85; border-bottom: 1px solid #1a3b64;}
+.element .navBar.active {
+    background-color: #244e85;
+    border-bottom: 1px solid #1a3b64;
+}
 
-.element .navBar.active:hover           {background-color:#265693;}
-.element .navBar.deprecated             {background-color:#444444;}         
+.element .navBar.active:hover {
+    background-color: #265693;
+}
 
-.element .details.active                {background-color:#8aa9c4;}
-.element .details.deprecated            {background-color:#777777;}
+.element .navBar.deprecated {
+    background-color: #444444;
+}
 
-.element .footer.active                 {background-color:#6e8cac;}
-.element .footer.deprecated             {background-color:#999999;}
+.element .details.active {
+    background-color: #8aa9c4;
+}
 
+.element .details.deprecated {
+    background-color: #777777;
+}
+
+.element .footer.active {
+    background-color: #6e8cac;
+}
+
+.element .footer.deprecated {
+    background-color: #999999;
+}
 
 /* Element EDIT mode */
-.element .navBar .edit                  {height:18px; font-size:12px; line-height:18px; margin:5px;}
-.element .navBar .edit input            {height:18px; width:250px; padding-left:5px; color:#fff; background-color:transparent; border:1px solid #efefef;}
-.element .edit textarea                 {width:90%; height:20px; padding:5px; color:#fff; font-size:12px; background-color:transparent; border:1px solid #efefef;}
-.element .edit input                    {width:50px;}
+.element .navBar .edit {
+    height: 18px;
+    font-size: 12px;
+    line-height: 18px;
+    margin: 5px;
+}
 
+.element .navBar .edit input {
+    height: 18px;
+    width: 250px;
+    padding-left: 5px;
+    color: #fff;
+    background-color: transparent;
+    border: 1px solid #efefef;
+}
+
+.element .edit textarea {
+    width: 90%;
+    height: 20px;
+    padding: 5px;
+    color: #fff;
+    font-size: 12px;
+    background-color: transparent;
+    border: 1px solid #efefef;
+}
+
+.element .edit input {
+    width: 50px;
+}
 
 /* Right Column Options Stuff */
-.buttons                                {float:right; height:30px; padding:5px;}
-.buttons > div                          {float:left; height:20px; width:20px; margin-left:10px; }
-.blue                                   {background:url('../images/blue2.png') no-repeat;}
-.blue:hover                             {background:url('../images/blue.png') no-repeat;}
+.buttons {
+    float: right;
+    height: 30px;
+    padding: 5px;
+}
 
-.active .deprecate                      {background:url('../images/Remove2.png') no-repeat;}
-.active .deprecate:hover                {background:url('../images/Remove2-hover.png') no-repeat;}
+.buttons > div {
+    float: left;
+    height: 20px;
+    width: 20px;
+    margin-left: 10px;
+}
 
-.deprecated .deprecate                  {background:url('../images/blue2.png') no-repeat;}
-.deprecated .deprecate:hover            {background:url('../images/blue.png') no-repeat;}
-                                        
+.blue {
+    background: url('../images/blue2.png') no-repeat;
+}
 
-                                        
-/* Schema Buttons */                    
-                                        
-li#sButtons                                   {float:right; padding-top:5px;} 
-                                              
-#sButtons #show_schema                        {height:20px; width:20px; background:url('../images/link.png');}
-#sButtons #show_schema:hover                  {background:url("../images/link-hover.png");}
-                                              
-#sButtons #add                                {height:20px; width:20px; background:url('../images/add.png');}
-#sButtons #add:hover                          {background:url("../images/add-hover.png");}
+.blue:hover {
+    background: url('../images/blue.png') no-repeat;
+}
 
-.active #sButtons #deprecate                  {height:20px; width:20px; background:url('../images/Remove2.png');}
-.active #sButtons #deprecate:hover            {background:url("../images/Remove2-hover.png");}
-.deprecated #sButtons #deprecate              {height:20px; width:20px; background:url('../images/blue2.png');}
-.deprecated #sButtons #deprecate:hover        {background:url("../images/blue.png");}
+.active .deprecate {
+    background: url('../images/Remove2.png') no-repeat;
+}
 
-/* FIXED stuff */                       
-.fixed                                  {position:fixed; top:0px;}
-#resultsWrapper.fixed                   {left:65%;}
+.active .deprecate:hover {
+    background: url('../images/Remove2-hover.png') no-repeat;
+}
+
+.deprecated .deprecate {
+    background: url('../images/blue2.png') no-repeat;
+}
+
+.deprecated .deprecate:hover {
+    background: url('../images/blue.png') no-repeat;
+}
+
+/* Schema Buttons */
+
+li#name {
+    float: right;
+}
+
+li#sButtons {
+    float: right;
+    padding-top: 5px;
+}
+
+#sButtons #show_schema {
+    height: 20px;
+    width: 20px;
+    background: url('../images/link.png');
+}
+
+#sButtons #show_schema:hover {
+    background: url("../images/link-hover.png");
+}
+
+#sButtons #add {
+    height: 20px;
+    width: 20px;
+    background: url('../images/add.png');
+}
+
+#sButtons #add:hover {
+    background: url("../images/add-hover.png");
+}
+
+.active #sButtons #deprecate {
+    height: 20px;
+    width: 20px;
+    background: url('../images/Remove2.png');
+}
+
+.active #sButtons #deprecate:hover {
+    background: url("../images/Remove2-hover.png");
+}
+
+.deprecated #sButtons #deprecate {
+    height: 20px;
+    width: 20px;
+    background: url('../images/blue2.png');
+}
+
+.deprecated #sButtons #deprecate:hover {
+    background: url("../images/blue.png");
+}
+
+/* FIXED stuff */
+.fixed {
+    position: fixed;
+    top: 0px;
+}
+
+#resultsWrapper.fixed {
+    left: 65%;
+}
 
 /* Global element boxes */
-.globalElement                          {border-bottom: none;}
+.globalElement {
+    border-bottom: none;
+}
 
 #schema {
     margin-bottom: 60px;
 }
 
 pre {
-        padding: 10px 15px;
-        margin: 5px 0 15px;
-        border-left: 5px solid #666666;
-        background: #222222;
-        font: 1em/1.5 "Courier News", monospace;
-        color: #bbbbbb;
-        overflow: auto;
+    padding: 10px 15px;
+    margin: 5px 0 15px;
+    border-left: 5px solid #666666;
+    background: #222222;
+    font: 1em/1.5 "Courier News", monospace;
+    color: #bbbbbb;
+    overflow: auto;
 }
 
-.test {border:4px solid red;}
+.test {
+    border: 4px solid red;
+}

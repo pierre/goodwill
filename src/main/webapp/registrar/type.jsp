@@ -34,6 +34,9 @@
         var actionCoreURL = "<%= it.getActionCoreURL() %>";
     </script>
     <script type="text/javascript" src="/js/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="/js/layout.js"></script>
+    <script type="text/javascript" src="/js/server.js"></script>
+    <script type="text/javascript" src="/js/fields.js"></script>
     <script type="text/javascript" src="/js/jquery-magic.js"></script>
     <script type="text/javascript" src="/js/jquery.json-2.2.js"></script>
     <link rel="stylesheet" href="/css/global.css" type="text/css">
@@ -51,6 +54,8 @@
 
 <div id="main">
     <div id="table">
+        <div id="ajax_message"></div>
+
         <table id="eventTypes">
             <thead>
             <tr>
@@ -62,19 +67,6 @@
 
     <div id="resultsWrapper">
         <div id="resultsPane">
-            <div id="title" class="active">
-                <ul>
-                    <li id="schema_title">Click on a schema on the left to see its definition</li>
-                    <li id="name"></li>
-                    <li id="sButtons">
-                        <ul>
-                            <li id="add"></li>
-                            <li id="deprecate"></li>
-                        </ul>
-                    </li>
-                    <div style="clear:both;"></div>
-                </ul>
-            </div>
             <div id="schema-information">
             </div>
             <div id="schema">
