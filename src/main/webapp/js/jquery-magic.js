@@ -113,6 +113,7 @@ t.events = function()
 
         r.updatePaneOnSelectEvent(this);
         r.create_fields(schema);
+        r.actions.highlightSelectedRow(this);
     });
 };
 
