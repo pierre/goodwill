@@ -18,17 +18,15 @@ package com.ning.metrics.goodwill.endpoint;
 
 import com.google.inject.Inject;
 import com.google.inject.internal.Nullable;
+import com.ning.metrics.goodwill.access.ThriftType;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import com.ning.metrics.goodwill.modules.ThriftRegistrar;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
 import com.ning.metrics.goodwill.store.GoodwillStore;
-import com.ning.metrics.goodwill.store.ThriftType;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.view.Viewable;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -68,28 +66,13 @@ public class Registrar
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Viewable getAll() throws JSONException
+    public Viewable getAll() throws IOException
     {
-        JSONArray storeInJSON = store.toJSON();
-
-        // If we are using a sink, populate some extra information for visual display.
-        // A common usecase is to see the CREATE TABLE statement for a SQL based sink.
         if (sink != null) {
-            for (int i = 0; i < storeInJSON.length(); i++) {
-                JSONObject type = (JSONObject) storeInJSON.get(i);
-                String typeName = (String) type.get(ThriftType.JSON_THRIFT_TYPE_NAME);
-
-                if (typeName != null) {
-                    ThriftType thriftType = store.findByName(typeName);
-                    if (thriftType != null) {
-                        type.put("sinkAddInfo", sink.addTypeInfo(thriftType));
-                        storeInJSON.put(i, type);
-                    }
-                }
-            }
+            store.addSinkInfo(sink);
         }
 
-        ThriftRegistrar registrar = new ThriftRegistrar(storeInJSON);
+        ThriftRegistrar registrar = new ThriftRegistrar(store.toJSON());
         registrar.setActionCoreURL(config.getActionCoreURL());
 
         return new Viewable("/registrar/type.jsp", registrar);
@@ -146,12 +129,11 @@ public class Registrar
     )
     {
         try {
-            JSONObject eventJSON = new JSONObject(jsonThriftTypeString);
-            ThriftType thriftType = new ThriftType(eventJSON);
+            ThriftType thriftType = ThriftType.decode(jsonThriftTypeString);
             store.addType(thriftType);
             log.info(String.format("Created new ThriftType <%s> from JSON <%s>", thriftType.toString(), jsonThriftTypeString));
         }
-        catch (JSONException e) {
+        catch (IOException e) {
             log.warn(String.format("Malformatted JSON: %s (%s)", jsonThriftTypeString, e));
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -166,12 +148,11 @@ public class Registrar
     )
     {
         try {
-            JSONObject eventJSON = new JSONObject(jsonThriftTypeString);
-            ThriftType thriftType = new ThriftType(eventJSON);
+            ThriftType thriftType = ThriftType.decode(jsonThriftTypeString);
             store.updateType(thriftType);
             log.info(String.format("Updated ThriftType <%s> from JSON <%s>", thriftType.toString(), jsonThriftTypeString));
         }
-        catch (JSONException e) {
+        catch (IOException e) {
             log.warn(String.format("Malformatted JSON: %s", jsonThriftTypeString));
             return Response.status(Response.Status.BAD_REQUEST).build();
         }

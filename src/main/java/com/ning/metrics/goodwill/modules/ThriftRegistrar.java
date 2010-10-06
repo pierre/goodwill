@@ -1,18 +1,18 @@
 package com.ning.metrics.goodwill.modules;
 
-import org.json.JSONArray;
+import java.io.ByteArrayOutputStream;
 
 public class ThriftRegistrar
 {
-    private final JSONArray storeInJSON;
+    private final ByteArrayOutputStream storeInJSON;
     private String actionCoreURL;
 
-    public ThriftRegistrar(JSONArray storeInJSON)
+    public ThriftRegistrar(ByteArrayOutputStream storeInJSON)
     {
         this.storeInJSON = storeInJSON;
     }
 
-    public JSONArray getStoreInJSON()
+    public ByteArrayOutputStream getStoreInJSON()
     {
         return storeInJSON;
     }
@@ -21,9 +21,9 @@ public class ThriftRegistrar
      * Setter for the actionCoreURL field.
      * The action core is an open-source HDFS front-end, similar to the one provided by the Namenode,
      * but on steroids.
-     * @link http://github.com/pierre/action-core
      *
      * @param actionCoreURL URL to the action core instance
+     * @link http://github.com/pierre/action-core
      */
     public void setActionCoreURL(String actionCoreURL)
     {

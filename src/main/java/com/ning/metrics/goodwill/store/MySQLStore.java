@@ -17,10 +17,10 @@
 package com.ning.metrics.goodwill.store;
 
 import com.google.inject.Inject;
+import com.ning.metrics.goodwill.access.ThriftField;
+import com.ning.metrics.goodwill.access.ThriftType;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -37,7 +37,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MySQLStore implements GoodwillStore
+public class MySQLStore extends GoodwillStore
 {
     private static Logger log = Logger.getLogger(MySQLStore.class);
 
@@ -77,6 +77,88 @@ public class MySQLStore implements GoodwillStore
         tableName = DBTableName;
         connectToMySQL(DBHost, DBPort, DBName, DBUsername, DBPassword);
         buildThrifTtypeList();
+    }
+
+    @Override
+    public Collection<ThriftType> getTypes() throws IOException
+    {
+        buildThrifTtypeList();
+
+        final ArrayList<ThriftType> thriftTypesList = new ArrayList(thriftTypes.values());
+        Collections.sort(thriftTypesList, new Comparator<ThriftType>()
+        {
+            @Override
+            public int compare(ThriftType o, ThriftType o1)
+            {
+                return o.getName().compareTo(o1.getName());
+            }
+        });
+
+        return thriftTypesList;
+    }
+
+    /**
+     * Add a new type to the store
+     *
+     * @param thriftType ThriftType to add
+     */
+    @Override
+    public void addType(ThriftType thriftType)
+    {
+        // Creating a new Schema is really the same as updating/extending one, since the data model we use define schemas
+        // as a list of fields.
+        updateType(thriftType);
+    }
+
+    /**
+     * Update a type to the store
+     *
+     * @param thriftType ThriftType to update
+     */
+    @Override
+    public boolean updateType(ThriftType thriftType)
+    {
+        try {
+            Statement select = connection.createStatement();
+            PreparedStatement inserts = connection.prepareStatement(String.format("INSERT INTO %s SET %s", tableName, TABLE_STRING_DESCRIPTOR));
+            PreparedStatement updates = connection.prepareStatement(String.format("UPDATE %s SET %s WHERE id = ?", tableName, TABLE_STRING_DESCRIPTOR));
+
+            // Update all fields
+            for (ThriftField field : thriftType.getSchema()) {
+                // There needs to be a UNIQUE constraint on (event_type, field_id)
+                ResultSet result = select.executeQuery(String.format("SELECT id FROM %s WHERE event_type = '%s' AND field_id = %d LIMIT 1", tableName, thriftType.getName(), field.getPosition()));
+                boolean seen = false;
+
+                while (result.next()) {
+                    if (seen) {
+                        throw new SQLException(String.format("Duplicated Thiftfield [%s]! add a UNIQUE constraint on (event_type, field_id)", field));
+                    }
+                    else {
+                        seen = true;
+                    }
+
+                    int key = result.getInt(1);
+
+                    // Needs to be changed if TABLE_STRING_DESCRIPTOR changes!
+                    updates.setInt(10, key);
+                    addSQLStatementToBatch(updates, thriftType, field);
+                }
+
+                if (!seen) {
+                    addSQLStatementToBatch(inserts, thriftType, field);
+                }
+            }
+
+            log.info(String.format("ThriftType updates: %s", updates.executeBatch().toString()));
+            log.info(String.format("ThriftType inserts: %s", inserts.executeBatch().toString()));
+            connection.commit();
+        }
+        catch (SQLException e) {
+            log.error(String.format("Unable to modify type [%s]: %s", thriftType, e));
+            return false;
+        }
+
+        return true;
     }
 
     private void buildThrifTtypeList() throws IOException
@@ -122,7 +204,7 @@ public class MySQLStore implements GoodwillStore
                         currentThriftType = thriftTypes.get(currentThriftTypeName);
                     }
                     else {
-                        currentThriftType = new ThriftType(currentThriftTypeName);
+                        currentThriftType = new ThriftType(currentThriftTypeName, new ArrayList<ThriftField>());
                         thriftTypes.put(currentThriftTypeName, currentThriftType);
                         log.debug(String.format("Found new ThriftType: %s", currentThriftTypeName));
                     }
@@ -140,87 +222,6 @@ public class MySQLStore implements GoodwillStore
         this.thriftTypes = thriftTypes;
     }
 
-    public void close() throws SQLException
-    {
-        connection.close();
-    }
-
-    @Override
-    public Collection<ThriftType> getTypes() throws IOException
-    {
-        buildThrifTtypeList();
-
-        final ArrayList thriftTypesList = new ArrayList(thriftTypes.values());
-        Collections.sort(thriftTypesList, new Comparator<ThriftType>()
-        {
-            @Override
-            public int compare(ThriftType o, ThriftType o1)
-            {
-                return o.getName().compareTo(o1.getName());
-            }
-        });
-
-        return thriftTypesList;
-    }
-
-    /**
-     * Given a Thrift name, find it in the store
-     *
-     * @param typeName name of the Thrift to search
-     * @return the ThriftType if found, null otherwise
-     */
-    @Override
-    public ThriftType findByName(String typeName)
-    {
-        try {
-            for (ThriftType thriftType : getTypes()) {
-                if (thriftType.getName().equals(typeName)) {
-                    return thriftType;
-                }
-            }
-        }
-        catch (IOException e) {
-            log.warn("Unable to fetch Thrift types", e);
-        }
-
-        return null;
-    }
-
-    /**
-     * Serialize all Thrifts in the store
-     *
-     * @return JSONArray representation
-     * @throws org.json.JSONException
-     */
-    @Override
-    public JSONArray toJSON() throws JSONException
-    {
-        JSONArray array = new JSONArray();
-        try {
-            for (ThriftType type : getTypes()) {
-                array.put(type.toJSON());
-            }
-        }
-        catch (IOException e) {
-            log.warn("Unable to fetch Thrift types", e);
-        }
-
-        return array;
-    }
-
-    /**
-     * Add a new type to the store
-     *
-     * @param thriftType ThriftType to add
-     */
-    @Override
-    public void addType(ThriftType thriftType)
-    {
-        // Creating a new Schema is really the same as updating/extending one, since the data model we use define schemas
-        // as a list of fields.
-        updateType(thriftType);
-    }
-
     private void addSQLStatementToBatch(PreparedStatement statement, ThriftType thriftType, ThriftField field)
         throws SQLException
     {
@@ -228,29 +229,29 @@ public class MySQLStore implements GoodwillStore
         statement.setInt(2, field.getPosition());
         statement.setString(3, field.getType());
         statement.setString(4, field.getName());
-        if (field.getSqlType() == null) {
+        if (field.getSql().getType() == null) {
             statement.setNull(5, Types.VARCHAR);
         }
         else {
-            statement.setString(5, field.getSqlType());
+            statement.setString(5, field.getSql().getType());
         }
-        if (field.getSqlLength() == null) {
+        if (field.getSql().getLength() == null) {
             statement.setNull(6, Types.INTEGER);
         }
         else {
-            statement.setInt(6, field.getSqlLength());
+            statement.setInt(6, field.getSql().getLength());
         }
-        if (field.getSqlPrecision() == null) {
+        if (field.getSql().getPrecision() == null) {
             statement.setNull(7, Types.INTEGER);
         }
         else {
-            statement.setInt(7, field.getSqlPrecision());
+            statement.setInt(7, field.getSql().getPrecision());
         }
-        if (field.getSqlScale() == null) {
+        if (field.getSql().getScale() == null) {
             statement.setNull(8, Types.INTEGER);
         }
         else {
-            statement.setInt(8, field.getSqlScale());
+            statement.setInt(8, field.getSql().getScale());
         }
         if (field.getDescription() == null) {
             statement.setNull(9, Types.VARCHAR);
@@ -261,61 +262,15 @@ public class MySQLStore implements GoodwillStore
         statement.addBatch();
     }
 
-    /**
-     * Update a type to the store
-     *
-     * @param thriftType ThriftType to update
-     */
-    @Override
-    public boolean updateType(ThriftType thriftType)
-    {
-        try {
-            Statement select = connection.createStatement();
-            PreparedStatement inserts = connection.prepareStatement(String.format("INSERT INTO %s SET %s", tableName, TABLE_STRING_DESCRIPTOR));
-            PreparedStatement updates = connection.prepareStatement(String.format("UPDATE %s SET %s WHERE id = ?", tableName, TABLE_STRING_DESCRIPTOR));
-
-            // Update all fields
-            for (ThriftField field : thriftType.getThriftItems()) {
-                // There needs to be a UNIQUE constraint on (event_type, field_id)
-                ResultSet result = select.executeQuery(String.format("SELECT id FROM %s WHERE event_type = '%s' AND field_id = %d LIMIT 1", tableName, thriftType.getName(), field.getPosition()));
-                boolean seen = false;
-
-                while (result.next()) {
-                    if (seen) {
-                        throw new SQLException(String.format("Duplicated Thiftfield [%s]! add a UNIQUE constraint on (event_type, field_id)", field));
-                    }
-                    else {
-                        seen = true;
-                    }
-
-                    int key = result.getInt(1);
-
-                    // Needs to be changed if TABLE_STRING_DESCRIPTOR changes!
-                    updates.setInt(10, key);
-                    addSQLStatementToBatch(updates, thriftType, field);
-                }
-
-                if (!seen) {
-                    addSQLStatementToBatch(inserts, thriftType, field);
-                }
-            }
-
-            log.info(String.format("ThriftType updates: %s", updates.executeBatch().toString()));
-            log.info(String.format("ThriftType inserts: %s", inserts.executeBatch().toString()));
-            connection.commit();
-        }
-        catch (SQLException e) {
-            log.error(String.format("Unable to modify type [%s]: %s", thriftType, e));
-            return false;
-        }
-
-        return true;
-    }
-
     private void connectToMySQL(String host, int port, String db, String username, String password) throws SQLException, ClassNotFoundException
     {
         Class.forName("com.mysql.jdbc.Driver");
         connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s", host, port, db), username, password);
         connection.setAutoCommit(false);
+    }
+
+    public void close() throws SQLException
+    {
+        connection.close();
     }
 }

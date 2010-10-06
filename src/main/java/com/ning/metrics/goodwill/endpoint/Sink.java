@@ -2,9 +2,9 @@ package com.ning.metrics.goodwill.endpoint;
 
 import com.google.inject.Inject;
 import com.google.inject.internal.Nullable;
+import com.ning.metrics.goodwill.access.ThriftType;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
 import com.ning.metrics.goodwill.store.GoodwillStore;
-import com.ning.metrics.goodwill.store.ThriftType;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.POST;

@@ -16,6 +16,8 @@
 
 package com.ning.metrics.goodwill.store;
 
+import com.ning.metrics.goodwill.access.ThriftField;
+import com.ning.metrics.goodwill.access.ThriftType;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -23,6 +25,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 //CREATE TABLE `thrift_types_tests` (
@@ -53,21 +56,21 @@ public class MySQLStoreTest
     {
         store = new MySQLStore("localhost", 3306, "goodwill", "root", "", "thrift_types_tests");
 
-        type1 = new ThriftType(TYPE1_NAME);
-        type1.addThriftField(new ThriftField("chair", "i32", 0));
-        type1.addThriftField(new ThriftField("deal", "string", 1));
-        type1.addThriftField(new ThriftField("continent", "string", 2));
-        type1.addThriftField(new ThriftField("egg", "string", 3));
-        type1.addThriftField(new ThriftField("car", "i32", 4));
-        type1.addThriftField(new ThriftField("bear", "string", 5));
+        type1 = new ThriftType(TYPE1_NAME, new ArrayList<ThriftField>());
+        type1.addThriftField(new ThriftField("chair", "i32", 0, null, null, null, null, null));
+        type1.addThriftField(new ThriftField("deal", "string", 1, null, null, null, null, null));
+        type1.addThriftField(new ThriftField("continent", "string", 2, null, null, null, null, null));
+        type1.addThriftField(new ThriftField("egg", "string", 3, null, null, null, null, null));
+        type1.addThriftField(new ThriftField("car", "i32", 4, null, null, null, null, null));
+        type1.addThriftField(new ThriftField("bear", "string", 5, null, null, null, null, null));
 
-        type2 = new ThriftType(TYPE2_NAME);
-        type2.addThriftField(new ThriftField("arm", "bool", 0));
-        type2.addThriftField(new ThriftField("consonent", "i16", 1));
-        type2.addThriftField(new ThriftField("bank", "bool", 2));
-        type2.addThriftField(new ThriftField("cover", "string", 3));
-        type2.addThriftField(new ThriftField("century", "string", 4));
-        type2.addThriftField(new ThriftField("city", "string", 5));
+        type2 = new ThriftType(TYPE2_NAME, new ArrayList<ThriftField>());
+        type2.addThriftField(new ThriftField("arm", "bool", 0, null, null, null, null, null));
+        type2.addThriftField(new ThriftField("consonent", "i16", 1, null, null, null, null, null));
+        type2.addThriftField(new ThriftField("bank", "bool", 2, null, null, null, null, null));
+        type2.addThriftField(new ThriftField("cover", "string", 3, null, null, null, null, null));
+        type2.addThriftField(new ThriftField("century", "string", 4, null, null, null, null, null));
+        type2.addThriftField(new ThriftField("city", "string", 5, null, null, null, null, null));
     }
 
     @AfterTest(alwaysRun = false, enabled = false)
@@ -114,12 +117,12 @@ public class MySQLStoreTest
 
         // Updates
 
-        type1.addThriftField(new ThriftField("foo", "string", 6));
+        type1.addThriftField(new ThriftField("foo", "string", 6, null, null, null, null, null));
 
-        Assert.assertEquals(store.findByName(TYPE1_NAME).getThriftItems().size(), 6);
+        Assert.assertEquals(store.findByName(TYPE1_NAME).getSchema().size(), 6);
         Assert.assertTrue(store.updateType(type1));
         types = store.getTypes();
-        Assert.assertEquals(store.findByName(TYPE1_NAME).getThriftItems().size(), 7);
+        Assert.assertEquals(store.findByName(TYPE1_NAME).getSchema().size(), 7);
         Assert.assertEquals(types.size(), 2);
 
         runAssertsOnFields();
@@ -130,12 +133,12 @@ public class MySQLStoreTest
     private void runAssertsOnFields()
     {
         ThriftType shouldBeType1 = store.findByName(TYPE1_NAME);
-        for (ThriftField field : shouldBeType1.getThriftItems()) {
+        for (ThriftField field : shouldBeType1.getSchema()) {
             Assert.assertEquals(field.getName(), type1.getFieldByPosition(field.getPosition()).getName());
             Assert.assertEquals(field.getType(), type1.getFieldByPosition(field.getPosition()).getType());
             Assert.assertEquals(field.getDescription(), type1.getFieldByPosition(field.getPosition()).getDescription());
-            Assert.assertEquals(field.getSqlType(), type1.getFieldByPosition(field.getPosition()).getSqlType());
-            Assert.assertEquals(field.getSqlLength(), type1.getFieldByPosition(field.getPosition()).getSqlLength());
+            Assert.assertEquals(field.getSql().getType(), type1.getFieldByPosition(field.getPosition()).getSql().getType());
+            Assert.assertEquals(field.getSql().getLength(), type1.getFieldByPosition(field.getPosition()).getSql().getLength());
             Assert.assertEquals(field.getPosition(), type1.getFieldByPosition(field.getPosition()).getPosition());
         }
     }

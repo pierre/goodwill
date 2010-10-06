@@ -1,9 +1,9 @@
 package com.ning.metrics.goodwill.sink;
 
 import com.google.inject.Inject;
+import com.ning.metrics.goodwill.access.ThriftField;
+import com.ning.metrics.goodwill.access.ThriftType;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
-import com.ning.metrics.goodwill.store.ThriftField;
-import com.ning.metrics.goodwill.store.ThriftType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.netezza.datasource.NzDatasource;
@@ -112,7 +112,7 @@ public class NetezzaSink implements GoodwillSink
         String tableName = getTableName(thriftType);
         String statement = String.format("CREATE TABLE %s (", tableName);
 
-        for (ThriftField field : thriftType.getThriftItems()) {
+        for (ThriftField field : thriftType.getSchema()) {
             statement += String.format("%s %s,", sanitizeThriftName(field.getName()), field.getFullSQLType());
         }
         statement = StringUtils.chop(statement); // remove last comma

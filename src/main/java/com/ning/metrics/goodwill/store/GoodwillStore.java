@@ -16,15 +16,20 @@
 
 package com.ning.metrics.goodwill.store;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.ning.metrics.goodwill.access.ThriftType;
+import com.ning.metrics.goodwill.sink.GoodwillSink;
+import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 
-public interface GoodwillStore
+public abstract class GoodwillStore
 {
-    public Collection<ThriftType> getTypes() throws IOException;
+    private static Logger log = Logger.getLogger(GoodwillStore.class);
+
+    final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Given a Thrift name, find it in the store
@@ -32,22 +37,65 @@ public interface GoodwillStore
      * @param typeName name of the Thrift to search
      * @return the ThriftType if found, null otherwise
      */
-    public ThriftType findByName(String typeName);
+    public ThriftType findByName(String typeName)
+    {
+        try {
+            for (ThriftType thriftType : getTypes()) {
+                if (thriftType.getName().equals(typeName)) {
+                    return thriftType;
+                }
+            }
+        }
+        catch (IOException e) {
+            log.warn("Unable to fetch Thrift types", e);
+        }
+
+        return null;
+    }
 
     /**
-     * Serialize all Thrifts in the store
+     * Serialize all Thrifts in the store in JSON format
      *
      * @return JSONArray representation
-     * @throws org.json.JSONException
+     * @throws IOException for serialization issues
      */
-    public JSONArray toJSON() throws JSONException;
+    public ByteArrayOutputStream toJSON() throws IOException
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        mapper.writeValue(out, this);
+        return out;
+    }
+
+    /**
+     * If we are using a sink, populate some extra information for visual display.
+     * A common usecase is to see the CREATE TABLE statement for a SQL based sink.
+     *
+     * @param sink Sink object
+     * @return true on success, false otherwise
+     */
+    public boolean addSinkInfo(GoodwillSink sink)
+    {
+        try {
+            for (ThriftType thriftType : getTypes()) {
+                thriftType.setSinkAddInfo(sink.addTypeInfo(thriftType));
+            }
+
+            return true;
+        }
+        catch (IOException e) {
+            log.warn("Unable to add sink information");
+            return false;
+        }
+    }
+
+    public abstract Collection<ThriftType> getTypes() throws IOException;
 
     /**
      * Add a new type to the store
      *
      * @param thriftType ThriftType to add
      */
-    public void addType(ThriftType thriftType);
+    public abstract void addType(ThriftType thriftType);
 
     /**
      * Update a type to the store
@@ -55,5 +103,5 @@ public interface GoodwillStore
      * @param thriftType ThriftType to update
      * @return true is success, false otherwise
      */
-    public boolean updateType(ThriftType thriftType);
+    public abstract boolean updateType(ThriftType thriftType);
 }

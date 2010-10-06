@@ -19,11 +19,11 @@ package com.ning.metrics.goodwill.store;
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.ning.metrics.goodwill.access.ThriftField;
+import com.ning.metrics.goodwill.access.ThriftType;
+import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Singleton
-public class CSVFileStore implements GoodwillStore
+public class CSVFileStore extends GoodwillStore
 {
     private final Logger log = Logger.getLogger(CSVFileStore.class);
 
@@ -65,11 +65,13 @@ public class CSVFileStore implements GoodwillStore
          * "TermFrequency",3,"string","term_freq_json",1,2147483647
          * "SpamMarkEvent",19,"string","abuse_type",8,2147483647
          * ...
+         *
+         * TODO: extend file format with extra sql fields
          */
         List<ThriftType> thriftTypes = new ArrayList<ThriftType>();
         for (Object entry : entries) {
-            Integer position = -1;
-            ThriftField thriftField = null;
+            Integer position;
+            ThriftField thriftField;
             String[] line = (String[]) entry;
 
             try {
@@ -81,7 +83,7 @@ public class CSVFileStore implements GoodwillStore
             }
 
             try {
-                thriftField = new ThriftField(line[3], line[2], position);
+                thriftField = new ThriftField(line[3], line[2], position, null, null, null, null, null);
             }
             catch (IllegalArgumentException e) {
                 log.warn(String.format("Ignoring unsupported type <%s>: %s", line[2], StringUtils.join(line, ",")));
@@ -90,7 +92,7 @@ public class CSVFileStore implements GoodwillStore
 
             if (currentThriftTypeName == null || !line[0].equals(currentThriftTypeName)) {
                 currentThriftTypeName = line[0];
-                currentThriftType = new ThriftType(currentThriftTypeName);
+                currentThriftType = new ThriftType(currentThriftTypeName, new ArrayList<ThriftField>());
                 thriftTypes.add(currentThriftType);
                 log.debug(String.format("Found new ThriftType thriftField to: %s", currentThriftTypeName));
             }
@@ -105,40 +107,6 @@ public class CSVFileStore implements GoodwillStore
     public Collection<ThriftType> getTypes()
     {
         return thriftTypes;
-    }
-
-    /**
-     * Given a Thrift name, find it in the store
-     *
-     * @param typeName name of the Thrift to search
-     * @return the ThriftType if found, null otherwise
-     */
-    @Override
-    public ThriftType findByName(String typeName)
-    {
-        for (ThriftType thriftType : getTypes()) {
-            if (thriftType.getName().equals(typeName)) {
-                return thriftType;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Serialize all Thrifts in the store
-     *
-     * @return JSONArray representation
-     */
-    @Override
-    public JSONArray toJSON() throws JSONException
-    {
-        JSONArray array = new JSONArray();
-        for (ThriftType type : getTypes()) {
-            array.put(type.toJSON());
-        }
-
-        return array;
     }
 
     /**
@@ -163,6 +131,4 @@ public class CSVFileStore implements GoodwillStore
         // Seek etc. Painful here
         return false;
     }
-
-
 }

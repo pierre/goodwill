@@ -1,6 +1,6 @@
 package com.ning.metrics.goodwill.sink;
 
-import com.ning.metrics.goodwill.store.ThriftType;
+import com.ning.metrics.goodwill.access.ThriftType;
 
 public interface GoodwillSink
 {
