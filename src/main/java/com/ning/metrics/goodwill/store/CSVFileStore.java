@@ -70,12 +70,12 @@ public class CSVFileStore extends GoodwillStore
          */
         List<ThriftType> thriftTypes = new ArrayList<ThriftType>();
         for (Object entry : entries) {
-            Integer position;
+            short position;
             ThriftField thriftField;
             String[] line = (String[]) entry;
 
             try {
-                position = Integer.valueOf(line[1]);
+                position = Short.valueOf(line[1]);
             }
             catch (NumberFormatException e) {
                 log.warn(String.format("Ignoring malformed line: %s", StringUtils.join(line, ",")));

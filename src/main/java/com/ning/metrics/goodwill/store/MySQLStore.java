@@ -126,7 +126,7 @@ public class MySQLStore extends GoodwillStore
             // Update all fields
             for (ThriftField field : thriftType.getSchema()) {
                 // There needs to be a UNIQUE constraint on (event_type, field_id)
-                ResultSet result = select.executeQuery(String.format("SELECT id FROM %s WHERE event_type = '%s' AND field_id = %d LIMIT 1", tableName, thriftType.getName(), field.getPosition()));
+                ResultSet result = select.executeQuery(String.format("SELECT id FROM %s WHERE event_type = '%s' AND field_id = %d LIMIT 1", tableName, thriftType.getName(), field.getId()));
                 boolean seen = false;
 
                 while (result.next()) {
@@ -189,7 +189,7 @@ public class MySQLStore extends GoodwillStore
 
                 ThriftField thriftField;
                 try {
-                    thriftField = new ThriftField(result.getString(2), result.getString(3), result.getInt(4), result.getString(5), result.getString(6), sqlLength, sqlScale, sqlPrecision);
+                    thriftField = new ThriftField(result.getString(2), result.getString(3), result.getShort(4), result.getString(5), result.getString(6), sqlLength, sqlScale, sqlPrecision);
                 }
                 catch (IllegalArgumentException e) {
                     log.warn(e);
@@ -226,8 +226,8 @@ public class MySQLStore extends GoodwillStore
         throws SQLException
     {
         statement.setString(1, thriftType.getName());
-        statement.setInt(2, field.getPosition());
-        statement.setString(3, field.getType());
+        statement.setInt(2, field.getId());
+        statement.setString(3, field.getType().name());
         statement.setString(4, field.getName());
         if (field.getSql().getType() == null) {
             statement.setNull(5, Types.VARCHAR);
