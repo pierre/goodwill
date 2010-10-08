@@ -26,7 +26,6 @@ import com.ning.metrics.goodwill.store.GoodwillStore;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.view.Viewable;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -81,7 +80,7 @@ public class Registrar
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/{type}/")
-    public Viewable getType(@PathParam("type") String typeName) throws JSONException
+    public Viewable getType(@PathParam("type") String typeName)
     {
         GoodwillSchema typeFound = store.findByName(typeName);
 
@@ -99,7 +98,7 @@ public class Registrar
 
     @GET
     @Produces("application/json")
-    public Response getAllJson() throws IOException, JSONException
+    public Response getAllJson() throws IOException
     {
         return Response.ok(store.toJSON().toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
@@ -107,7 +106,7 @@ public class Registrar
     @GET
     @Produces("application/json")
     @Path("/{type}/")
-    public Response getTypeJson(@PathParam("type") String typeName) throws IOException, JSONException
+    public Response getTypeJson(@PathParam("type") String typeName) throws IOException
     {
         if (typeName == null) {
             return Response.ok(store.toJSON().toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
