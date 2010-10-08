@@ -19,8 +19,8 @@ package com.ning.metrics.goodwill.store;
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.ning.metrics.goodwill.access.ThriftField;
-import com.ning.metrics.goodwill.access.ThriftType;
+import com.ning.metrics.goodwill.access.GoodwillSchema;
+import com.ning.metrics.goodwill.access.GoodwillSchemaField;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -36,7 +36,7 @@ public class CSVFileStore extends GoodwillStore
 {
     private final Logger log = Logger.getLogger(CSVFileStore.class);
 
-    private List<ThriftType> thriftTypes;
+    private List<GoodwillSchema> goodwillSchemata;
     private String fileName;
 
     @Inject
@@ -54,8 +54,8 @@ public class CSVFileStore extends GoodwillStore
         log.info(String.format("Read CSV file: %s", fileName));
         List<String[]> entries = reader.readAll();
 
-        ThriftType currentThriftType = null;
-        String currentThriftTypeName = null;
+        GoodwillSchema currentSchema = null;
+        String currentSchemaName = null;
 
         /**
          * CSV file format:
@@ -68,10 +68,10 @@ public class CSVFileStore extends GoodwillStore
          *
          * TODO: extend file format with extra sql fields
          */
-        List<ThriftType> thriftTypes = new ArrayList<ThriftType>();
+        List<GoodwillSchema> schemata = new ArrayList<GoodwillSchema>();
         for (Object entry : entries) {
             short position;
-            ThriftField thriftField;
+            GoodwillSchemaField thriftField;
             String[] line = (String[]) entry;
 
             try {
@@ -83,50 +83,50 @@ public class CSVFileStore extends GoodwillStore
             }
 
             try {
-                thriftField = new ThriftField(line[3], line[2], position, null, null, null, null, null);
+                thriftField = new GoodwillSchemaField(line[3], line[2], position, null, null, null, null, null);
             }
             catch (IllegalArgumentException e) {
                 log.warn(String.format("Ignoring unsupported type <%s>: %s", line[2], StringUtils.join(line, ",")));
                 continue;
             }
 
-            if (currentThriftTypeName == null || !line[0].equals(currentThriftTypeName)) {
-                currentThriftTypeName = line[0];
-                currentThriftType = new ThriftType(currentThriftTypeName, new ArrayList<ThriftField>());
-                thriftTypes.add(currentThriftType);
-                log.debug(String.format("Found new ThriftType thriftField to: %s", currentThriftTypeName));
+            if (currentSchemaName == null || !line[0].equals(currentSchemaName)) {
+                currentSchemaName = line[0];
+                currentSchema = new GoodwillSchema(currentSchemaName, new ArrayList<GoodwillSchemaField>());
+                schemata.add(currentSchema);
+                log.debug(String.format("Found new ThriftType thriftField to: %s", currentSchemaName));
             }
 
-            currentThriftType.addThriftField(thriftField);
-            log.debug(String.format("Added ThriftField to %s: %s", currentThriftTypeName, thriftField.toString()));
+            currentSchema.addThriftField(thriftField);
+            log.debug(String.format("Added ThriftField to %s: %s", currentSchemaName, thriftField.toString()));
         }
 
-        this.thriftTypes = thriftTypes;
+        this.goodwillSchemata = schemata;
     }
 
-    public Collection<ThriftType> getTypes()
+    public Collection<GoodwillSchema> getTypes()
     {
-        return thriftTypes;
+        return goodwillSchemata;
     }
 
     /**
      * Add a new type to the store
      *
-     * @param thriftType ThriftType to add
+     * @param schema GoodwillSchema to add
      */
     @Override
-    public void addType(ThriftType thriftType)
+    public void addType(GoodwillSchema schema)
     {
-        thriftTypes.add(thriftType);
+        goodwillSchemata.add(schema);
     }
 
     /**
      * Update a type to the store
      *
-     * @param thriftType ThriftType to update
+     * @param schema GoodwillSchema to update
      */
     @Override
-    public boolean updateType(ThriftType thriftType)
+    public boolean updateType(GoodwillSchema schema)
     {
         // Seek etc. Painful here
         return false;

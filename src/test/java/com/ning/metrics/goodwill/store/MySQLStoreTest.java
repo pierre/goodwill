@@ -16,8 +16,8 @@
 
 package com.ning.metrics.goodwill.store;
 
-import com.ning.metrics.goodwill.access.ThriftField;
-import com.ning.metrics.goodwill.access.ThriftType;
+import com.ning.metrics.goodwill.access.GoodwillSchema;
+import com.ning.metrics.goodwill.access.GoodwillSchemaField;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -47,8 +47,8 @@ public class MySQLStoreTest
 {
     private MySQLStore store;
     private static final String TYPE2_NAME = "Indiana Jones and the Last Crusade";
-    private ThriftType type1;
-    private ThriftType type2;
+    private GoodwillSchema type1;
+    private GoodwillSchema type2;
     private static final String TYPE1_NAME = "The Shawshank Redemption";
 
     @BeforeTest(alwaysRun = false, enabled = false)
@@ -56,21 +56,21 @@ public class MySQLStoreTest
     {
         store = new MySQLStore("localhost", 3306, "goodwill", "root", "", "thrift_types_tests");
 
-        type1 = new ThriftType(TYPE1_NAME, new ArrayList<ThriftField>());
-        type1.addThriftField(new ThriftField("chair", "i32", (short) 0, null, null, null, null, null));
-        type1.addThriftField(new ThriftField("deal", "string", (short) 1, null, null, null, null, null));
-        type1.addThriftField(new ThriftField("continent", "string", (short) 2, null, null, null, null, null));
-        type1.addThriftField(new ThriftField("egg", "string", (short) 3, null, null, null, null, null));
-        type1.addThriftField(new ThriftField("car", "i32", (short) 4, null, null, null, null, null));
-        type1.addThriftField(new ThriftField("bear", "string", (short) 5, null, null, null, null, null));
+        type1 = new GoodwillSchema(TYPE1_NAME, new ArrayList<GoodwillSchemaField>());
+        type1.addThriftField(new GoodwillSchemaField("chair", "i32", (short) 0, null, null, null, null, null));
+        type1.addThriftField(new GoodwillSchemaField("deal", "string", (short) 1, null, null, null, null, null));
+        type1.addThriftField(new GoodwillSchemaField("continent", "string", (short) 2, null, null, null, null, null));
+        type1.addThriftField(new GoodwillSchemaField("egg", "string", (short) 3, null, null, null, null, null));
+        type1.addThriftField(new GoodwillSchemaField("car", "i32", (short) 4, null, null, null, null, null));
+        type1.addThriftField(new GoodwillSchemaField("bear", "string", (short) 5, null, null, null, null, null));
 
-        type2 = new ThriftType(TYPE2_NAME, new ArrayList<ThriftField>());
-        type2.addThriftField(new ThriftField("arm", "bool", (short) 0, null, null, null, null, null));
-        type2.addThriftField(new ThriftField("consonent", "i16", (short) 1, null, null, null, null, null));
-        type2.addThriftField(new ThriftField("bank", "bool", (short) 2, null, null, null, null, null));
-        type2.addThriftField(new ThriftField("cover", "string", (short) 3, null, null, null, null, null));
-        type2.addThriftField(new ThriftField("century", "string", (short) 4, null, null, null, null, null));
-        type2.addThriftField(new ThriftField("city", "string", (short) 5, null, null, null, null, null));
+        type2 = new GoodwillSchema(TYPE2_NAME, new ArrayList<GoodwillSchemaField>());
+        type2.addThriftField(new GoodwillSchemaField("arm", "bool", (short) 0, null, null, null, null, null));
+        type2.addThriftField(new GoodwillSchemaField("consonent", "i16", (short) 1, null, null, null, null, null));
+        type2.addThriftField(new GoodwillSchemaField("bank", "bool", (short) 2, null, null, null, null, null));
+        type2.addThriftField(new GoodwillSchemaField("cover", "string", (short) 3, null, null, null, null, null));
+        type2.addThriftField(new GoodwillSchemaField("century", "string", (short) 4, null, null, null, null, null));
+        type2.addThriftField(new GoodwillSchemaField("city", "string", (short) 5, null, null, null, null, null));
     }
 
     @AfterTest(alwaysRun = false, enabled = false)
@@ -83,7 +83,7 @@ public class MySQLStoreTest
     public void testInvalidThriftField()
     {
         try {
-            new ThriftField("test", "string", (short) 1, "", null, 2, 23, 5);
+            new GoodwillSchemaField("test", "string", (short) 1, "", null, 2, 23, 5);
             Assert.fail();
         }
         catch (IllegalArgumentException e) {
@@ -96,7 +96,7 @@ public class MySQLStoreTest
     @Test(enabled = false)
     public void testAddUpdateType() throws Exception
     {
-        Collection<ThriftType> types = store.getTypes();
+        Collection<GoodwillSchema> types = store.getTypes();
         Assert.assertEquals(types.size(), 0, "You need to cleanup your test db");
 
         // Inserts
@@ -117,7 +117,7 @@ public class MySQLStoreTest
 
         // Updates
 
-        type1.addThriftField(new ThriftField("foo", "string", (short) 6, null, null, null, null, null));
+        type1.addThriftField(new GoodwillSchemaField("foo", "string", (short) 6, null, null, null, null, null));
 
         Assert.assertEquals(store.findByName(TYPE1_NAME).getSchema().size(), 6);
         Assert.assertTrue(store.updateType(type1));
@@ -132,8 +132,8 @@ public class MySQLStoreTest
 
     private void runAssertsOnFields()
     {
-        ThriftType shouldBeType1 = store.findByName(TYPE1_NAME);
-        for (ThriftField field : shouldBeType1.getSchema()) {
+        GoodwillSchema shouldBeType1 = store.findByName(TYPE1_NAME);
+        for (GoodwillSchemaField field : shouldBeType1.getSchema()) {
             Assert.assertEquals(field.getName(), type1.getFieldByPosition(field.getId()).getName());
             Assert.assertEquals(field.getType(), type1.getFieldByPosition(field.getId()).getType());
             Assert.assertEquals(field.getDescription(), type1.getFieldByPosition(field.getId()).getDescription());

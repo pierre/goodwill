@@ -1,8 +1,8 @@
 package com.ning.metrics.goodwill.sink;
 
 import com.google.inject.Inject;
-import com.ning.metrics.goodwill.access.ThriftField;
-import com.ning.metrics.goodwill.access.ThriftType;
+import com.ning.metrics.goodwill.access.GoodwillSchema;
+import com.ning.metrics.goodwill.access.GoodwillSchemaField;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -63,15 +63,15 @@ public class NetezzaSink implements GoodwillSink
      * For Netezza, this means creating a table where the data can be dumped. The CREATE TABLE statement
      * is constructed from the SQL information documented in the ThriftFields.
      *
-     * @param thriftType ThriftType to add
+     * @param schema GoodwillSchema to add
      */
     @Override
-    public boolean addType(ThriftType thriftType)
+    public boolean addType(GoodwillSchema schema)
         throws SQLException, IOException, ClassNotFoundException
     {
         connectToNetezza(DBHost, DBPort, DBName, DBUsername, DBPassword);
 
-        String createTableStatement = getCreateTableStatement(thriftType);
+        String createTableStatement = getCreateTableStatement(schema);
 
         try {
             Statement statement = connection.createStatement();
@@ -80,10 +80,10 @@ public class NetezzaSink implements GoodwillSink
             PreparedStatement extraStatement = null;
             if (extraSQL != null) {
                 // TODO: hack. We do a manual replacement first because escaping can do strange things. More thoughts needed here.
-                extraStatement = connection.prepareStatement(StringUtils.replace(extraSQL, "?", getTableName(thriftType)));
+                extraStatement = connection.prepareStatement(StringUtils.replace(extraSQL, "?", getTableName(schema)));
 //                int i = 1;
 //                while (i <= extraStatement.getParameterMetaData().getParameterCount()) {
-//                    extraStatement.setString(i, thriftType.getName());
+//                    extraStatement.setString(i, schema.getName());
 //                    i++;
 //                }
                 extraStatement.addBatch();
@@ -107,12 +107,12 @@ public class NetezzaSink implements GoodwillSink
         }
     }
 
-    private String getCreateTableStatement(ThriftType thriftType)
+    private String getCreateTableStatement(GoodwillSchema schema)
     {
-        String tableName = getTableName(thriftType);
+        String tableName = getTableName(schema);
         String statement = String.format("CREATE TABLE %s (", tableName);
 
-        for (ThriftField field : thriftType.getSchema()) {
+        for (GoodwillSchemaField field : schema.getSchema()) {
             statement += String.format("%s %s,", sanitizeThriftName(field.getName()), field.getFullSQLType());
         }
         statement = StringUtils.chop(statement); // remove last comma
@@ -121,9 +121,9 @@ public class NetezzaSink implements GoodwillSink
         return statement;
     }
 
-    private String getTableName(ThriftType thriftType)
+    private String getTableName(GoodwillSchema schema)
     {
-        return String.format(tableNameFormat, sanitizeThriftName(thriftType.getName()));
+        return String.format(tableNameFormat, sanitizeThriftName(schema.getName()));
     }
 
     private String sanitizeThriftName(String name)
@@ -136,11 +136,11 @@ public class NetezzaSink implements GoodwillSink
      * <p/>
      * Updating a table in Netezza can be quite tricky. Don't do it.
      *
-     * @param thriftType ThriftType to update
+     * @param schema ThriftType to update
      * @return true is success, false otherwise
      */
     @Override
-    public boolean updateType(ThriftType thriftType)
+    public boolean updateType(GoodwillSchema schema)
     {
         return false;
     }
@@ -148,16 +148,16 @@ public class NetezzaSink implements GoodwillSink
     /**
      * Give information on how to add a Type in the sink
      *
-     * @param thriftType ThriftType to add
+     * @param schema ThriftType to add
      * @return info how to create a Type in the sink
      */
     @Override
-    public String addTypeInfo(ThriftType thriftType)
+    public String addTypeInfo(GoodwillSchema schema)
     {
-        String info = String.format("%s\n", getCreateTableStatement(thriftType));
+        String info = String.format("%s\n", getCreateTableStatement(schema));
 
         if (extraSQL != null) {
-            info += StringUtils.replace(extraSQL, "?", getTableName(thriftType));
+            info += StringUtils.replace(extraSQL, "?", getTableName(schema));
         }
 
         return info;

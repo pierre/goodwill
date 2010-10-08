@@ -51,7 +51,7 @@ function sanitizeString(stringToSanitize)
 function json_to_objects(json)
 {
     var objects = {};
-    $.each(json, function(index, eventType)
+    $.each(json.types, function(index, eventType)
     {
         var name = eventType.name;
         var schema = $.map(eventType.schema, function(s, index)

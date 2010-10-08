@@ -18,7 +18,7 @@ package com.ning.metrics.goodwill.endpoint;
 
 import com.google.inject.Inject;
 import com.google.inject.internal.Nullable;
-import com.ning.metrics.goodwill.access.ThriftType;
+import com.ning.metrics.goodwill.access.GoodwillSchema;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import com.ning.metrics.goodwill.modules.ThriftRegistrar;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
@@ -83,7 +83,7 @@ public class Registrar
     @Path("/{type}/")
     public Viewable getType(@PathParam("type") String typeName) throws JSONException
     {
-        ThriftType typeFound = store.findByName(typeName);
+        GoodwillSchema typeFound = store.findByName(typeName);
 
         log.debug(String.format("Found type: %s", typeFound));
         if (typeFound != null) {
@@ -113,7 +113,7 @@ public class Registrar
             return Response.ok(store.toJSON().toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
         }
         else {
-            ThriftType typeFound = store.findByName(typeName);
+            GoodwillSchema typeFound = store.findByName(typeName);
             if (typeFound != null) {
                 return Response.ok(typeFound.toJSON().toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
             }
@@ -129,9 +129,9 @@ public class Registrar
     )
     {
         try {
-            ThriftType thriftType = ThriftType.decode(jsonThriftTypeString);
-            store.addType(thriftType);
-            log.info(String.format("Created new ThriftType <%s> from JSON <%s>", thriftType.toString(), jsonThriftTypeString));
+            GoodwillSchema schema = GoodwillSchema.decode(jsonThriftTypeString);
+            store.addType(schema);
+            log.info(String.format("Created new ThriftType <%s> from JSON <%s>", schema.toString(), jsonThriftTypeString));
         }
         catch (IOException e) {
             log.warn(String.format("Malformatted JSON: %s (%s)", jsonThriftTypeString, e));
@@ -148,7 +148,7 @@ public class Registrar
     )
     {
         try {
-            ThriftType thriftType = ThriftType.decode(jsonThriftTypeString);
+            GoodwillSchema thriftType = GoodwillSchema.decode(jsonThriftTypeString);
             store.updateType(thriftType);
             log.info(String.format("Updated ThriftType <%s> from JSON <%s>", thriftType.toString(), jsonThriftTypeString));
         }

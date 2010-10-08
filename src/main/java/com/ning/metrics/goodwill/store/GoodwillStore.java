@@ -16,7 +16,7 @@
 
 package com.ning.metrics.goodwill.store;
 
-import com.ning.metrics.goodwill.access.ThriftType;
+import com.ning.metrics.goodwill.access.GoodwillSchema;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -37,12 +37,12 @@ public abstract class GoodwillStore
      * @param typeName name of the Thrift to search
      * @return the ThriftType if found, null otherwise
      */
-    public ThriftType findByName(String typeName)
+    public GoodwillSchema findByName(String typeName)
     {
         try {
-            for (ThriftType thriftType : getTypes()) {
-                if (thriftType.getName().equals(typeName)) {
-                    return thriftType;
+            for (GoodwillSchema schema : getTypes()) {
+                if (schema.getName().equals(typeName)) {
+                    return schema;
                 }
             }
         }
@@ -76,8 +76,8 @@ public abstract class GoodwillStore
     public boolean addSinkInfo(GoodwillSink sink)
     {
         try {
-            for (ThriftType thriftType : getTypes()) {
-                thriftType.setSinkAddInfo(sink.addTypeInfo(thriftType));
+            for (GoodwillSchema schema : getTypes()) {
+                schema.setSinkAddInfo(sink.addTypeInfo(schema));
             }
 
             return true;
@@ -88,20 +88,20 @@ public abstract class GoodwillStore
         }
     }
 
-    public abstract Collection<ThriftType> getTypes() throws IOException;
+    public abstract Collection<GoodwillSchema> getTypes() throws IOException;
 
     /**
      * Add a new type to the store
      *
-     * @param thriftType ThriftType to add
+     * @param schema GoodwillSchema to add
      */
-    public abstract void addType(ThriftType thriftType);
+    public abstract void addType(GoodwillSchema schema);
 
     /**
      * Update a type to the store
      *
-     * @param thriftType ThriftType to update
+     * @param schema GoodwillSchema to update
      * @return true is success, false otherwise
      */
-    public abstract boolean updateType(ThriftType thriftType);
+    public abstract boolean updateType(GoodwillSchema schema);
 }

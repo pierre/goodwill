@@ -381,7 +381,7 @@ e.dropdown = function(attr)
         ""  : [],
         "string" : ["nvarchar", "varchar"],
         "bool" : ["boolean"],
-        "i8" : ["byteint"],
+        "byte" : ["byteint"],
         "i16" : ["smallint"],
         "i32" : ["integer"],
         "i64" : ["bigint", "date", "datetime", "timestamp"],
@@ -414,7 +414,7 @@ e.dropdown = function(attr)
 e.footer_dropdown = function()
 {
     var dropdown = $("<select>");
-    var options = ["", "string", "bool", "i8", "i16", "i32", "i64", "double"];
+    var options = ["", "string", "bool", "byte", "i16", "i32", "i64", "double"];
 
     $.each(options, function(index, option)
     {
