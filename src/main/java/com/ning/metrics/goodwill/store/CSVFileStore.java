@@ -29,6 +29,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 @Singleton
@@ -36,7 +39,6 @@ public class CSVFileStore extends GoodwillStore
 {
     private final Logger log = Logger.getLogger(CSVFileStore.class);
 
-    private List<GoodwillSchema> goodwillSchemata;
     private String fileName;
 
     @Inject
@@ -68,7 +70,7 @@ public class CSVFileStore extends GoodwillStore
          *
          * TODO: extend file format with extra sql fields
          */
-        List<GoodwillSchema> schemata = new ArrayList<GoodwillSchema>();
+        HashMap<String, GoodwillSchema> schemata = new HashMap<String, GoodwillSchema>();
         for (Object entry : entries) {
             short position;
             GoodwillSchemaField thriftField;
@@ -93,7 +95,7 @@ public class CSVFileStore extends GoodwillStore
             if (currentSchemaName == null || !line[0].equals(currentSchemaName)) {
                 currentSchemaName = line[0];
                 currentSchema = new GoodwillSchema(currentSchemaName, new ArrayList<GoodwillSchemaField>());
-                schemata.add(currentSchema);
+                schemata.put(currentSchemaName, currentSchema);
                 log.debug(String.format("Found new ThriftType thriftField to: %s", currentSchemaName));
             }
 
@@ -104,9 +106,31 @@ public class CSVFileStore extends GoodwillStore
         this.goodwillSchemata = schemata;
     }
 
-    public Collection<GoodwillSchema> getTypes()
+    @Override
+    public Collection<GoodwillSchema> getTypes() throws IOException
     {
-        return goodwillSchemata;
+        parseFile();
+
+        final ArrayList<GoodwillSchema> thriftTypesList = new ArrayList(goodwillSchemata.values());
+        Collections.sort(thriftTypesList, new Comparator<GoodwillSchema>()
+        {
+            @Override
+            public int compare(GoodwillSchema o, GoodwillSchema o1)
+            {
+                return o.getName().compareTo(o1.getName());
+            }
+        });
+
+        if (sink != null) {
+            for (int i = 0; i < thriftTypesList.size(); i++) {
+                GoodwillSchema schema = thriftTypesList.get(i);
+                schema.setSinkAddInfo(sink.addTypeInfo(schema));
+                thriftTypesList.set(i, schema);
+
+            }
+        }
+
+        return thriftTypesList;
     }
 
     /**
@@ -117,7 +141,7 @@ public class CSVFileStore extends GoodwillStore
     @Override
     public void addType(GoodwillSchema schema)
     {
-        goodwillSchemata.add(schema);
+        goodwillSchemata.put(schema.getName(), schema);
     }
 
     /**

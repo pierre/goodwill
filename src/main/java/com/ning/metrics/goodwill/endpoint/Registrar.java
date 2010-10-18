@@ -57,6 +57,10 @@ public class Registrar
         this.config = config;
         this.store = store;
         this.sink = sink;
+
+        if (sink != null) {
+            this.store.setSink(sink);
+        }
     }
 
     /*
@@ -67,10 +71,6 @@ public class Registrar
     @Produces(MediaType.TEXT_HTML)
     public Viewable getAll() throws IOException
     {
-        if (sink != null) {
-            store.addSinkInfo(sink);
-        }
-
         ThriftRegistrar registrar = new ThriftRegistrar(store.toJSON());
         registrar.setActionCoreURL(config.getActionCoreURL());
 

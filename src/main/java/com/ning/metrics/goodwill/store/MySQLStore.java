@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 
 public class MySQLStore extends GoodwillStore
 {
@@ -54,8 +53,6 @@ public class MySQLStore extends GoodwillStore
 
     private Connection connection;
     private final String tableName;
-
-    private Map<String, GoodwillSchema> goodwillSchemata;
 
     @Inject
     public MySQLStore(
@@ -93,6 +90,15 @@ public class MySQLStore extends GoodwillStore
                 return o.getName().compareTo(o1.getName());
             }
         });
+
+        if (sink != null) {
+            for (int i = 0; i < thriftTypesList.size(); i++) {
+                GoodwillSchema schema = thriftTypesList.get(i);
+                schema.setSinkAddInfo(sink.addTypeInfo(schema));
+                thriftTypesList.set(i, schema);
+
+            }
+        }
 
         return thriftTypesList;
     }

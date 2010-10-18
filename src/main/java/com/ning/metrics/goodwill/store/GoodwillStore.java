@@ -24,12 +24,17 @@ import org.codehaus.jackson.map.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 public abstract class GoodwillStore
 {
     private static Logger log = Logger.getLogger(GoodwillStore.class);
 
     final ObjectMapper mapper = new ObjectMapper();
+
+    protected GoodwillSink sink;
+
+    protected Map<String, GoodwillSchema> goodwillSchemata;
 
     /**
      * Given a Thrift name, find it in the store
@@ -66,26 +71,9 @@ public abstract class GoodwillStore
         return out;
     }
 
-    /**
-     * If we are using a sink, populate some extra information for visual display.
-     * A common usecase is to see the CREATE TABLE statement for a SQL based sink.
-     *
-     * @param sink Sink object
-     * @return true on success, false otherwise
-     */
-    public boolean addSinkInfo(GoodwillSink sink)
+    public void setSink(GoodwillSink sink)
     {
-        try {
-            for (GoodwillSchema schema : getTypes()) {
-                schema.setSinkAddInfo(sink.addTypeInfo(schema));
-            }
-
-            return true;
-        }
-        catch (IOException e) {
-            log.warn("Unable to add sink information");
-            return false;
-        }
+        this.sink = sink;
     }
 
     public abstract Collection<GoodwillSchema> getTypes() throws IOException;
