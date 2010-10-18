@@ -380,11 +380,13 @@ e.dropdown = function(attr)
     var type_map = {
         ""  : [],
         "string" : ["nvarchar", "varchar"],
+        "ip" : ["nvarchar", "varchar"],
         "bool" : ["boolean"],
         "byte" : ["byteint"],
         "i16" : ["smallint"],
         "i32" : ["integer"],
         "i64" : ["bigint", "date", "datetime", "timestamp"],
+        "date" : ["date", "datetime", "timestamp"],
         "double" : ["numeric", "decimal"]
     };
 
@@ -414,7 +416,7 @@ e.dropdown = function(attr)
 e.footer_dropdown = function()
 {
     var dropdown = $("<select>");
-    var options = ["", "string", "bool", "byte", "i16", "i32", "i64", "double"];
+    var options = ["", "string", "bool", "byte", "i16", "i32", "i64", "double", "date", "ip"];
 
     $.each(options, function(index, option)
     {

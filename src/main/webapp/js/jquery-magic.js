@@ -233,7 +233,7 @@ r.actions = {
         var string = "struct " + eventType + " &nbsp; {<br />";
         $.each(schema, function(index, field)
         {
-            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ":" + field.field_type + " " + sanitizeString(field.name) + (index == schema.length - 1 ? "" : ",") + "<br />";
+            string += "&nbsp;&nbsp;&nbsp;&nbsp;" + field.position + ":" + fieldTypetoThriftType(field).toLowerCase() + " " + sanitizeString(field.name) + (index == schema.length - 1 ? "" : ",") + "<br />";
         });
         string += "}";
 

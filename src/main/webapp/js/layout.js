@@ -32,6 +32,27 @@ keys = function(obj)
     return accumalator;
 };
 
+/**
+ * Convert a field type, as defined in SchemaFieldType, to a Thrift type.
+ *
+ * @param field String representation of a SchemaFieldType
+ * @See SchemaFieldType in com.ning:metrics.serialization
+ */
+function fieldTypetoThriftType(field)
+{
+    if (field.field_type.toLowerCase() == "date") {
+        return "i64";
+    }
+    else {
+        if (field.field_type.toLowerCase() == "ip") {
+            return "string";
+        }
+        else {
+            return field.field_type;
+        }
+    }
+}
+
 function camelizeString(string)
 {
     var a = string.split('_'), i;
