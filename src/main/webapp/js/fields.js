@@ -238,8 +238,8 @@ e.get_attributes = function(element, create)
         else {
             if (attr.field_type == "DOUBLE") {
                 attr.sql_length = "";
-                attr.sql_scale = $(".sql .primary_parameter input", element).val();
-                attr.sql_precision = $(".sql .secondary_parameter input", element).val();
+                attr.sql_precision = $(".sql .primary_parameter input", element).val();
+                attr.sql_scale = $(".sql .secondary_parameter input", element).val();
             }
             else {
                 attr.sql_length = "";
@@ -269,9 +269,6 @@ e.status = function(element)
  */
 e.enter_edit_mode = function(element, attr, create)
 {
-    //console.log("enter edit mode");
-
-    // FIX element attributes
     $(".navBar .name", element)
             .addClass("edit")
             .html(
@@ -333,7 +330,6 @@ e.enter_edit_mode = function(element, attr, create)
  */
 e.return_to_std_mode = function(element, attr)
 {
-    // FIX element attributes
     $(".name", element)
             .removeClass("edit")
             .html(attr.name || "");
@@ -349,10 +345,10 @@ e.return_to_std_mode = function(element, attr)
             .html(attr.sql_type || "");
 
     $(".sql .primary_parameter", element)
-            .html(attr.sql_length || attr.sql_scale || "");
+            .html(attr.sql_length || attr.sql_precision || "");
 
     $(".sql .secondary_parameter", element)
-            .html(attr.sql_precision || "");
+            .html(attr.sql_scale || "");
 
     $('.type .dropdown', element)
             .html(attr.field_type || "");
@@ -441,9 +437,9 @@ e.param = function(attributes, form)
     else {
         if (field_type == "DOUBLE") {
             $(".primary_parameter", form)
-                    .html($("<input>").val(scale));
-            $(".secondary_parameter", form)
                     .html($("<input>").val(precision));
+            $(".secondary_parameter", form)
+                    .html($("<input>").val(scale));
 
         }
         else {
