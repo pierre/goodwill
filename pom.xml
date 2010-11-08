@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.goodwill-access</artifactId>
-            <version>0.0.5-SNAPSHOT</version>
+            <version>0.0.5</version>
         </dependency>
         <!-- Viewable body writer -->
         <dependency>
