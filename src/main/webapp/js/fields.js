@@ -107,9 +107,7 @@ e.events = function(element)
                 .html(e.dropdown(attributes));
 
         var sql = $(".details .sql", element);
-        e.param(attributes, "sql", sql);
-
-        // e.param("", "field", footer);
+        e.param(attributes, sql);
     });
 };
 
@@ -134,7 +132,7 @@ e.create_element = function(field_obj)
 
                 .append($('<div class="type">')
                 .append($('<ul class="list">')
-                .append($("<li>").html("Thrift type: "))
+                .append($("<li>").html("Field type: "))
                 .append($('<li class="dropdown">').html(element.field_type || ""))
                 )
                 )
@@ -143,7 +141,7 @@ e.create_element = function(field_obj)
                 .append($('<ul class="list">')
                 .append($("<li>").html("SQL type: "))
                 .append($('<li class="dropdown">').html(element.sql_type || ""))
-                .append($('<li class="primary_parameter">').html(element.sql_precision || ""))
+                .append($('<li class="primary_parameter">').html(element.sql_length || element.sql_precision || ""))
                 .append($('<li class="secondary_parameter">').html(element.sql_scale || ""))
                 )
                 )
@@ -154,16 +152,8 @@ e.create_element = function(field_obj)
                 .append('<div style="clear:both"></div>')
                 )
 
+                // Schema field footer
                 .append($('<div class="footer">')
-                .append($('<div class="type">')
-                .append($('<ul class="list">')
-                .append($("<li>").html("Thrift type: "))
-                .append($('<li class="dropdown">')
-                .html(element.field_type || "")
-                )
-                )
-
-                )
                 .append($('<div class="position">')
                 .append($('<div class="text">').text("Thrift position: "))
                 .append($('<div class="value">').html(element.position + "" || ""))
@@ -202,13 +192,13 @@ e.get_attributes = function(element, create)
         attr.active = $(".navBar", element).hasClass("active") ? "active" : "deprecated";
         attr.edit_mode = $(element).attr("_edit");
 
-        if (attr.field_type == "string") {
+        if (attr.field_type == "STRING") {
             attr.sql_length = $(".sql .primary_parameter", element).html() || "";
             attr.sql_scale = "";
             attr.sql_precision = "";
         }
         else {
-            if (attr.field_type == "decimal" || attr.field_type == "numeric") {
+            if (attr.field_type == "DOUBLE") {
                 attr.sql_length = "";
                 attr.sql_precision = $(".sql .primary_parameter", element).html();
                 attr.sql_scale = $(".sql .secondary_parameter", element).html();
@@ -240,13 +230,13 @@ e.get_attributes = function(element, create)
         attr.description = (attr.description != DEFAULT_DESCRIPTION) ? attr.description : "";
 
         // get sql length, scale, and precision
-        if (attr.field_type == "string") {
+        if (attr.field_type == "STRING") {
             attr.sql_length = $(".sql .primary_parameter input", element).val() || "";
             attr.sql_scale = "";
             attr.sql_precision = "";
         }
         else {
-            if (attr.field_type == "double") {
+            if (attr.field_type == "DOUBLE") {
                 attr.sql_length = "";
                 attr.sql_scale = $(".sql .primary_parameter input", element).val();
                 attr.sql_precision = $(".sql .secondary_parameter input", element).val();
@@ -313,11 +303,12 @@ e.enter_edit_mode = function(element, attr, create)
             );
 
     var sql = $(".details .sql", element);
-    e.param(attr, "sql", sql);
+    e.param(attr, sql);
 
     if (create) {
-        $('.details .type', element)
+        $(".details .type .dropdown", element)
                 .show();
+
         $('.details .type .dropdown', element)
                 .html(
                 e.footer_dropdown(attr)
@@ -337,6 +328,9 @@ e.enter_edit_mode = function(element, attr, create)
     $(element).attr("_edit", "edit");
 };
 
+/*
+ * Called when exiting edit mode and at initial page load
+ */
 e.return_to_std_mode = function(element, attr)
 {
     // FIX element attributes
@@ -348,7 +342,8 @@ e.return_to_std_mode = function(element, attr)
             .removeClass("edit")
             .html(attr.description || "");
 
-    $(".details .type", element).hide();
+    $(".details .type .dropdown", element)
+            .html(attr.field_type || "");
 
     $(".sql .dropdown", element)
             .html(attr.sql_type || "");
@@ -379,15 +374,15 @@ e.dropdown = function(attr)
     // Netezza specific!
     var type_map = {
         ""  : [],
-        "string" : ["nvarchar", "varchar"],
-        "ip" : ["nvarchar", "varchar"],
-        "bool" : ["boolean"],
-        "byte" : ["byteint"],
-        "i16" : ["smallint"],
-        "i32" : ["integer"],
-        "i64" : ["bigint", "date", "datetime", "timestamp"],
-        "date" : ["date", "datetime", "timestamp"],
-        "double" : ["numeric", "decimal"]
+        "STRING" : ["nvarchar", "varchar"],
+        "IP" : ["nvarchar", "varchar"],
+        "BOOLEAN" : ["boolean"],
+        "BYTE" : ["byteint"],
+        "SHORT" : ["smallint"],
+        "INTEGER" : ["integer"],
+        "LONG" : ["bigint", "date", "datetime", "timestamp"],
+        "DATE" : ["date", "datetime", "timestamp"],
+        "DOUBLE" : ["numeric", "decimal"]
     };
 
 
@@ -411,12 +406,13 @@ e.dropdown = function(attr)
     var sql_type = attr.sql_type;
 
     return build_dropdown(dropdown, possible_types, sql_type);
-}
+};
 
 e.footer_dropdown = function()
 {
     var dropdown = $("<select>");
-    var options = ["", "string", "bool", "byte", "i16", "i32", "i64", "double", "date", "ip"];
+    // This needs to match SchemaFieldType in metrics.serialization-common
+    var options = ["", "BOOLEAN", "BYTE", "SHORT", "INTEGER", "LONG", "DOUBLE", "STRING", "DATE", "IP"];
 
     $.each(options, function(index, option)
     {
@@ -427,19 +423,15 @@ e.footer_dropdown = function()
     return dropdown;
 };
 
-e.param = function(attributes, type, form)
+// Populate fields when entering edit mode
+e.param = function(attributes, form)
 {
+    var field_type = attributes.field_type || "";
+    var length = attributes.sql_length || "";
+    var scale = attributes.sql_scale || "";
+    var precision = attributes.sql_precision || "";
 
-    // var option = $(".dropdown select option:selected", form).text();
-
-    var field_type = attributes.field_type;
-    var length = eval("attributes." + type + "_length") || "";
-    var scale = eval("attributes." + type + "_scale") || "";
-    var precision = eval("attributes." + type + "_precision") || "";
-
-    //console.log("length: " + length);
-
-    if (field_type == "string") {
+    if (field_type == "STRING") {
         $(".primary_parameter", form)
                 .html($("<input>").val(length));
         $(".secondary_parameter", form)
@@ -447,7 +439,7 @@ e.param = function(attributes, type, form)
 
     }
     else {
-        if (field_type == "double" || field_type == "decimal") {
+        if (field_type == "DOUBLE") {
             $(".primary_parameter", form)
                     .html($("<input>").val(scale));
             $(".secondary_parameter", form)

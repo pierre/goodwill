@@ -24,7 +24,7 @@
 <html>
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    <title>Goodwill - a Thrift types store</title>
+    <title>Goodwill - an Event Types store</title>
     <jsp:useBean id="it"
                  type="com.ning.metrics.goodwill.modules.ThriftRegistrar"
                  scope="request">
@@ -45,7 +45,7 @@
 
 <div id="header">
     <div class="wrapper">
-        <h1>Thrift Registrar</h1>
+        <h1>Schemata registrar</h1>
 
         <div class="newET"><a>Create an Event Type</a></div>
     </div>
