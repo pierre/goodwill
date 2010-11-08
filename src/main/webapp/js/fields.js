@@ -371,7 +371,7 @@ e.dropdown = function(attr)
     var type_map = {
         ""  : [],
         "STRING" : ["nvarchar", "varchar"],
-        "IP" : ["nvarchar", "varchar"],
+        "IP" : ["nvarchar", "varchar", "integer"],
         "BOOLEAN" : ["boolean"],
         "BYTE" : ["byteint"],
         "SHORT" : ["smallint"],
