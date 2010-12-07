@@ -427,6 +427,8 @@ e.param = function(attributes, form)
     var scale = attributes.sql_scale || "";
     var precision = attributes.sql_precision || "";
 
+    // TODO FIXME: use type_map here (e.g. ip->nvarchar)
+
     if (field_type == "STRING") {
         $(".primary_parameter", form)
                 .html($("<input>").val(length));
