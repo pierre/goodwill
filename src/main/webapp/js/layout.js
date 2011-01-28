@@ -40,17 +40,27 @@ keys = function(obj)
  */
 function fieldTypetoThriftType(field)
 {
+    if (field.field_type.toLowerCase() == "boolean") {
+        return "bool";
+    }
+    if (field.field_type.toLowerCase() == "short") {
+        return "i16";
+    }
+    if (field.field_type.toLowerCase() == "integer") {
+        return "i32";
+    }
+    if (field.field_type.toLowerCase() == "long") {
+        return "i64";
+    }
+
     if (field.field_type.toLowerCase() == "date") {
         return "i64";
     }
-    else {
-        if (field.field_type.toLowerCase() == "ip") {
-            return "string";
-        }
-        else {
-            return field.field_type;
-        }
+    if (field.field_type.toLowerCase() == "ip") {
+        return "string";
     }
+
+    return field.field_type;
 }
 
 function camelizeString(string)
