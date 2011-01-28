@@ -23,7 +23,6 @@ import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import com.ning.metrics.goodwill.modules.ThriftRegistrar;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
 import com.ning.metrics.goodwill.store.GoodwillStore;
-import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.view.Viewable;
 import org.apache.log4j.Logger;
 
@@ -75,21 +74,6 @@ public class Registrar
         registrar.setActionCoreURL(config.getActionCoreURL());
 
         return new Viewable("/registrar/type.jsp", registrar);
-    }
-
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    @Path("/{type}/")
-    public Viewable getType(@PathParam("type") String typeName)
-    {
-        GoodwillSchema typeFound = store.findByName(typeName);
-
-        log.debug(String.format("Found type: %s", typeFound));
-        if (typeFound != null) {
-            return new Viewable("/registrar/show.jsp", typeFound);
-        }
-
-        throw new NotFoundException("Type, " + typeName + ", is not found");
     }
 
     /*
