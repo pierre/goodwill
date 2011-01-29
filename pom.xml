@@ -9,7 +9,7 @@
     <groupId>com.ning</groupId>
     <artifactId>metrics.goodwill</artifactId>
     <packaging>war</packaging>
-    <version>1.1.3-SNAPSHOT</version>
+    <version>1.1.3</version>
     <name>goodwill</name>
     <description>Store for sharing schemata (Thrift, Smile, ...) between HDFS, DataWarehouses, and other</description>
     <url>http://github.com/pierre/goodwill</url>
