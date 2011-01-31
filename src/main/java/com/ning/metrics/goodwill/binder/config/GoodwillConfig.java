@@ -123,7 +123,7 @@ public class GoodwillConfig
     }
 
     // Whether the DELETE API is allowed.
-    // In general, you don't want to enable it in production Ð you won't be able to read data in HDFS associated
+    // In general, you don't want to enable it in production as you won't be able to read data in HDFS associated
     // to deleted events via the goodwill-access library
     @Config(value = "goodwill.api.delete")
     public boolean allowDeleteEvent()
