@@ -50,7 +50,8 @@ public class GoodwillServerModule extends ServletModule
 
                 final String storeType = config.getStoreType();
                 if (storeType.equals("mysql")) {
-                    binder.bind(GoodwillStore.class).to(MySQLStore.class);
+                    // Fail early if we can't connect to MySQL
+                    binder.bind(GoodwillStore.class).to(MySQLStore.class).asEagerSingleton();
                     log.info("Enabled MySQL store");
                 }
                 else if (storeType.equals("csv")) {
