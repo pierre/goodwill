@@ -167,6 +167,42 @@ public class MySQLStore extends GoodwillStore
         return true;
     }
 
+    /**
+     * Delete a type
+     *
+     * @param schema GoodwillSchema to delete
+     * @return true is success, false otherwise
+     */
+    @Override
+    public boolean deleteType(GoodwillSchema schema)
+    {
+        try {
+            String deleteStatement = String.format("DELETE FROM %s WHERE event_type = ?", tableName);
+            PreparedStatement delete = connection.prepareStatement(deleteStatement);
+            delete.setString(1, schema.getName());
+            delete.addBatch();
+
+            int[] results = delete.executeBatch();
+            if (results.length == 0) {
+                throw new SQLException(String.format("[%s] no DELETE statement submitted", delete.toString()));
+            }
+
+            int resultCode = results[0];
+            if (resultCode == PreparedStatement.EXECUTE_FAILED) {
+                throw new SQLException(String.format("[%s] PreparedStatement.EXECUTE_FAILED", delete.toString()));
+            }
+
+            log.info(String.format("ThriftType deletes: [%s] %d", delete.toString(), resultCode));
+            connection.commit();
+
+            return true;
+        }
+        catch (SQLException e) {
+            log.error(String.format("Unable to delete type [%s]: %s", schema.getName(), e));
+            return false;
+        }
+    }
+
     private void buildGoodwillSchemaList() throws IOException
     {
         HashMap<String, GoodwillSchema> schemata = new HashMap<String, GoodwillSchema>();

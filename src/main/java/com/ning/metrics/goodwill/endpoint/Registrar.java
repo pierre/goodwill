@@ -27,6 +27,7 @@ import com.sun.jersey.api.view.Viewable;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -103,6 +104,35 @@ public class Registrar
         }
 
         return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @DELETE
+    @Path("/{type}/")
+    public Response deleteType(@PathParam("type") String typeName) throws IOException
+    {
+        if (!config.allowDeleteEvent()) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        if (typeName == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        else {
+            GoodwillSchema typeFound = store.findByName(typeName);
+            if (typeFound != null) {
+                if (store.deleteType(typeFound)) {
+                    return Response.noContent().build();
+                }
+                else {
+                    return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+                }
+            }
+            else {
+                // Don't! The condition is not necessarily permanent!
+                //return Response.status(Response.Status.GONE)
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        }
     }
 
     @POST

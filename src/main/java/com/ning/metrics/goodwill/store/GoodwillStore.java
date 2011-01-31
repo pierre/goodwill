@@ -92,4 +92,12 @@ public abstract class GoodwillStore
      * @return true is success, false otherwise
      */
     public abstract boolean updateType(GoodwillSchema schema);
+
+    /**
+     * Delete a type
+     *
+     * @param schema GoodwillSchema to delete
+     * @return true is success, false otherwise
+     */
+    public abstract boolean deleteType(GoodwillSchema schema);
 }

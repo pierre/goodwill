@@ -155,4 +155,16 @@ public class CSVFileStore extends GoodwillStore
         // Seek etc. Painful here
         return false;
     }
+
+    /**
+     * Delete a type
+     *
+     * @param schema GoodwillSchema to delete
+     * @return true is success, false otherwise
+     */
+    @Override
+    public boolean deleteType(GoodwillSchema schema)
+    {
+        return false;
+    }
 }
