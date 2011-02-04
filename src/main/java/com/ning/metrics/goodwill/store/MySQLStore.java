@@ -53,6 +53,11 @@ public class MySQLStore extends GoodwillStore
 
     private Connection connection;
     private final String tableName;
+    private final String DBHost;
+    private final int DBPort;
+    private final String DBName;
+    private final String DBUsername;
+    private final String DBPassword;
 
     @Inject
     public MySQLStore(
@@ -72,14 +77,25 @@ public class MySQLStore extends GoodwillStore
     ) throws SQLException, IOException, ClassNotFoundException
     {
         tableName = DBTableName;
-        connectToMySQL(DBHost, DBPort, DBName, DBUsername, DBPassword);
+        this.DBHost = DBHost;
+        this.DBPort = DBPort;
+        this.DBName = DBName;
+        this.DBUsername = DBUsername;
+        this.DBPassword = DBPassword;
+
+        connectToMySQL();
         buildGoodwillSchemaList();
     }
 
     @Override
     public Collection<GoodwillSchema> getTypes() throws IOException
     {
-        buildGoodwillSchemaList();
+        try {
+            buildGoodwillSchemaList();
+        }
+        catch (SQLException e) {
+            throw new IOException(e);
+        }
 
         final ArrayList<GoodwillSchema> thriftTypesList = new ArrayList(goodwillSchemata.values());
         Collections.sort(thriftTypesList, new Comparator<GoodwillSchema>()
@@ -203,7 +219,7 @@ public class MySQLStore extends GoodwillStore
         }
     }
 
-    private void buildGoodwillSchemaList() throws IOException
+    private void buildGoodwillSchemaList() throws IOException, SQLException
     {
         HashMap<String, GoodwillSchema> schemata = new HashMap<String, GoodwillSchema>();
         GoodwillSchema currentThriftType = null;
@@ -258,7 +274,9 @@ public class MySQLStore extends GoodwillStore
 
         }
         catch (SQLException e) {
-            throw new IOException(e);
+            log.warn(String.format("Connection throwed [%s], trying to reconnect", e.getLocalizedMessage()));
+            tryToReconnect(e);
+            log.info("And we're back!");
         }
 
         this.goodwillSchemata = schemata;
@@ -304,10 +322,24 @@ public class MySQLStore extends GoodwillStore
         statement.addBatch();
     }
 
-    private void connectToMySQL(String host, int port, String db, String username, String password) throws SQLException, ClassNotFoundException
+    private void tryToReconnect(SQLException e) throws IllegalStateException, SQLException
+    {
+        try {
+            close();
+            connectToMySQL();
+        }
+        catch (SQLException originalException) {
+            throw new SQLException("Unable to reconnect to MySQL", originalException);
+        }
+        catch (ClassNotFoundException uh) {
+            throw new IllegalStateException("We shouldn't get here", uh);
+        }
+    }
+
+    private void connectToMySQL() throws SQLException, ClassNotFoundException
     {
         Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s", host, port, db), username, password);
+        connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s", DBHost, DBPort, DBName), DBUsername, DBPassword);
         connection.setAutoCommit(false);
     }
 
