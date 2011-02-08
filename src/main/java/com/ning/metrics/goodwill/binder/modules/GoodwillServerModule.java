@@ -22,6 +22,8 @@ import com.google.inject.Module;
 import com.google.inject.servlet.ServletModule;
 import com.google.inject.util.Providers;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.dao.DAOBoneCPAccess;
+import com.ning.metrics.goodwill.dao.DAOAccess;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
 import com.ning.metrics.goodwill.sink.NetezzaSink;
 import com.ning.metrics.goodwill.store.CSVFileStore;
@@ -44,13 +46,13 @@ public class GoodwillServerModule extends ServletModule
             @Override
             public void configure(Binder binder)
             {
-
                 GoodwillConfig config = new ConfigurationObjectFactory(System.getProperties()).build(GoodwillConfig.class);
                 binder.bind(GoodwillConfig.class).toInstance(config);
 
                 final String storeType = config.getStoreType();
                 if (storeType.equals("mysql")) {
                     // Fail early if we can't connect to MySQL
+                    binder.bind(DAOAccess.class).to(DAOBoneCPAccess.class).asEagerSingleton();
                     binder.bind(GoodwillStore.class).to(MySQLStore.class).asEagerSingleton();
                     log.info("Enabled MySQL store");
                 }

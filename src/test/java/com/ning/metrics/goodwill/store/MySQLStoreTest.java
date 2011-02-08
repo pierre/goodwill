@@ -18,6 +18,7 @@ package com.ning.metrics.goodwill.store;
 
 import com.ning.metrics.goodwill.access.GoodwillSchema;
 import com.ning.metrics.goodwill.access.GoodwillSchemaField;
+import com.ning.metrics.goodwill.dao.DAOBoneCPAccess;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -46,6 +47,8 @@ import java.util.Collection;
 public class MySQLStoreTest
 {
     private MySQLStore store;
+    private DAOBoneCPAccess access;
+
     private static final String TYPE2_NAME = "Indiana Jones and the Last Crusade";
     private GoodwillSchema type1;
     private GoodwillSchema type2;
@@ -54,7 +57,8 @@ public class MySQLStoreTest
     @BeforeTest(alwaysRun = false, enabled = false)
     public void setUp() throws SQLException, IOException, ClassNotFoundException
     {
-        store = new MySQLStore("localhost", 3306, "goodwill", "root", "", "thrift_types_tests");
+        access = new DAOBoneCPAccess("localhost", 3306, "goodwill", "root", "");
+        store = new MySQLStore("thrift_types_tests", access);
 
         type1 = new GoodwillSchema(TYPE1_NAME, new ArrayList<GoodwillSchemaField>());
         type1.addThriftField(new GoodwillSchemaField("chair", "i32", (short) 0, null, null, null, null, null));
@@ -76,7 +80,6 @@ public class MySQLStoreTest
     @AfterTest(alwaysRun = false, enabled = false)
     public void tearDown() throws SQLException
     {
-        store.close();
     }
 
     @Test(enabled = false)

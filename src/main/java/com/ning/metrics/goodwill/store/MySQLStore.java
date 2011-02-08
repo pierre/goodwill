@@ -20,11 +20,11 @@ import com.google.inject.Inject;
 import com.ning.metrics.goodwill.access.GoodwillSchema;
 import com.ning.metrics.goodwill.access.GoodwillSchemaField;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
+import com.ning.metrics.goodwill.dao.DAOAccess;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,6 +35,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+
+import static com.ning.metrics.goodwill.dao.DAOUtil.close;
 
 public class MySQLStore extends GoodwillStore
 {
@@ -51,51 +53,33 @@ public class MySQLStore extends GoodwillStore
             "sql_scale = ?, " +
             "description = ?";
 
-    private Connection connection;
     private final String tableName;
-    private final String DBHost;
-    private final int DBPort;
-    private final String DBName;
-    private final String DBUsername;
-    private final String DBPassword;
+    private final DAOAccess access;
 
     @Inject
     public MySQLStore(
-        GoodwillConfig config
-    ) throws SQLException, IOException, ClassNotFoundException
+        GoodwillConfig config,
+        DAOAccess access
+    ) throws IOException
     {
-        this(config.getStoreDBHost(), config.getStoreDBPort(), config.getStoreDBName(), config.getStoreDBUsername(), config.getStoreDBPassword(), config.getStoreDBThriftTableName());
+        this(config.getStoreDBThriftTableName(), access);
     }
 
     public MySQLStore(
-        String DBHost,
-        int DBPort,
-        String DBName,
-        String DBUsername,
-        String DBPassword,
-        String DBTableName
-    ) throws SQLException, IOException, ClassNotFoundException
+        String DBTableName,
+        DAOAccess access
+    ) throws IOException
     {
         tableName = DBTableName;
-        this.DBHost = DBHost;
-        this.DBPort = DBPort;
-        this.DBName = DBName;
-        this.DBUsername = DBUsername;
-        this.DBPassword = DBPassword;
+        this.access = access;
 
-        connectToMySQL();
         buildGoodwillSchemaList();
     }
 
     @Override
     public Collection<GoodwillSchema> getTypes() throws IOException
     {
-        try {
-            buildGoodwillSchemaList();
-        }
-        catch (SQLException e) {
-            throw new IOException(e);
-        }
+        buildGoodwillSchemaList();
 
         final ArrayList<GoodwillSchema> thriftTypesList = new ArrayList(goodwillSchemata.values());
         Collections.sort(thriftTypesList, new Comparator<GoodwillSchema>()
@@ -140,15 +124,22 @@ public class MySQLStore extends GoodwillStore
     @Override
     public boolean updateType(GoodwillSchema schema)
     {
+        Connection connection = null;
+        Statement select = null;
+        PreparedStatement inserts = null;
+        PreparedStatement updates = null;
+        ResultSet result = null;
+
         try {
-            Statement select = connection.createStatement();
-            PreparedStatement inserts = connection.prepareStatement(String.format("INSERT INTO %s SET %s", tableName, TABLE_STRING_DESCRIPTOR));
-            PreparedStatement updates = connection.prepareStatement(String.format("UPDATE %s SET %s WHERE id = ?", tableName, TABLE_STRING_DESCRIPTOR));
+            connection = getConnection();
+            select = connection.createStatement();
+            inserts = connection.prepareStatement(sqlInsertField());
+            updates = connection.prepareStatement(sqlUpdateField());
 
             // Update all fields
             for (GoodwillSchemaField field : schema.getSchema()) {
                 // There needs to be a UNIQUE constraint on (event_type, field_id)
-                ResultSet result = select.executeQuery(String.format("SELECT id FROM %s WHERE event_type = '%s' AND field_id = %d LIMIT 1", tableName, schema.getName(), field.getId()));
+                result = select.executeQuery(sqlSelectFieldId(schema, field));
                 boolean seen = false;
 
                 while (result.next()) {
@@ -179,6 +170,11 @@ public class MySQLStore extends GoodwillStore
             log.error(String.format("Unable to modify type [%s]: %s", schema, e));
             return false;
         }
+        finally {
+            close(inserts);
+            close(updates);
+            close(connection, select, result);
+        }
 
         return true;
     }
@@ -192,9 +188,12 @@ public class MySQLStore extends GoodwillStore
     @Override
     public boolean deleteType(GoodwillSchema schema)
     {
+        Connection connection = null;
+        PreparedStatement delete = null;
+
         try {
-            String deleteStatement = String.format("DELETE FROM %s WHERE event_type = ?", tableName);
-            PreparedStatement delete = connection.prepareStatement(deleteStatement);
+            connection = getConnection();
+            delete = connection.prepareStatement(sqlDeleteSchema());
             delete.setString(1, schema.getName());
             delete.addBatch();
 
@@ -217,16 +216,25 @@ public class MySQLStore extends GoodwillStore
             log.error(String.format("Unable to delete type [%s]: %s", schema.getName(), e));
             return false;
         }
+        finally {
+            close(connection, delete);
+        }
     }
 
-    private void buildGoodwillSchemaList() throws IOException, SQLException
+
+    private void buildGoodwillSchemaList() throws IOException
     {
         HashMap<String, GoodwillSchema> schemata = new HashMap<String, GoodwillSchema>();
         GoodwillSchema currentThriftType = null;
         String currentThriftTypeName = null;
+
+        Connection connection = null;
+        Statement select = null;
+        ResultSet result = null;
         try {
-            Statement select = connection.createStatement();
-            ResultSet result = select.executeQuery(String.format("SELECT event_type, field_name, field_type, field_id, description, sql_type, sql_length, sql_scale, sql_precision FROM %s ORDER BY field_id ASC", tableName));
+            connection = getConnection();
+            select = connection.createStatement();
+            result = select.executeQuery(sqlSelectSchema());
 
             while (result.next()) {
                 String thriftType = result.getString(1);
@@ -274,9 +282,10 @@ public class MySQLStore extends GoodwillStore
 
         }
         catch (SQLException e) {
-            log.warn(String.format("Connection throwed [%s], trying to reconnect", e.getLocalizedMessage()));
-            tryToReconnect(e);
-            log.info("And we're back!");
+            log.warn(String.format("Unable to retrieve schemata: %s", e.getLocalizedMessage()));
+        }
+        finally {
+            close(connection, select, result);
         }
 
         this.goodwillSchemata = schemata;
@@ -322,29 +331,60 @@ public class MySQLStore extends GoodwillStore
         statement.addBatch();
     }
 
-    private void tryToReconnect(SQLException e) throws IllegalStateException, SQLException
+    /**
+     * Get the select statement to find the row id for a field
+     *
+     * @param schema Schema the field belongs to
+     * @param field  The field to look up
+     * @return The select SQL statement
+     */
+    private String sqlSelectFieldId(GoodwillSchema schema, GoodwillSchemaField field)
     {
-        try {
-            close();
-            connectToMySQL();
-        }
-        catch (SQLException originalException) {
-            throw new SQLException("Unable to reconnect to MySQL", originalException);
-        }
-        catch (ClassNotFoundException uh) {
-            throw new IllegalStateException("We shouldn't get here", uh);
-        }
+        return String.format("SELECT id FROM %s WHERE event_type = '%s' AND field_id = %d LIMIT 1", tableName, schema.getName(), field.getId());
     }
 
-    private void connectToMySQL() throws SQLException, ClassNotFoundException
+    /**
+     * Get the select statement to retrieve a full schema
+     *
+     * @return The select SQL statement
+     */
+    private String sqlSelectSchema()
     {
-        Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s", DBHost, DBPort, DBName), DBUsername, DBPassword);
-        connection.setAutoCommit(false);
+        return String.format("SELECT event_type, field_name, field_type, field_id, description, sql_type, sql_length, sql_scale, sql_precision FROM %s ORDER BY field_id ASC", tableName);
     }
 
-    public void close() throws SQLException
+    /**
+     * Get the update statement for a specific field
+     *
+     * @return The update SQL statement
+     */
+    private String sqlUpdateField()
     {
-        connection.close();
+        return String.format("UPDATE %s SET %s WHERE id = ?", tableName, TABLE_STRING_DESCRIPTOR);
+    }
+
+    /**
+     * Get the insert statement to add a field
+     *
+     * @return The insert SQL statement
+     */
+    private String sqlInsertField()
+    {
+        return String.format("INSERT INTO %s SET %s", tableName, TABLE_STRING_DESCRIPTOR);
+    }
+
+    /**
+     * Get the delete statement to remove a schema (all fields for the schema)
+     *
+     * @return The delete SQL statement
+     */
+    private String sqlDeleteSchema()
+    {
+        return String.format("DELETE FROM %s WHERE event_type = ?", tableName);
+    }
+
+    private Connection getConnection() throws SQLException
+    {
+        return access.getDataSource().getConnection();
     }
 }
