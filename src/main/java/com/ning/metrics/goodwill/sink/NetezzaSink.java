@@ -10,7 +10,6 @@ import org.netezza.datasource.NzDatasource;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -18,43 +17,14 @@ public class NetezzaSink implements GoodwillSink
 {
     private final Logger log = Logger.getLogger(NetezzaSink.class);
 
-    private Connection connection;
-    private final String extraSQL;
-    private final String tableNameFormat;
-    private final String DBHost;
-    private final int DBPort;
-    private final String DBName;
-    private final String DBUsername;
-    private final String DBPassword;
+    private final GoodwillConfig config;
 
     @Inject
     public NetezzaSink(
         GoodwillConfig config
     )
     {
-        this(config.getSinkDBHost(), config.getSinkDBPort(), config.getSinkDBName(), config.getSinkDBUsername(), config.getSinkDBPassword(),
-            config.getSinkExtraSQL(), config.getSinkDBTableNameFormat());
-    }
-
-    public NetezzaSink(
-        String DBHost,
-        int DBPort,
-        String DBName,
-        String DBUsername,
-        String DBPassword,
-        String extraSQL,
-        String tableNameFormat
-    )
-    {
-        this.DBHost = DBHost;
-        this.DBPort = DBPort;
-        this.DBName = DBName;
-        this.DBUsername = DBUsername;
-        this.DBPassword = DBPassword;
-
-        // TODO: hack. Maven escapes strangely parameters on the command line, replace manually \* with *.
-        this.extraSQL = StringUtils.replace(extraSQL, "\\*", "*");
-        this.tableNameFormat = tableNameFormat;
+        this.config = config;
     }
 
     /**
@@ -69,42 +39,74 @@ public class NetezzaSink implements GoodwillSink
     public boolean addType(GoodwillSchema schema)
         throws SQLException, IOException, ClassNotFoundException
     {
-        connectToNetezza(DBHost, DBPort, DBName, DBUsername, DBPassword);
-
-        String createTableStatement = getCreateTableStatement(schema);
+        boolean success = false;
 
         try {
+            Connection connection = connectToNetezza(config.getSinkDBFirstHost(), config.getSinkDBFirstPort(), config.getSinkDBFirstSchema(),
+                config.getSinkDBFirstUsername(), config.getSinkDBFirstPassword());
+
+            String createTableStatement = getCreateTableStatement(schema);
             Statement statement = connection.createStatement();
             statement.addBatch(createTableStatement);
 
-            PreparedStatement extraStatement = null;
-            if (extraSQL != null) {
-                // TODO: hack. We do a manual replacement first because escaping can do strange things. More thoughts needed here.
-                extraStatement = connection.prepareStatement(StringUtils.replace(extraSQL, "?", getTableName(schema)));
-//                int i = 1;
-//                while (i <= extraStatement.getParameterMetaData().getParameterCount()) {
-//                    extraStatement.setString(i, schema.getName());
-//                    i++;
-//                }
-                extraStatement.addBatch();
-            }
-
-            // We need to commit in two stages unfortunately, because the free-form SQL snippet may refer to the table in the first
-            // statement (e.g. to create a view).
-            log.info(String.format("Adding Thrift to Netezza: %s", statement.executeBatch().toString()));
+            statement.executeBatch();
+            log.info(String.format("Added Thrift to Netezza: %s", schema.getName()));
             connection.commit();
 
-            if (extraStatement != null) {
-                log.info(String.format("Running extra SQL in Netezza: %s", extraStatement.executeBatch().toString()));
-                connection.commit();
+            connection.close();
+            success = true;
+
+            if (config.getSinkFirstExtraSQL() != null) {
+                success = executeExtraSql(config.getSinkDBFirstHost(), config.getSinkDBFirstPort(), config.getSinkDBFirstSchema(),
+                    config.getSinkDBFirstUsername(), config.getSinkDBFirstPassword(), config.getSinkFirstExtraSQL(), schema);
+
+                if (success && config.getSinkSecondExtraSQL() != null) {
+                    success = executeExtraSql(config.getSinkDBSecondHost(), config.getSinkDBSecondPort(), config.getSinkDBSecondSchema(),
+                        config.getSinkDBSecondUsername(), config.getSinkDBSecondPassword(), config.getSinkSecondExtraSQL(), schema);
+                }
             }
 
-            return true;
+            return success;
         }
         catch (SQLException e) {
             log.warn(String.format("Unable to add Type to Netezza: %s", e));
+            return success;
+        }
+    }
+
+    private boolean executeExtraSql(String host, int port, String database, String username,
+                                    String password, String statement, GoodwillSchema schema)
+    {
+        try {
+            Connection connection = connectToNetezza(host, port, database, username, password);
+
+            String safeSQL = getUnescapedStatement(statement, schema);
+
+            log.info(String.format("Running extra SQL in Netezza: %s", safeSQL));
+            Statement extraStatement = connection.createStatement();
+            extraStatement.execute(safeSQL);
+            connection.commit();
+
+            connection.close();
+            return true;
+        }
+        catch (SQLException e) {
+            log.warn(String.format("Unable to run extra SQL in Netezza: %s", e));
             return false;
         }
+        catch (ClassNotFoundException e) {
+            log.warn(String.format("Unable to run extra SQL in Netezza: %s", e));
+            return false;
+        }
+    }
+
+    private String getUnescapedStatement(String statement, GoodwillSchema schema)
+    {
+        // TODO: hack. We do a manual replacement first because escaping can do strange things. More thoughts needed here.
+        // TODO: hack. Maven escapes strangely parameters on the command line, replace manually \* with *.
+        String safeSQL = StringUtils.replace(statement, "\\*", "*");
+        safeSQL = StringUtils.replace(safeSQL, "?", getTableName(schema));
+        return safeSQL;
     }
 
     private String getCreateTableStatement(GoodwillSchema schema)
@@ -123,7 +125,7 @@ public class NetezzaSink implements GoodwillSink
 
     private String getTableName(GoodwillSchema schema)
     {
-        return String.format(tableNameFormat, sanitizeThriftName(schema.getName()));
+        return String.format(config.getSinkDBTableNameFormat(), sanitizeThriftName(schema.getName()));
     }
 
     private String sanitizeThriftName(String name)
@@ -156,21 +158,18 @@ public class NetezzaSink implements GoodwillSink
     {
         String info = String.format("%s\n", getCreateTableStatement(schema));
 
-        if (extraSQL != null) {
-            info += StringUtils.replace(extraSQL, "?", getTableName(schema));
+        if (config.getSinkFirstExtraSQL() != null) {
+            info += getUnescapedStatement(config.getSinkFirstExtraSQL(), schema);
+
+            if (config.getSinkSecondExtraSQL() != null) {
+                info += getUnescapedStatement(config.getSinkSecondExtraSQL(), schema);
+            }
         }
 
         return info;
     }
 
-
-    public void close() throws SQLException
-    {
-        connection.close();
-    }
-
-
-    private void connectToNetezza(String host, int port, String db, String username, String password) throws SQLException, ClassNotFoundException
+    private Connection connectToNetezza(String host, int port, String db, String username, String password) throws SQLException, ClassNotFoundException
     {
         NzDatasource datasource = new NzDatasource();
         datasource.setHost(host);
@@ -179,7 +178,9 @@ public class NetezzaSink implements GoodwillSink
         datasource.setUser(username);
         datasource.setPassword(password);
 
-        connection = datasource.getConnection();
+        Connection connection = datasource.getConnection();
         connection.setAutoCommit(false);
+
+        return connection;
     }
 }
