@@ -220,7 +220,7 @@ r.actions = {
         $("#title #name")
                 .html($("<a>")
                 .attr("target", "_blank")
-                .attr("href", ("http://action.ninginc.com:8080/rest/1.0/hdfs?dir=/events/ning/" + eventType))
+                .attr("href", (actionCoreURL + eventType))
                 .text("HDFS"));
 
         r.events();
