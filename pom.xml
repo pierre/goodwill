@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
@@ -32,7 +33,7 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.5</version>
+            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -57,7 +58,7 @@
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.goodwill-access</artifactId>
-            <version>0.0.10</version>
+            <version>0.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.collections</groupId>
@@ -68,7 +69,7 @@
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>metrics.serialization-common</artifactId>
-            <version>1.0.6</version>
+            <version>2.0.0-pre6</version>
         </dependency>
         <!-- Viewable body writer -->
         <dependency>
@@ -89,7 +90,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
+            <version>1.2.16</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -105,7 +106,7 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.6.2</version>
+            <version>1.8.1</version>
         </dependency>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
@@ -122,30 +123,29 @@
         <dependency>
             <groupId>org.skife.config</groupId>
             <artifactId>config-magic</artifactId>
-            <version>0.5</version>
+            <version>0.8</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>1.5.6</version>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.6</version>
+            <version>1.6.1</version>
             <scope>runtime</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>5.11</version>
-            <classifier>jdk15</classifier>
+            <version>6.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -231,7 +231,8 @@
                                 <!-- must use shade and not assembly plugin for proper META-INF/services handling -->
                                 <!-- otherwise com.sun.jersey.core.impl.provider.entity.StringProvider doesn't get found -->
                                 <!-- since both jersey-server and jersey-core contain META-INF/services/javax.ws.ext.MessageBodyWriter -->
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                             <createSourcesJar>true</createSourcesJar>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
