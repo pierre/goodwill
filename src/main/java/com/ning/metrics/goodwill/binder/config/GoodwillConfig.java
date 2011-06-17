@@ -17,80 +17,58 @@
 package com.ning.metrics.goodwill.binder.config;
 
 import org.skife.config.Config;
+import org.skife.config.Default;
+import org.skife.config.DefaultNull;
 
-public class GoodwillConfig
+public interface GoodwillConfig
 {
     @Config(value = "goodwill.store.type")
-    public String getStoreType()
-    {
-        return "mysql";
-    }
+    @Default("mysql")
+    public String getStoreType();
 
     @Config(value = "goodwill.store.csv.file.path")
-    public String getCSVFilePath()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getCSVFilePath();
 
     @Config(value = "goodwill.store.db.host")
-    public String getStoreDBHost()
-    {
-        return "localhost";
-    }
+    @Default("localhost")
+    public String getStoreDBHost();
 
     @Config(value = "goodwill.store.db.port")
-    public int getStoreDBPort()
-    {
-        return 3306;
-    }
+    @Default("3306")
+    public int getStoreDBPort();
 
     @Config(value = "goodwill.store.db.name")
-    public String getStoreDBName()
-    {
-        return "goodwill";
-    }
+    @Default("goodwill")
+    public String getStoreDBName();
 
     @Config(value = "goodwill.store.db.user")
-    public String getStoreDBUsername()
-    {
-        return "root";
-    }
+    @Default("root")
+    public String getStoreDBUsername();
 
     @Config(value = "goodwill.store.db.password")
-    public String getStoreDBPassword()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getStoreDBPassword();
 
     @Config(value = "goodwill.store.db.thrift_table.name")
-    public String getStoreDBThriftTableName()
-    {
-        return "thrift_types";
-    }
+    @Default("thrift_types")
+    public String getStoreDBThriftTableName();
 
     @Config(value = "goodwill.sink.type")
-    public String getSinkType()
-    {
-        return null;
-    }
+    @DefaultNull
+    public String getSinkType();
 
     @Config(value = "goodwill.sink.db.table_name_format")
-    public String getSinkDBTableNameFormat()
-    {
-        return "xe_%s";
-    }
+    @Default("xe_%s")
+    public String getSinkDBTableNameFormat();
 
     @Config(value = "goodwill.sink.db.first.host")
-    public String getSinkDBFirstHost()
-    {
-        return "localhost";
-    }
+    @Default("localhost")
+    public String getSinkDBFirstHost();
 
     @Config(value = "goodwill.sink.db.first.port")
-    public int getSinkDBFirstPort()
-    {
-        return 3306;
-    }
+    @Default("3306")
+    public int getSinkDBFirstPort();
 
     /**
      * First schema to run statements in (where the table is created)
@@ -98,22 +76,16 @@ public class GoodwillConfig
      * @return schema where to create the table
      */
     @Config(value = "goodwill.sink.db.first.schema")
-    public String getSinkDBFirstSchema()
-    {
-        return "goodwill_sink";
-    }
+    @Default("goodwill_sink")
+    public String getSinkDBFirstSchema();
 
     @Config(value = "goodwill.sink.db.first.user")
-    public String getSinkDBFirstUsername()
-    {
-        return "root";
-    }
+    @Default("root")
+    public String getSinkDBFirstUsername();
 
     @Config(value = "goodwill.sink.db.first.password")
-    public String getSinkDBFirstPassword()
-    {
-        return "";
-    }
+    @DefaultNull
+    public String getSinkDBFirstPassword();
 
     /**
      * To create a stage table for instance:
@@ -123,22 +95,16 @@ public class GoodwillConfig
      * @return extra SQL to run in the schema where the table is created
      */
     @Config(value = "goodwill.sink.db.first.extra_sql")
-    public String getSinkFirstExtraSQL()
-    {
-        return null;
-    }
+    @DefaultNull
+    public String getSinkFirstExtraSQL();
 
-    @Config(value = "goodwill.sink.db.first.host")
-    public String getSinkDBSecondHost()
-    {
-        return getSinkDBFirstHost();
-    }
+    @Config(value = "goodwill.sink.db.second.host")
+    @Default("localhost")
+    public String getSinkDBSecondHost();
 
-    @Config(value = "goodwill.sink.db.first.port")
-    public int getSinkDBSecondPort()
-    {
-        return getSinkDBFirstPort();
-    }
+    @Config(value = "goodwill.sink.db.second.port")
+    @Default("3306")
+    public int getSinkDBSecondPort();
 
     /**
      * Optionally, Goodwill can run statements in another schema (database). This can be useful when cross database access
@@ -147,42 +113,30 @@ public class GoodwillConfig
      * @return Second schema to run statements in
      */
     @Config(value = "goodwill.sink.db.second.schema")
-    public String getSinkDBSecondSchema()
-    {
-        return getSinkDBFirstSchema();
-    }
+    @Default("goodwill_sink")
+    public String getSinkDBSecondSchema();
 
     @Config(value = "goodwill.sink.db.second.user")
-    public String getSinkDBSecondUsername()
-    {
-        return getSinkDBFirstUsername();
-    }
+    @Default("root")
+    public String getSinkDBSecondUsername();
 
     @Config(value = "goodwill.sink.db.second.password")
-    public String getSinkDBSecondPassword()
-    {
-        return getSinkDBFirstPassword();
-    }
+    @DefaultNull
+    public String getSinkDBSecondPassword();
 
     @Config(value = "goodwill.sink.db.second.extra_sql")
-    public String getSinkSecondExtraSQL()
-    {
-        return null;
-    }
+    @DefaultNull
+    public String getSinkSecondExtraSQL();
 
     @Config(value = "goodwill.action.url")
-    public String getActionCoreURL()
-    {
-        return null;
-    }
+    @DefaultNull
+    public String getActionCoreURL();
 
     // Whether the DELETE API is allowed.
     // In general, you don't want to enable it in production as you won't be able to read data in HDFS associated
     // to deleted events via the goodwill-access library
 
     @Config(value = "goodwill.api.delete")
-    public boolean allowDeleteEvent()
-    {
-        return false;
-    }
+    @Default("false")
+    public boolean allowDeleteEvent();
 }

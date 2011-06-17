@@ -44,9 +44,9 @@ public class GoodwillServerModule extends ServletModule
         install(new Module()
         {
             @Override
-            public void configure(Binder binder)
+            public void configure(final Binder binder)
             {
-                GoodwillConfig config = new ConfigurationObjectFactory(System.getProperties()).build(GoodwillConfig.class);
+                final GoodwillConfig config = new ConfigurationObjectFactory(System.getProperties()).build(GoodwillConfig.class);
                 binder.bind(GoodwillConfig.class).toInstance(config);
 
                 final String storeType = config.getStoreType();
