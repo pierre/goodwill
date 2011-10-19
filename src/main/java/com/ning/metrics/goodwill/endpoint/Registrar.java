@@ -17,7 +17,6 @@
 package com.ning.metrics.goodwill.endpoint;
 
 import com.google.inject.Inject;
-import com.google.inject.internal.Nullable;
 import com.ning.metrics.goodwill.access.GoodwillSchema;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import com.ning.metrics.goodwill.modules.ThriftRegistrar;
@@ -26,6 +25,7 @@ import com.ning.metrics.goodwill.store.GoodwillStore;
 import com.sun.jersey.api.view.Viewable;
 import org.apache.log4j.Logger;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;

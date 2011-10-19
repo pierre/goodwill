@@ -1,12 +1,12 @@
 package com.ning.metrics.goodwill.endpoint;
 
 import com.google.inject.Inject;
-import com.google.inject.internal.Nullable;
 import com.ning.metrics.goodwill.access.GoodwillSchema;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
 import com.ning.metrics.goodwill.store.GoodwillStore;
 import org.apache.log4j.Logger;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
