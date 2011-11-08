@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>goodwill - Checkstyle report</title>
+    <link>http://github.com/pierre/goodwill</link>
+    <description>goodwill - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2010 - 2011 Ning, Inc.</copyright>
+    <item>
+      <title>File: 16,
+             Errors: 1022,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://github.com/pierre/goodwill/checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://github.com/pierre/goodwill/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.sink.NetezzaSink.java">com/ning/metrics/goodwill/sink/NetezzaSink.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  150
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.dao.DAOBoneCPAccess.java">com/ning/metrics/goodwill/dao/DAOBoneCPAccess.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  46
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.modules.ThriftRegistrar.java">com/ning/metrics/goodwill/modules/ThriftRegistrar.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  39
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.endpoint.Registrar.java">com/ning/metrics/goodwill/endpoint/Registrar.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  103
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.store.GoodwillStore.java">com/ning/metrics/goodwill/store/GoodwillStore.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  52
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.binder.modules.GoodwillServicesModule.java">com/ning/metrics/goodwill/binder/modules/GoodwillServicesModule.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  13
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.binder.listeners.GoodwillGuiceListener.java">com/ning/metrics/goodwill/binder/listeners/GoodwillGuiceListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  15
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.dao.DAOAccess.java">com/ning/metrics/goodwill/dao/DAOAccess.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  9
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.binder.config.GoodwillConfig.java">com/ning/metrics/goodwill/binder/config/GoodwillConfig.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  101
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.binder.modules.GoodwillSinkProvider.java">com/ning/metrics/goodwill/binder/modules/GoodwillSinkProvider.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  26
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.binder.modules.GoodwillStoreProvider.java">com/ning/metrics/goodwill/binder/modules/GoodwillStoreProvider.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  30
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.sink.GoodwillSink.java">com/ning/metrics/goodwill/sink/GoodwillSink.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  19
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.store.CSVFileStore.java">com/ning/metrics/goodwill/store/CSVFileStore.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  83
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.dao.DAOUtil.java">com/ning/metrics/goodwill/dao/DAOUtil.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  52
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.endpoint.Sink.java">com/ning/metrics/goodwill/endpoint/Sink.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  38
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/pierre/goodwill/checkstyle.html#com.ning.metrics.goodwill.store.MySQLStore.java">com/ning/metrics/goodwill/store/MySQLStore.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  246
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+
