@@ -18,7 +18,6 @@ package com.ning.metrics.goodwill.binder.modules;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.ning.jetty.utils.log4j.Log4JMBean;
 import com.ning.metrics.goodwill.sink.GoodwillSink;
 import com.ning.metrics.goodwill.store.GoodwillStore;
 
@@ -27,8 +26,6 @@ public class GoodwillServicesModule implements Module
     @Override
     public void configure(final Binder binder)
     {
-        binder.bind(Log4JMBean.class).asEagerSingleton();
-
         binder.bind(GoodwillSink.class).toProvider(GoodwillSinkProvider.class).asEagerSingleton();
         binder.bind(GoodwillStore.class).toProvider(GoodwillStoreProvider.class).asEagerSingleton();
     }

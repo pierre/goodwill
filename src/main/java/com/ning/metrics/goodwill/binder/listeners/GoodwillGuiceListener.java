@@ -2,8 +2,6 @@ package com.ning.metrics.goodwill.binder.listeners;
 
 import com.ning.jetty.base.modules.ServerModuleBuilder;
 import com.ning.jetty.core.listeners.SetupServer;
-import com.ning.jetty.utils.healthchecks.DBIHealthCheck;
-import com.ning.jetty.utils.log4j.Log4JMBean;
 import com.ning.metrics.goodwill.binder.config.GoodwillConfig;
 import com.ning.metrics.goodwill.binder.modules.GoodwillServicesModule;
 
@@ -16,7 +14,7 @@ public class GoodwillGuiceListener extends SetupServer
     {
         final ServerModuleBuilder builder = new ServerModuleBuilder()
             .addConfig(GoodwillConfig.class)
-            .addJMXExport(Log4JMBean.class)
+            .enableLog4J()
             .setAreciboProfile(System.getProperty("action.arecibo.profile", "ning.jmx:name=MonitoringProfile"))
             .addModule(new GoodwillServicesModule())
             .addResource("com.ning.metrics.goodwill.endpoint");

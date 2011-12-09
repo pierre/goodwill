@@ -137,12 +137,15 @@ public class Registrar
 
     @POST
     @Consumes("application/json")
-    public Response post(
-        String jsonThriftTypeString
-    )
+    public Response post(String jsonThriftTypeString)
     {
         try {
             GoodwillSchema schema = GoodwillSchema.decode(jsonThriftTypeString);
+            // Use PUT to update a Schema
+            if (store.findByName(schema.getName()) != null) {
+                return Response.status(Response.Status.CONFLICT).build();
+            }
+
             store.addType(schema);
             log.info(String.format("Created new ThriftType <%s> from JSON <%s>", schema.toString(), jsonThriftTypeString));
         }
@@ -156,9 +159,7 @@ public class Registrar
 
     @PUT
     @Consumes("application/json")
-    public Response put(
-        String jsonThriftTypeString
-    )
+    public Response put(String jsonThriftTypeString)
     {
         try {
             GoodwillSchema thriftType = GoodwillSchema.decode(jsonThriftTypeString);
