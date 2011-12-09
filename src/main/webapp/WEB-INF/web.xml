@@ -17,11 +17,11 @@
   -->
 
 <web-app
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="http://java.sun.com/xml/ns/javaee"
-        xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-        version="2.5">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
     <display-name>action-core</display-name>
     <filter>
         <!-- Guice emulates Servlet API with DI -->
@@ -44,13 +44,12 @@
         <!-- Context listener: called at startup time and creates the injector -->
         <listener-class>com.ning.metrics.goodwill.binder.listeners.GoodwillGuiceListener</listener-class>
     </listener>
-    <!-- ServletHandler#handle requires a backend servlet, it won't be used though (handled by Guice) -->
     <servlet>
-        <servlet-name>log-invalid-resources</servlet-name>
-        <servlet-class>com.ning.jetty.core.servlets.LogInvalidResourcesServlet</servlet-class>
+        <servlet-name>staticServlet</servlet-name>
+        <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>log-invalid-resources</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <servlet-name>staticServlet</servlet-name>
+        <url-pattern>/static/*</url-pattern>
     </servlet-mapping>
 </web-app>

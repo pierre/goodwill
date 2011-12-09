@@ -353,27 +353,27 @@ table td .eventName {
 }
 
 .blue {
-    background: url('../images/blue2.png') no-repeat;
+    background: url('/static/images/blue2.png') no-repeat;
 }
 
 .blue:hover {
-    background: url('../images/blue.png') no-repeat;
+    background: url('/static/images/blue.png') no-repeat;
 }
 
 .active .deprecate {
-    background: url('../images/Remove2.png') no-repeat;
+    background: url('/static/images/Remove2.png') no-repeat;
 }
 
 .active .deprecate:hover {
-    background: url('../images/Remove2-hover.png') no-repeat;
+    background: url('/static/images/Remove2-hover.png') no-repeat;
 }
 
 .deprecated .deprecate {
-    background: url('../images/blue2.png') no-repeat;
+    background: url('/static/images/blue2.png') no-repeat;
 }
 
 .deprecated .deprecate:hover {
-    background: url('../images/blue.png') no-repeat;
+    background: url('/static/images/blue.png') no-repeat;
 }
 
 /* Schema Buttons */
@@ -390,41 +390,41 @@ li#sButtons {
 #sButtons #show_schema {
     height: 20px;
     width: 20px;
-    background: url('../images/link.png');
+    background: url('/static/images/link.png');
 }
 
 #sButtons #show_schema:hover {
-    background: url("../images/link-hover.png");
+    background: url("/static/images/link-hover.png");
 }
 
 #sButtons #add {
     height: 20px;
     width: 20px;
-    background: url('../images/add.png');
+    background: url('/static/images/add.png');
 }
 
 #sButtons #add:hover {
-    background: url("../images/add-hover.png");
+    background: url("/static/images/add-hover.png");
 }
 
 .active #sButtons #deprecate {
     height: 20px;
     width: 20px;
-    background: url('../images/Remove2.png');
+    background: url('/static/images/Remove2.png');
 }
 
 .active #sButtons #deprecate:hover {
-    background: url("../images/Remove2-hover.png");
+    background: url("/static/images/Remove2-hover.png");
 }
 
 .deprecated #sButtons #deprecate {
     height: 20px;
     width: 20px;
-    background: url('../images/blue2.png');
+    background: url('/static/images/blue2.png');
 }
 
 .deprecated #sButtons #deprecate:hover {
-    background: url("../images/blue.png");
+    background: url("/static/images/blue.png");
 }
 
 /* FIXED stuff */

@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.ning</groupId>
         <artifactId>metrics.base-pom</artifactId>
-        <version>0.0.3</version>
+        <version>0.0.15</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ning</groupId>
@@ -119,8 +119,44 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency><!-- For LogLevelCounterAppender -->
+                        <groupId>com.ning.jetty</groupId>
+                        <artifactId>ning-service-skeleton-log4j</artifactId>
+                        <version>0.0.15</version>
+                        <classifier>selfcontained</classifier>
+                        <scope>runtime</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                        <version>1.6.3</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                        <version>1.6.3</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                        <version>1.2.16</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
-                    <contextPath>/</contextPath>
+                    <webAppConfig>
+                        <contextPath>/</contextPath>
+                        <defaultsDescriptor>${basedir}/src/main/jetty-config/etc/webdefault.xml</defaultsDescriptor>
+                    </webAppConfig>
+                    <systemProperties>
+                        <systemProperty>
+                            <name>log4j.configuration</name>
+                            <value>file:${basedir}/src/main/resources/log4j.xml</value>
+                        </systemProperty>
+                    </systemProperties>
+                    <reload>manual</reload>
+                    <stopKey />
+                    <stopPort />
                 </configuration>
             </plugin>
             <plugin>

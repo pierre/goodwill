@@ -33,13 +33,13 @@
         var json = <%= it.getStoreInJSON() %>;
         var actionCoreURL = "<%= it.getActionCoreURL() %>";
     </script>
-    <script type="text/javascript" src="/js/jquery-1.3.2.min.js"></script>
-    <script type="text/javascript" src="/js/layout.js"></script>
-    <script type="text/javascript" src="/js/server.js"></script>
-    <script type="text/javascript" src="/js/fields.js"></script>
-    <script type="text/javascript" src="/js/jquery-magic.js"></script>
-    <script type="text/javascript" src="/js/jquery.json-2.2.js"></script>
-    <link rel="stylesheet" href="/css/global.css" type="text/css">
+    <script type="text/javascript" src="/static/js/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="/static/js/layout.js"></script>
+    <script type="text/javascript" src="/static/js/server.js"></script>
+    <script type="text/javascript" src="/static/js/fields.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-magic.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.json-2.2.js"></script>
+    <link rel="stylesheet" href="/static/css/global.css" type="text/css">
 </head>
 <body>
 
